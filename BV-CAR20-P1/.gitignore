@@ -1,0 +1,31 @@
+# SAS Output Files
+*.xpt
+*.sas7bdat
+*.log
+*.lst
+
+# Python Cache
+__pycache__/
+*.pyc
+*.pyo
+.ipynb_checkpoints/
+
+# Data outputs (generated, not source)
+02_datasets/tabulations/*.xpt
+04_output/**/*.rtf
+04_output/**/*.pdf
+04_output/**/*.png
+
+# OS Files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Keep legacy CSV files (these are source data)
+!02_datasets/legacy/*.csv

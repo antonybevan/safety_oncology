@@ -1,0 +1,1050 @@
+Precision  BioSciences, Inc.
+Page 1 of 27 Title:  Statistical Analysis Plan (SAP) for “A Phase 1/2a, Open -label, Dose -escalation, 
+Dose -expansion, Parallel Assignment Study to Evaluate the Safety and Clinical Activity of 
+BV-CAR20 in Study Subjects  with Relapsed/Refractory (r/r) Non-Hodgkin Lymphoma 
+(NHL) or r/r Chronic Lymphocytic Leukemia (CLL) or Small Lymphocytic Lymphoma 
+(SLL) ” 
+Protocol number : BV-CAR20 -01 v5.0 10FEB2021  
+Product : BV-CAR20 
+Sponsor : BioVantage Therapeutics, Inc.  
+Effective date : March 29, 2022  
+Confidentiality statement  
+This document is confidential information of BioVantage Therapeutics, Inc. It may not be disclosed 
+to parties not associated with the clinical investigation or used for any purpose without the prior 
+written authorization of BioVantage Therapeutics, Inc.  Description:  
+The purpose of this SAP is to describe the planned analyses and outputs to be 
+included in the Clinical Study Report for Protocol BV-CAR20 -01 (version 5.0), 
+dated 10 February 2021.  
+This SAP is intended to describe the efficacy, safety analyses required for the  study.  
+This SAP will be provided to the study team members to convey the content of  
+statistical package.  NCT #NCT-XXXXX
+
+   
+    Precision  BioSciences, Inc.
+    
+ 
+ Page 2 of 27 
+ SAP Authors and Signatures  
+ 
+Author ’s Name and Functional Area : 
+Function  Name/title  
+Lead Author   BioVantage Therapeutics, Inc.  
+Contributing Author   BioVantage Therapeutics, Inc.  
+Contributing Author   BioVantage Therapeutics, Inc. 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+I give my approval for the attached SAP entitled “A Phase 1/2a, Open -label, Dose -escalation, 
+Dose -expansion, Parallel Assignment Study to Evaluate the Safety and Clinical Activity of 
+BV-CAR20 in Study Subjects with Relapsed/Refractory (r/r) Non -Hodgkin Lymphoma 
+(NHL) or r/r Chronic Lymphocytic Leukemia ( CLL) or Small Lymphocytic Lymphoma 
+(SLL)” dated  March 29, 2022.  
+ 
+SAP Approval Signatures  
+Roles  Name/title  Signature  Date  
+Lead Author   
+, PBI    
+Statistical Reviewer  , 
+PBI   
+Clinical Trial 
+Manager   
+, PBI    
+Medical Director   
+, PBI    
+Lead Programmer   
+, PharStat, Inc    
+ 
+ 
+  
+
+
+   
+    Precision  BioSciences, Inc.
+    
+ 
+ Page 3 of 27 
+ Table of Contents  
+1 SUMMARY OF KEY PROTOCOL INFORMATION  7 
+1.1 Change to the Protocol Defined Statistical Analysis Plan  7 
+1.2 Study Objectives and Endpoints  7 
+1.3 General Study Design  8 
+1.4 Statistical Hypotheses  10 
+2 SAMPLE SIZE  10 
+3 PLANNED ANALYSES  10 
+3.1 Interim Analyses and Data Monitoring  10 
+3.2 Final analysis  11 
+4 ANALYSIS POPULATIONS  11 
+4.1 Protocol Deviations  12 
+5 CONSIDERATIONS FOR DATA ANALY SES AND DATA HANDLING CONVENTIONS  12 
+5.1 Data Quality Assurance  13 
+5.2 Study Assessments Windows  13 
+5.3 Study Treatment Display Descriptors  13 
+5.4 Handling of Missing Data  13 
+5.5 Multiple Comparisons  14 
+5.6 Covariates and Subgroups Analysis  14 
+5.7 Data Derivations and Transformations  14 
+5.8 Reporting Process and Standards  15 
+6 STUDY POPULATION  15 
+6.1 Subject Disposition  15 
+6.2 Demographic and Baseline Variables  15 
+7 EFFICACY ANALYSES  16 
+7.1 Efficacy Analysis  16 
+7.1.1  Objective Response Rate (OR R) 16 
+7.1.2  Progression -Free Survival (PFS)  16 
+8 SAFETY ANALYSES  16 
+8.1 Extent of Exposure  17 
+8.2 Adverse Events  17 
+8.2.1  Adverse Event Summaries  17 
+8.2.2  Adverse Events of Special Interest (AESI)  18 
+9 REPORTING CONVENTIONS  18 
+10 QUALITY ASSURANCE OF STATISTICAL PROGRAMMING  18 
+11 LISTING OF TABLES, LISTINGS AND FIGURES  20 
+12 APPENDICES  24 
+12.1  Appendix A: Schedule of Activities  24 
+ 
+
+   
+    Precision  BioSciences, Inc.
+    
+ 
+ Page 4 of 27 
+ List of Abbreviations  
+ 
+Abbreviation  Definition  
+AE adverse event  
+AESI  adverse events of special interest  
+ALL  acute lymphoblastic leukemia  
+ASTCT  American Society for Transplantation and Cellular Therapy  
+B-ALL  B-cell acute lymphoblastic leukemia  
+BMA  bone marrow aspiration  
+BMI  body mass index  
+BOR  best overall response  
+CAR  chimeric antigen receptor  
+CBC  complete blood count  
+CI confidence interval  
+CLL  Chronic lymphocytic leukemia  
+CNS  Central nervous system  
+CS clinically significant  
+CR complete response  
+CRi complete response with incomplete recovery of counts  
+CRP  C-reactive protein  
+CRS  cytokine release syndrome  
+CT computed tomography  
+CTCAE  Common Terminology Criteria for Adverse Events  
+DLT  dose-limiting toxicity  
+DoR  duration of response  
+ECG  electrocardiogram  
+ECHO  echocardiogram  
+ECOG  Eastern Cooperative Oncology Group  
+eCRF  electronic case report form  
+FDA  Food and Drug Administration  
+GvHD  graft -versus -host disease  
+HIV human immunodeficiency virus  
+HLA  human leukocyte antigen  
+ICANS  immune effector cell -mediated neurotoxicity syndrome  
+
+   
+    Precision  BioSciences, Inc.
+    
+ 
+ Page 5 of 27 
+ ICF Informed consent form  
+ICH International Council for harmonization  
+ITT Intent -to-Treat  
+IV intravenous  
+kg kilogram  
+KM Kaplan -Meier  
+LTFU  long-term follow -up 
+LVEF  Left ventricular ejection fraction  
+MedDRA  Medical Dictionary for Regulatory Activities  
+mg milligram  
+MRD  minimal residual disease  
+MRI  Magnetic Resonance Imaging  
+MTD  maximum tolerated dose  
+MUGA  Multiple gated acquisition scan  
+NCCN  National Comprehensive Cancer Network  
+NCI National Cancer Institute  
+NCS  Not clinically significant  
+NHL  non-Hodgkin lymphoma  
+ORR  objective response rate  
+OS overall survival  
+PD progressive disease  
+PET positron emission tomography  
+PFS progression -free survival  
+PK pharmacokinetic(s)  
+PR partial response  
+PT Preferred Term  
+QC quality control  
+qPCR  quantitative polymerase chain reaction  
+RE Response Evaluable  
+RNA  ribonucleic acid  
+r/r relapsed/refractory  
+SAE  serious adverse event  
+SAP Statistical Analysis Plan   
+
+   
+    Precision  BioSciences, Inc.
+    
+ 
+ Page 6 of 27 
+ SD stable disease  
+SLL Small lymphocytic leukemia  
+SoA Schedule of Activities  
+SOC  System Organ Class  
+TEAE  treatment -emergent adverse event  
+TESAE  treatment -emergent serious adverse event  
+WHO  World Health Organization  
+  
+
+   
+    Precision  BioSciences, Inc.
+    
+ 
+ Page 7 of 27 
+ 1 SUMMARY OF KEY PROTOCOL INFORMATION  
+1.1 Change to the Protocol Defined Statistical Analysis Plan  
+Any changes from the originally planned statistical analysis specified in the protocol are 
+outlined in  Table 1. 
+Table 1: Change to protocol defined analysis plan 
+Protocol  Statistical Analysis Plan  Rationale for Changes  
+BV-CAR20 -01 
+v4.0 09SEP 2020 Cohort A(NHL) and Cohort B 
+(CLL/SLL) will be combined for all 
+analyses.   Protocol V4 has combined 
+the two cohorts into one 
+cohort, and dose level 3 has 
+been changed to a flat dose 
+of 480x10^6 cells.  
+BV-CAR20 -01 
+v5.0 10FEB2021  Subject enrollment will be 
+discontinued after the completion of 
+Phase 1. The study will not progress to 
+Phase 2a.  All subsequent sections in 
+the SAP apply to only Phase 1.   
+ 
+Actual dose level given in the study 
+will be used for summary table s  This study includes only 
+Phase 1 due to the project 
+not moving forward.  
+ 
+Dose level 2: 240x10^6 cells 
+were not given as dose level 
+2 dosing has been completed 
+based on protocol V4.  
+ 
+1.2 Study Objectives and Endpoints  
+The primary, secondary, and exploratory objectives and corresponding endpoints  for Phase 1  
+are listed in Table 2. Due to early study termination, only a synopsis will be generate d, and 
+exploratory endpoints will not be included.  
+Table 2: Study objectives and endpoints  
+Objective  Endpoints  
+Primary Objective  Primary Endpoints  
+Evaluate the safety and tolerability of 
+BV-CAR20 in subjects with r/r CD20+ NHL 
+including r/rCD20+ CLL/SLL and find an 
+appropriate dose to optimize safety and 
+efficacy  The identification of the maximum tolerated 
+dose (MTD) based on the incidence of dose-
+limiting toxicities (DLTs)  
+Secondary Objectives  Secondary Endpoints  
+Evaluate the clinical activity and safety 
+profile of BV-CAR20 in study subjects 
+with r/r CD20+ NHL including r/r CD20+ 
+CLL/SLL  Objective response rate (ORR)  
+• NHL: Lugano 2016 criteria  
+• CLL/SLL: International Workshop 
+on Chronic Lymphocytic Leukemia 
+(iwCLL) 2018 guidelines  
+ Progression -free survival (PFS)  
+• Defined as the duration (days) from 
+Day 0 to disease progression or 
+death  
+ Incidence of AESI, SAEs, and DLTs related 
+
+   
+    Precision  BioSciences, Inc.
+    
+ 
+ Page 8 of 27 
+ to the investigational product  
+ 
+1.3 General Study Design  
+This study is a nonrandomized, open -label, dose escalation Phase 1 study.  Essential 
+components of the study design and key features are summarized in Table 3. 
+Table 3: Overview of study design and key features  
+Design Features  Three escalating dose groups will be enrolled and treated 
+sequentially, with the possibility of a single de -escalation.  
+• Within each dose group, at least 3 and at most 6 study 
+subjects will be treated with a single dose of 
+BV-CAR20 using a standard 3  + 3 design.  
+• The starting dose of BV-CAR20 will be 1×106 CAR T 
+cells/kg body weight.  
+• In the absence of DLTs, subsequent dose groups will be 
+treated with escalating doses to a maximum flat dose of 
+480×106 CAR T cells.  
+• If a DLT is observed in 1 of 3 study subjects at a given 
+dose level, 3 additional study subjects (for a total of up 
+to 6 study subjects) will be enrolled and treated at that 
+dose level.  
+• When 3 additional study subjects are added to the dose 
+group, the dose will be inc reased to the next dose level if 
+≤1 of 6 study subjects experiences a DLT.  
+• If ≥2 of the 3 to 6 study subjects in a dose group 
+experience DLTs  then the MTD has been exceeded . The 
+dose level will then be lowered to the previous dose  and 
+up to 3 additional st udy subjects (for a total of 6) will be 
+treated at the previous (lower) dose level.  
+• See the flow chart of the dose escalation algorithm in 
+Figure 1. 
+ 
+Dosing Schedule  • Lymphodepletion (LD) chemotherapy will be 
+administered during the Screening Period from Days -5 
+to -3. 
+• All subjects will receive an intravenous (IV) 
+BV-CAR20 on Day 0 of the study.  
+• The first treated subject in each dose level (including the 
+dose de -escalation group, i.e., Dose -1) will be observed 
+for 14 days for safety before any subsequent subject 
+receives any study treatment to provide an adequate 
+safety monitoring wind ow. 
+• Once the first study subject in each dose level has 
+completed Day 14 after dosing with no DLTs, then 
+subsequent subjects can be enrolled without delays into 
+that dose level.  
+• See Figure 2 for the study design schematic.  
+
+   
+    Precision  BioSciences, Inc.
+    
+ 
+ Page 9 of 27 
+ Treatment assignment  No randomization scheme or treatment arm assignment applies.  
+Three BV-CAR20 doses are planned:  
+Dose 1: 1x10^6 cells/kg , Protocol V3  
+Dose 2: 3x10^6 cells/kg , Protocol V3  
+Dose 3: 480x10^6 cells , Protocol V4  
+ 
+All subjects will receive fludarabine 30 mg/m2/day and 
+cyclophosphamide 500 mg/m2/day from Day -5 to Day -3. 
+Blinding  Blinding of study subjects or study staff does not apply.  
+Interim /Analysis  • No formal interim analyses are planned.  
+• A Safety Monitoring Committee will review safety data 
+at regular intervals and to determine whether dose 
+escalation is appropriate  
+ 
+Figure 1: Dose escalation algorithm  
+ 
+
+
+   
+    Precision  BioSciences, Inc.
+    
+ 
+ Page 10 of 27 
+  
+Figure 2: Study schema  
+ 
+Abbreviations: ICF=informed consent form.  
+1.4 Statistical Hypotheses  
+Statistical analysis for all safety and efficacy parameters will be descriptive  in nature. 
+Categorical variables will be summarized by frequency distributions (number and 
+percentages of study subjects). Continuous variables will be summarized by mean, standard 
+deviation, median, minimum, and maximum, and time -to-event variables will be summarized 
+using Kaplan -Meier methods and figures for the estimated median time.  
+No formal statistical hypothesis testing is planned; however, if exploratory analyses are 
+conducted and confidence intervals (CIs) are provided for estimates, the 95% CIs a re 
+consistent with a 2 -sided 5%  significance level. All analyses, summaries, and listings will be 
+performed using SAS® (Cary, North Carolina) software (version 9.4 or higher).  
+2 SAMPLE SIZE  
+Subjects will be enrolled in dose groups with 3 to 6 subjects for ea ch dose. Dose escalation of 
+BV-CAR20 will follow a standard 3 + 3 design with sequential groups of 3 subjects treated 
+with incrementally higher doses of BV-CAR20 until a DLT is observed and the MTD is 
+established. Per the standard oncology 3 + 3 Phase 1 do se-escalation design, the total number 
+of subjects to be enrolled cannot be precisely determined because the sample size is 
+dependent upon the observed safety profile, which will determine the number of subjects per 
+dose group and the number of dose escala tions required to achieve the MTD. For this Phase 1  
+study , 4 dose levels (including possible de -escalation) may be tested. It is anticipated that 
+approximately 9 -30 study subjects will be required to reach the MTD.  
+3 PLANNED ANALYSES  
+3.1 Interim Analyses and Data Monitoring  
+No formal interim analyses are planned.  
+Dose escalation investigator calls consisting of the investigators, the medical monitor, and 
+sponsor representative(s) will meet regularly to review safety and efficacy data and to 
+provide safety oversight during the study. The group will review safety dat a at regular 
+intervals to discuss any unexpected significant toxicities and to determine whether dose 
+
+
+   
+    Precision  BioSciences, Inc.
+    
+ 
+ Page 11 of 27 
+ escalation is appropriate.  
+3.2 Final analysis  
+The final planned primary analyses will be performed after the completion of the following 
+sequential steps:  
+1. All subjects have completed a 28 Day Safety observation period of the study as 
+defined in the protocol.  
+2. All required database cleaning activities have been completed , and the final database 
+release and database freeze have been declared by Data Mana gement.  
+4 ANALYSIS  POPULATION S 
+The analysis populations along with their inclusion criteria are defined in Table 4.  
+Following protocol amendment V4, enrolment for CLL/SLL and NHL cohorts have been 
+combined, therefore, these two cohorts will be combined in the tables/figures and will be 
+identified in the d ata listings if needed.  
+Table 4: Analysis populations  
+Population  Definition / Criteria  Analyses 
+Evaluated  
+All Screened  • All subjects who sign the informed consent 
+form (ICF) and participate the screening 
+assessments.  
+• Note: screening failures, screened but 
+never enrolled are included in this 
+population.  • Study 
+population 
+display  
+• Screening 
+failures 
+display  
+Intent -To-Treat 
+(ITT) / Enrolled  • Includes all subjects who are eligible for 
+treatment based on inclusion and exclusion 
+criteria and enrolled into the study.  
+• Subjects will only appear once in the ITT 
+population, even if they are retreated with 
+BV-CAR20.  • Study 
+population  
+• Safety 
+displays ( vital 
+sign, ECG, 
+labs, etc.)  
+Safety  • Includes all subjects who receive study 
+treatment, starting with Lymphodepletion.  
+• This population will be used to summarize 
+the demographic and baseline 
+characteristics and safety data.  
+• Subjects will only appear once in the 
+Safety population, even if they are retreated 
+with BV-CAR20.  • TEAE -related 
+safety 
+displays  
+• Demographic 
+and baseline 
+characteristics  
+Response 
+Evaluable  (RE)  • Includes all subjects who received study 
+treatment BV-CAR20 and have at least 1 
+post-Baseline efficacy assessment.  • Efficacy 
+displays  
+
+   
+    Precision  BioSciences, Inc.
+    
+ 
+ Page 12 of 27 
+ Population  Definition / Criteria  Analyses 
+Evaluated  
+• Subjects who discontinue due to disease 
+progression, have a transplant, die, or have 
+a treatment -related toxicity prior to having 
+a disease assessment will be included in the 
+Response Evaluable population.  
+• Subjects who are retreated will be included 
+in the Response Evaluable population for 
+each treatment of BV-CAR20  
+ 
+Enrolled (ITT) and Safety population consists of the same subjects for this study . ‘Safety’ 
+population will be used tables and listings.  
+4.1 Protocol Deviations  
+Protocol deviations (including deviations related to study inclusion/exclusion criteria, 
+conduct of the trial, patient management or patient assessment) will be summarized or listed.  
+A separate summary and listing of all inclusion/exclusion criteria deviat ions will also be 
+provided, if any. This summary will be based on data as recorded on the inclusion/exclusion 
+page of the eCRF.  
+Major protocol deviations will be summarized for the Safety Population. A listing of all 
+protocol deviations will be provided.   
+Protocol deviations will be tracked by the study team throughout the conduct of the study in 
+accordance with the Protocol Deviation Management Plan. Data will be reviewed prior to 
+freezing the database to ensure all important deviations are capt ured and categorized on the 
+protocol deviations dataset. This dataset will be the basis for the summaries or listings of 
+protocol deviations. If there are many protocol deviations, a summary will be produced. If 
+there are only a few protocol deviations, a listing will be produced.  
+5 CONSIDERATIONS FOR DATA ANALYSES AND DATA 
+HANDLING CONVENTIONS  
+Statistical analyses will be primarily descriptive in nature. Unless otherwise specified, 
+continuous variables will be summarized by presenting the number of non -missing 
+observations, mean, standard deviation, median, minimum, and maximum. Categorical 
+variables will be summarized by presenting the number of subjects and percentage for each 
+category.  
+Time -to-event variables will be summarized using Kaplan -Meier (KM) methods and figures 
+for the estimated median time. No formal statistical hypothesis testing is planned; however, if 
+exploratory analyses are conducted and confidence intervals (CIs) are provided for estimates, 
+the 95% CIs are consistent with a 2 -sided 5% significance level.  
+Results of statistical analyses, descriptive statistics, and supporting l istings will be presented 
+by BV-CAR20 dose levels.  
+
+   
+    Precision  BioSciences, Inc.
+    
+ 
+ Page 13 of 27 
+ All tabulations will be based on pooled data across centers.  
+Analyses will be performed using SAS for Windows statistical software, version 9.4 or 
+higher (SAS, Cary, NC), except where other software may be  deemed more appropriate.  
+Pharstat will perform all efficacy and safety statistical analyses described in this SAP.  
+5.1 Data Quality Assurance  
+Once all the source verification is complete, all queries are resolved, and the database has 
+been updated accordingl y, the database will be locked and made available to Pharstat for final 
+analysis.  
+PBI’s biostatisticians will review the data when:  
+1. Final analysis: All subjects complete Day 360 visit or discontinue from the study.  
+2. Ad-hoc analyses: Based on planned publications and presentations , ad-hoc analyses 
+will be requested.  Source verification and query resolution will be an ongoing 
+process. Targeted data quality checks will be performed by Data Management when 
+ad-hoc analyses are requested.  
+5.2 Study Assessments Windows  
+Data will be summarized by nominal study visit recorded in  the database . 
+See Table 9 in Section 12.1 (App endix A) for the timing of all relevant assessments.  
+5.3 Study Treatment Display Descriptors  
+The treatment description s to be used for the displays  are listed in  Table 5. 
+ 
+Table 5: Treatment descriptions for displays  
+Footnote Description  Table Header  Order  
+1 × 106 cells/kg  DL1 1 
+3 × 106 cells/kg DL2 2 
+480 × 106 cells DL3 3 
+ 
+5.4 Handling of Missing Data  
+Except for the time -to-event endpoints (described below), partial first diagnosis date and 
+partial end dates of concomitant medications will be listed as they are recorded, all other 
+“Unknown” or “not done” data will be treated as  missing; unless otherwise specified, no 
+method for imputation is planned.  
+Missing data on the PFS endpoint will have events coded as right censored per  Table 6 based 
+on the FDA’s Guidance for Industry document Clinical Trial Endpoints for the Approval of 
+Non-small Cell Lung Cancer Drugs and Biologics (April 2015) [1]; Table C1.  
+Table 6: Censoring methods for PFS  
+
+   
+    Precision  BioSciences, Inc.
+    
+ 
+ Page 14 of 27 
+ Situation  Date of Progression or Censoring  Outcome  
+Progression documented between 
+scheduled visits  Earliest date of radiological 
+assessment documenting 
+progression  PFS event  
+No progression  Date of last radiological assessment 
+of measured lesions  Censored  
+Treatment discontinuation for 
+undocumented progression  Date of discontinuation PFS event  
+Treatment discontinuation for 
+toxicity or other reason  Date of discontinuation  PFS event  
+New anticancer treatment started  Date of start of new anticancer 
+treatment  PFS event  
+Death before first progressive 
+disease (PD) assessment  Date of death  PFS event  
+Death between adequate 
+assessment visits  Date of death  PFS event  
+Death or progression after more 
+than 1 missed visit  Date of first missed visit  PFS event  
+ 
+5.5 Multiple Comparisons  
+There are no multiple comparisons.  
+5.6  Covariates and Subgroups Analysis  
+Given this is a dose escalation study, no covariates or subgroups analysis will be done .  
+5.7 Data Derivations and Transformations  
+The following derivations will be used in this study:  
+Study day:  
+• =Date of assessment – Day 0 date (first BV-CAR20 admin istration) + 1 for 
+assessments done after  date of first BV-CAR20 administration.  
+• =Date of assessment – Day 0 date (first BV-CAR20 administration ) for assessments 
+done before  date of first PBCA R20A administration . 
+ 
+Weight:  Baseline weight extracted from screening visit.  
+Duration :  
+• Duration on study ( days) (or Time to Next Treatment) = end of study date – screening  
+date + 1  
+• Time to AEs onset = AE onset date – Day0 date + 1  
+
+   
+    Precision  BioSciences, Inc.
+    
+ 
+ Page 15 of 27 
+ • Duration of AE = AE end date -AE start date + 1  
+• Follow -up time =  Last contact/assessment  date – Day 0 date +1  
+ 
+5.8 Reporting Process and Standards  
+Table 7 
+Software  SAS version 9.4 will be used  
+Datasets  SDTM: Not applicable  
+ADAM: Not applicable  
+RAW: Medidata will be used to create analysis datasets  
+Location  Programs will be located at Box\ClinFinalData \BV-CAR20 \BV-CAR20 -
+01\Program  
+Datasets will be located at  Box\ClinFinalData \BV-CAR20 \BV-CAR20 -
+01\Data \RAW  
+Outputs will be located at Box\ClinFinalData \BV-CAR20 \BV-CAR20 -
+01\Output  
+QC QC programs and output will be located at 
+\Box\ClinFinalData \BV-CAR20 \BV-CAR20 -01\QC 
+Precision  Calculated values will be presented at no more than 3 significant digits  
+Unscheduled 
+visits  Unscheduled visit s will not be included in summary tables.  
+Unscheduled visit s will b e included in figures.  
+All unscheduled visits will be  only included in figures and listings . 
+Descriptive 
+Summary  Categorical Data: N, n, frequency, %  
+Continuous Data: N, n, mean, median, standard deviation (SD), min, max . 
+ 
+6 STUDY POPULATION  
+6.1 Subject Disposition  
+A summary table (frequency counts and percentages) of all subjects in the All Screened  
+population be provided including study completion status and reasons for early termination.  
+Subject disposition will be tabulated by dose level and overall. First screening (first subject 
+first visit) and last contact/assessment date as well as first and last BV-CAR20 injection 
+dates for each dose will be presented in the table.  
+Screen failures with reasons (inclusion/exclusion criteria numbers recorded in the eCRF) as 
+well as early discontinuations with reasons will be listed  for all subjects .  
+A by -subject listing for screened population will be created.  It will include Screen failure 
+subjects with reasons (inclusion/exclusion criteria numbers recorded in the eCRF) and 
+subjects who started LD but did not dose with their reasons fo r discontinuation and time on 
+study.  
+6.2 Demographic and Baseline Variables  
+Descriptive statistics will be used to summarize the demographic characteristics (including a ge 
+(≥65 years vs. <65 years), gender, race, ethnicity, height, weight, and body mass index (BMI) 
+at Screening) for the Safety population.  
+
+   
+    Precision  BioSciences, Inc.
+    
+ 
+ Page 16 of 27 
+ Descriptive statistics will be used to summarize the baseline characteristics for subjects in the 
+Safety population w ith the data collected at Screening or Day 0 pre -dose only. Baseline data  
+will includ e disease type, disease stage, prior autologous stem cell transplant, prior line 
+therapy, refractory subgroup, and baseline Eastern Cooperative Oncology Group (ECOG) 
+perfo rmance status . 
+7 EFFICACY ANALYSES  
+All efficacy analyses described below will be carried out on the RE population. Unless 
+otherwise specified, data will be summarized by dose level and overall.  
+7.1  Efficacy Analysis  
+Efficacy analyses on ORR and PFS will be performed.  
+7.1.1 Objective Response Rate (ORR)  
+The ORR is defined as the proportion of study subjects as respon der, including partial 
+response (PR) and complete response (CR) rates  (i.e., the ORR is the rate of CR + PR).  The 
+response  to treatment with BV-CAR20 through Day 360 will be evaluated  using the Lugano 
+criteria for NHL and iwCLL for CLL/SLL (see Protocol Section 8.1).  
+Since the primary objective of this study is to determine the safety and tolerability of 
+BV-CAR20, to identify  an appropriate dose to optimize safety and efficacy, and to optimize 
+the treatment regimen, an estimation approach will be applied to efficacy data analyses. The 
+ORR will be summarized by number and percentage of subjects for all dose levels and along 
+with the corresponding exact 95% CIs  (Exact binomial CI : Clopper -Pearson method) . 
+7.1.2 Progression -Free Survival (PFS)  
+PFS is defined as the interval between the date of first BV-CAR20 administration and the 
+date of disease relapse, progression, or death, whichever occurs (i.e., the number of days from 
+Day 0 to disease relapse, progression, or death). Details on censoring method can be found in 
+Section 5.4, Table 6. 
+PFS (days) = Date of disease relapse or progression or death or last assessment (or 
+retreatment date) − Date of first BV-CAR20 administration + 1  
+A PFS summary by dose will also be provided.  
+Individual PFS will be plotted with swimmer plot and grouped by d ose level  and indicated as 
+responder, non -responder, starting new SCT treatment or death.  
+For subjects who meet the retreatment criteria and have had a study visit within 30 days, their 
+PFS will be calculated from each BV-CAR20 infusion.  
+8 SAFETY ANALYSES  
+All subjects in the Safety population will be included in the summaries and listings of safety 
+data. No formal hypothesis testing will be performed to compare differences between dose 
+groups. The safety data will be summarized for the overall AEs and specially AESI. Any 
+clinical ly significant events related to laboratory tests, electrocardiograms (ECGs), and vital 
+signs  will be captured as AEs . All summaries will be descriptive.  
+
+   
+    Precision  BioSciences, Inc.
+    
+ 
+ Page 17 of 27 
+ 8.1 Extent of Exposure  
+Study treatment administrations (including both LD and BV-CAR20) will be listed for each 
+subject with drug name, dose, total cells infused (in 10^6 cells), and total lymphodepletion 
+administered.  Subject compliance with treatment will also be noted in th is listing.  
+8.2 Adverse Events  
+An adverse event ( AE) is defined as any untoward medical occurrence in a subject or clinical 
+investigation subject administered a pharmaceutical product and which does not necessarily 
+have to have a causal relationship with this t reatment.  
+All AEs will be collected until death, disease progression, stem cell transplant, withdrawal 
+due to intolerable toxicity, withdrawal of consent, or Day 360, whichever occurs first, and 
+recorded on the eCRF, regardless of whether they are related to the study treatment. All AEs 
+collected through Day 28 will be used for assessment of DLTs; any AEs occurring after Day 
+28 will be considered in dose -escalation decisions and monitoring procedures as appropriate.  
+AEs, including SAEs, that occur after sig ning of informed consent and before administration 
+of any protocol -specified medication will be recorded as Medical History on the appropriate 
+eCRF.  
+The AEs will be classified using the Medical Dictionary for Regulatory Activities (MedDRA) 
+classification s ystem version 2 2.1. The severity of the toxicities will be graded according to 
+the NCI CTCAE version 5.0.  
+8.2.1 Adverse Event Summaries  
+A treatment -emergent adverse event (TEAE) is an AE with initial onset or that worsens in 
+severity after the first dose of BV-CAR20.  
+Non-TEAE is defined as an AE that occurred prior to the BV-CAR20 injection , but after the 
+initiation of lymphodepletion , and they will be summarized separately from TEAEs by 
+system organ class ( SOC ) and prefer term ( PT) based on ITT  (Enrolled)  population.  
+The following summaries will be tabulated : 
+i. The number and percentage of subjects experiencing a TEAE,  
+ii. The number and percentage of subjects experiencing a  SAE,  
+iii. The number and percentage of subjects experiencing a n AESI,  
+iv. The number and percentage of subjects experiencing a fatal AE . 
+Additionally, the following inf ormation will be provided:  
+v. The number and percentage of subjects experiencing a  serious adverse event related to 
+each of the study medications (BV-CAR20, Lymphodepletion (Cyclophosphamide & 
+Fludarabine))  by max toxicity grade , 
+vi. Listing of all TESAE s, 
+vii. Listing of all  subjects who  died on study . 
+All TEAEs will be listed.  The listing will contain the following information: dose level, PT, 
+PT grade, whether the event was an SAE, DLT, or AESI , symptom  grade, relationship to 
+study medications (BV-CAR20, Cyclophosphamide, Fludarabine), whether the adverse event 
+attributed to the disease, study day at onset, duration of the adverse event in days, treatment 
+given to treat the adverse event, and the outcome . Listings will be sorted by subject and AE 
+
+   
+    Precision  BioSciences, Inc.
+    
+ 
+ Page 18 of 27 
+ onsite date.  
+8.2.2 Adverse Events of Special Interest (AESI)  
+The following AESI are AEs are of particular concern in CAR T cell therapy:  
+• CRS  
+• ICANS  
+• GvHD  
+Subjects will be assessed for AESI from the administration of PBCA R20A through Day 360.  
+The following will be presented by dose and overall:  
+i. Summary of onset and duration of All AESIs ,  
+ii. The number and percentage of subjects with symptoms from each type of AESI (CRS, 
+ICANS, GvHD) by dose and by max grade (ASTCT grade or GvHD grade) , 
+iii. Summary of AESIs and symptoms by max toxicity grade and dose,  
+iv. The number and percentage of AESIs and Infections by max toxicity grade and dose,  
+v. Summary of medications given for AESIs , 
+Listing of all Cytokine Release Syndrome, ICANS, and GvHD  will also be provided. All 
+occurrences of these AESI s will be listed for each subject. The listing will contain the 
+following information: dose level, AE PT, PT grade, associated symptoms of the AESI, 
+associated symptoms grade, AE onset days on study , duration of the AESI in days, treatment 
+given to treat th e adverse event, and the outcome. Listings will be sorted by subject and AE 
+onset date.  
+The median time (range) to onset of an AESI from the first dose of BV-CAR20 and the 
+median duration (range) of an AESI:  
+Duration of AESI (days) = Date of Resolution – Date of Onset + 1.  
+Time to AESI onset (days) = Date of AE onset  – Day 0 Date + 1.  
+ 
+For an AESI that is ongoing at the time of the analysis, the date of data cutoff will be used to 
+calculate the duration.  
+9 REPORTING CONVENTIONS  
+The mean, standard deviation, and any other statistics other than quantiles, will be 
+reported to one decimal place greater than the original data. Quantiles, such as median, 
+minimum , and maximum , will use the same number of decimal places as the original 
+data.  
+10 QUALITY ASSURA NCE OF STATISTICAL PROGRAMMING  
+Analyses will be performed using SAS for Windows statistical software, version 9.4 or 
+higher (SAS, Cary, NC), except where other software may be deemed more appropriate.  
+To provide high quality code that is understandable an d allows reproduction of the analysis , 
+the following points will be followed : 
+
+   
+    Precision  BioSciences, Inc.
+    
+ 
+ Page 19 of 27 
+ • The population to be used in a table or figure will be explicitly set at the start of a 
+block of code that computes the output, ideally by looking up the population from the 
+table of tables.  
+• Any outputs will have the  
+o date and time included , 
+o the name of the code file that produced the analysis , 
+o programmer initials or user IDs . 
+• At the start of any code file there will be a set of comments that give  
+o the author , 
+o the date and time of writing , 
+o references to inputs and outputs , 
+o reference to any parent code file that runs the child code file . 
+All coding and output should adhere to one of three levels of quality control (QC), as outlined 
+below:  
+• Level 1: the QC programmer /statistician  will conduct a manual review of the data and 
+compare  the output to  the raw listing.  
+• Level 2 : the QC programmer /statistician  will review the program, output, and log to 
+ensure that these files are error -free. 
+• Level 3: a second review programmer/ statistician will  independently reproduce the 
+analyses and output.  
+Most listings are classified as QC level 1, most summaries are classified as QC level 2, and 
+all summaries and analyses involving primary endpoints and AESI are classified as QC level 
+3 (see Section 11 for QC level classifications for specific listings and tables).  
+  
+
+   
+    Precision  BioSciences, Inc.
+    
+ 
+ Page 20 of 27 
+ 11 LISTING OF TABLES, LISTINGS AND FIGURES  
+This section is to give precise details for each table, listing or figure to be produced.  
+Mock tables, listings and figures should be provided.  Including the title, number, analysis 
+population, etc.  
+Tables:  # of decimal digits, formatting (e.g., confidence in brackets, in parentheses, in 
+separate co lumns).  
+Figures:  labels for all axes, legends, plotting symbols.  
+These detailed specifications can have minor revisions during the production phase without 
+needing to revise the SAP, this may include changing the table numbers if a reordering or 
+deletion i s appropriate, providing that the specifications in the main body of the SAP sections 
+4 to 8 are met.  
+Suggestions for ordering or organizing TLFs:  
+e.g., Tables E for efficacy and S for safety and nothing for patient disposition.  
+Disposition is Table of Figure 1.xxx 
+Efficacy is Table or Figure 2.xxx 
+Safety is Table or Figure 3.xxx 
+The following numbering will be applied for SAP generated displays:  
+Table 8: Numbering for SAP generated displays  
+Section  Tables  Figures  
+Study Population  1.1 to 1.xxx  1.1 to 1.xxx  
+Efficacy  2.1 to 2.xxx 2.1 to 2.xxx 
+Safety  3.1 to 3.xxx 3.1 to 3.xxx 
+Section  Listings  
+ICH Listings  1 to xx  
+Other Listings  xx+1 to yy  
+ 
+
+   
+    Precision  BioSciences, Inc.     
+ 
+ Page 21 of 27 
+ Table 10: Study population tables and listings  
+No. Population  Example  
+Shell  Title  Programming Notes  Quality  
+Control  Deliverable  
+[Priority]  
+  Subject Disposition  
+ 1.1 All 
+Screened  SD1 Summary of Subject Disposition  Retreated subject will be included 
+under actual dose level received  3  FP [1]  
+1 All 
+Screened  L-SD1 Listing of Screen Failures    1 FP [1]  
+  Protocol Deviation  
+ 1.2 Safety  PD1 Summary /Listing  of Major Protocol 
+Deviations    If no major deviations, then put a 
+blank table as ‘As no data to 
+present . If few, only listing needed  1  FP [1]  
+  Demographic and Baseline Characteristics  
+ 1.3 Safety  DMBC1  Summary of Demographics and Baseline 
+Characteristics  Retreated subject will not be 
+included in the summary  3 FP [1]  
+        
+ 
+Table 11: Efficacy tables , figures  and listings  
+No. Population  Example  
+Shell  Title  Programming Notes  Quality  
+Control  Deliverable  
+[Priority]  
+  Response  
+ 2.1 RE ORR1  Summary of Objective Response Rate by Initial 
+Treatment  Responder=CR+PR, no 
+retreatment data  3  FP [1]  
+ 2 RE L-ORR1  Listing of Objective Response Data  Include retreatment data  3  FP [1]  
+2.1 RE F-SW Swimmer plot for Progression Free Survival  For retreatment subject, combine 
+the initial data with retreatment 1 FP [1]  
+
+   
+    Precision  BioSciences, Inc.     
+ 
+ Page 22 of 27 
+ data 
+  
+Table 12: Safety tables and listings  
+No. Population  Example  
+Shell  Title  Programming Notes  Quality  
+Control  Deliverable  
+[Priority]  
+  Extent of Exposure  
+3.1 Safety  L-TA1 Listing of Planned and Actual Treatment 
+Administered  Including dose level, lot number, 
+date and time, drug name , 
+compliance, and total quantity 
+administered  1  FP [1]  
+All AEs  
+ 3.2 Safety  AEAll1  Summary of Over all Adverse Events by 
+Treatment  Combine the initial and retreatment 
+periods safety data, this will be the 
+summary for each individual  2  FP [1]  
+3 Safety  L-AE1 Listing of All Treatment Emergent Adverse 
+Events   2 FP [1]  
+  AEs of Special Interest  
+3.3 Safety  AEAll2  Summary of Onset and Duration for all AESIs  Onset and duration are related to 
+max grade of each type of AE 3 FP [1]  
+ 3.4 Safety  AESI2  Summary of  AESIs and S ymptoms by Dose and 
+Max Toxicity Grade  AE and CRS data should be 
+combined to identify the CRS 
+events and symptoms   3 FP [1]  
+ 3.5 Safety  AESI1  Summary of AEs of Special Interest and 
+Infections by Max Toxicity Grade and Dose  Infection will combine all infection 
+Aes, and max grade  3 FP [1]  
+3.6 Safety  CM1  Summary of Concomitant Medications Given 
+for AESI  Select the Toxi, Dex  and other 
+medications for fever,  1 FP [1]  
+4 Safety  L-
+AEAll1 Listing of All Cytokine Release Syndrome, 
+ICANS, GvHD   1 FP [1]  
+
+   
+    Precision  BioSciences, Inc.     
+ 
+ Page 23 of 27 
+   SAEs  
+3.7 Safety  SAE1  Summary of All BV-CAR20 -related Serious 
+Adverse Event By Max Toxicity Grade   1 FP [1]  
+3.8 Safety  SAE1  Summary of All Lymphodepletion -related 
+Serious Adverse Event By Max Toxicity Grade   1 FP [1]  
+ 5 Safety  L-SAE1  Listing of All TESAEs      1 FP [1]  
+ 6 Safety  L-SAE1  Listing of All Deaths     1 FP [1]  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
+   
+    Precision  BioSciences, Inc.     
+ 
+ Page 24 of 27 
+ 12 APPENDICES  
+12.1 Appendix A: Schedule of Activities  
+ 
+Table 9: Study schedule  
+ Treatment Period  Follow -up 
+Month  - 1 2 3 4 5 6 9 12 
+Day -28a 0 1 3 7 10 14 21 28 42 60 90 120 150 180 270 360/ 
+ET 
+Visit window (days)    +1 +1 ±1 ±1 ±2 ±2 ±2 ±5 ±5 ±5 ±5 ±5 ±5 ±7 ±7 
+Informed consent  X                 
+Inclusion and exclusion 
+criteria X                 
+Demography  X                 
+Weight  X X       X   X   X X X 
+Full physical examination  X X       X   X   X X X 
+Medical history  X X        Xb Xb Xb Xb Xb Xb Xb Xb 
+Viral serologyc X                 
+HLA haplotype  X                 
+Anti-HLA antibodies  X        X   X      
+Brain MRI  Xd                 
+Lumbar puncture (History of 
+CNS involvement) Xe                 
+
+   
+    Precision  BioSciences, Inc.     
+ 
+ Page 25 of 27 
+  Treatment Period  Follow -up 
+Month  - 1 2 3 4 5 6 9 12 
+Day -28a 0 1 3 7 10 14 21 28 42 60 90 120 150 180 270 360/ 
+ET 
+Visit window (days)    +1 +1 ±1 ±1 ±2 ±2 ±2 ±5 ±5 ±5 ±5 ±5 ±5 ±7 ±7 
+LVEF (ECHO or MUGA) X                 
+Serum pregnancy test 
+(WOCBP only)  X                 
+Clinical laboratory 
+assessmentsf X X X X X X X X X X X X X X X X X 
+Coagulation panelg X X                
+Vital signsh X X X X X X X X X X X X X X X X X 
+12-lead ECG (triplicate)i X                 
+ECOG Performance 
+Status  X X       X   X   X X X 
+Fludarabine + 
+cyclophosphamidej                  
+Study treatment 
+administrationk  X                
+Study participant diaryl  ------------------------ X------------------          
+PET-CT scan (NHL only) Xm      Xn  X  X X   X X X 
+Tumor/liquid biopsy  Xo      Xp 
+Serum and whole blood 
+samples for analysesq X Xr X X X X X X X X X X X X X X X 
+
+   
+    Precision  BioSciences, Inc.     
+ 
+ Page 26 of 27 
+  Treatment Period  Follow -up 
+Month  - 1 2 3 4 5 6 9 12 
+Day -28a 0 1 3 7 10 14 21 28 42 60 90 120 150 180 270 360/ 
+ET 
+Visit window (days)    +1 +1 ±1 ±1 ±2 ±2 ±2 ±5 ±5 ±5 ±5 ±5 ±5 ±7 ±7 
+BMA/bone marrow 
+biopsy (Diagnosed w BM 
+involvement)s X        X  X X   X X X 
+CT scan (if preferred to 
+PET/CT for CLL/SLL 
+only)  X        X  X X   X X X 
+Objective response 
+assessment          X  X X   X X X 
+MRD assessmentt X        X  X X   X X X 
+Concomitant medications  X 
+AE review  X 
+AESIu  X X X X X X X X X X X X X X X X 
+Abbreviations: AE=adverse event; AESI=adverse event of special interest; BMA=bone marrow aspiration; CAR=chimeric antigen rec eptor; CLL=chronic lymphocytic 
+leukemia; CNS=central nervous system; CT=computed tomography; DLBCL=diffuse large B -cell lympho ma; ECG=electrocardiogram; ECOG=Eastern Cooperative 
+Oncology Group; ECHO=echocardiogram; ET=early termination; eCRF=electronic case report form; HLA=human leukocyte antigen; HIV =human immunodeficiency 
+virus; IV=intravenous; LD=lymphodepletion; LVEF=left ve ntricular ejection fraction; MRI=magnetic resonance imaging; MUGA=multigated acquisition scan; NHL=non -
+Hodgkin lymphoma; PBMC=peripheral blood mononuclear cell; PET=positron emission tomography; SLL=small lymphocytic lymphoma; W OCBP=women of 
+childbearing p otential.  
+a Lymphodepletion regimens will be administered as described in the Pharmacy Manual. 
+b Study subjects are asked about the current status of their disease and treatment, including stem cell transplant. 
+c Viral screening to include HIV antibody, he patitis B surface antigen, hepatitis B core antibody, hepatitis C antibody, HLA haplotype, and anti -HLA antibodies.  
+
+   
+    Precision  BioSciences, Inc.     
+ 
+ Page 27 of 27 
+ d Brain MRI is recommended for all study subjects at Baseline to assess the presence of brain disease or abnormalities. A negat ive MRI is re quired at Screening for NHL 
+study subjects with a history of CNS disease. An MRI conducted as a part of the routine care within 6 weeks of initiating lym phodepletion chemotherapy may be used for 
+Screening.  
+e A negative lumbar puncture is required at Screen ing only if the study participant has a history of CNS disease. A lumbar puncture conducted as a part of the routine care 
+within 6  weeks of initiating lymphodepletion chemotherapy may be used for Screening.  
+f Clinical laboratory tests for safety assessment s are outlined in Protocol Section 7.1.4. Clinical laboratory tests can be performed up to 24 hours before dosing on Day  0. 
+g Coagulation panel may be performed after Baseline if the investigator considers it necessary.  
+h Vital signs should be measured on the day of dosing at 5 minutes (±2 minutes) before dosing, then at the end of infusion (±5 minutes), 60 minutes after the end  of infusion 
+(±10 minutes), and 4 hours (±15 minutes) after the end of infusion. Vital signs should also be collected as clinically  indicated. 
+i Additional ECGs will be collected as clinically indicated.  
+j The initial lymphodepletion chemotherapy regimen will be composed of fludarabine (30 mg/m2/day IV) and cyclophosphamide (500  mg/m2/day IV) during the Screening 
+Period from Days -5 to -3. However, modified lymphodepletion regimens may be used after safety is established in dose level. The lymphodepletion regi men will be 
+specified at the time of registration. Please refer to the Pharmacy Manual for the lymphodepletion dosing regimen; l ymphodepletion status may be discussed between the 
+Sponsor Medical Monitor, Principal Investigators, and contract research organization Medical Monitor prior to registration.  
+k Study subjects are evaluated for the following restrictions 2 hours (±60 minute s) prior to receiving the BV-CAR20 infusion: new uncontrolled infection after receipt of 
+lymphodepletion, fever, taking any corticosteroid beyond the replacement details, rapid acceleration of malignant disease, an d any organ dysfunction since Screening. 
+Additional details are provided in Protocol Section 5.1.1. At the investigator’s discretion, study subjects may receive premed ication 1  hour (±15 minutes) prior to receiving 
+the BV-CAR20 infusion with oral acetaminophen and oral or IV diphenhydramine accord ing to the institutional standards.  
+l Study participant diaries will be provided to study subjects on Day 0 to monitor temperature, at least daily, during the firs t 28 days.  
+m . The PET -CT scan conducted as part of the routine care within 4 weeks of BV-CAR20 administration may be used for Screening purposes. If the scan is performed as a 
+part of routine care, the result will be obtained from the study participant’s physician or medical record.  
+n A PET -CT scan on Day 14 is optional and will be determined by the investigator. Additional details are provided in Protocol Section 8.4.  
+o Screening tumor biopsy may be omitted if a study participant has had a biopsy showing CD20+ disease within 6 months before Screening and has not received any anti -
+CD20+ therapy since then. Note: If the tumor is CD20 -negative by flow cytometry, it should be evaluated by immunohistochemistry as flow assays may result in false 
+negatives due to comp etition with CD20 targeting treatment antibodies (e.g. rituximab).  
+p  Tumor biopsy may be performed to confirm imaging changes as clinically indicated. Additional biopsies may be performed pendin g Sponsor approval.  
+q Exploratory analyses will be performed by the central laboratory. Additional analyses performed at the site that are not required by the protocol should b e captured in the 
+eCRF.  
+r Blood samples will be collected before BV-CAR20 administration on Day 0.  
+s If available, the central labo ratory will also test fresh BMA or bone marrow core samples for CAR T cells.  
+t MRD assessment will be performed at Screening for all study subjects. Please consult the Laboratory Manual for specific sampl e requirements at Screening. At subsequent 
+visits, M RD assessment will only be performed for study subjects who meet other standard response criteria (see Protocol Section 8.1).  Please consult the Laboratory Manual 
+for specific sample requirements at all subsequent visits. Note that these samples are diseas e-specific and may be different between Screening and all subsequent visits.  
+u AESIs are listed in Protocol Section 7.2.1.3.  
