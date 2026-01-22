@@ -9,7 +9,7 @@
  * Usage:        ⭐ RUN THIS FIRST before any other SAS programs
  *
  * Instructions:
- * 1. If using SAS OnDemand: Just open and run (auto-detects ~/BV-CAR20-P1)
+ * 1. If using SAS OnDemand: Just open and run (auto-detects ~/safety_oncology)
  * 2. If using local SAS 9.4: Update LOCAL_ROOT below
  ******************************************************************************/
 
@@ -19,12 +19,12 @@
 %macro set_paths;
     %if &IS_CLOUD > 0 %then %do;
         /* SAS OnDemand (Linux) - Auto-detect home directory */
-        %let PROJ_ROOT = %sysget(HOME)/BV-CAR20-P1;
+        %let PROJ_ROOT = %sysget(HOME)/safety_oncology;
         %put NOTE: Running on SAS OnDemand;
     %end;
     %else %do;
         /* Local Windows SAS 9.4 */
-        %let PROJ_ROOT = d:\safety_oncology\BV-CAR20-P1;
+        %let PROJ_ROOT = d:\safety_oncology;
         %put NOTE: Running on local SAS 9.4;
     %end;
     

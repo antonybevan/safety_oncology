@@ -10,11 +10,11 @@ np.random.seed(SEED)
 
 # Handle environment-specific paths
 if os.name == 'nt':  # Windows
-    OUTPUT_DIR = r"d:\safety_oncology\BV-CAR20-P1\02_datasets\legacy"
+    OUTPUT_DIR = r"d:\safety_oncology\02_datasets\legacy"
 else:  # Linux (SAS OnDemand)
     # Auto-detect project root in home directory
     home = os.path.expanduser("~")
-    OUTPUT_DIR = os.path.join(home, "BV-CAR20-P1", "02_datasets", "legacy")
+    OUTPUT_DIR = os.path.join(home, "safety_oncology", "02_datasets", "legacy")
 
 if not os.path.exists(OUTPUT_DIR):
     os.makedirs(OUTPUT_DIR)

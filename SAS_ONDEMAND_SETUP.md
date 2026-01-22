@@ -5,7 +5,7 @@ This guide shows how to execute the BV-CAR20-P1 clinical programming pipeline in
 
 ---
 
-## � Quick Start (3 Steps)
+## 🚀 Quick Start (3 Steps)
 
 ### Step 1: Clone Repository in SAS Studio
 
@@ -15,7 +15,7 @@ This guide shows how to execute the BV-CAR20-P1 clinical programming pipeline in
 
 ```bash
 cd ~
-git clone https://github.com/[YOUR-USERNAME]/BV-CAR20-P1.git
+git clone https://github.com/antonybevan/safety_oncology.git
 ```
 
 ### Step 2: Generate Synthetic Data
@@ -23,8 +23,8 @@ git clone https://github.com/[YOUR-USERNAME]/BV-CAR20-P1.git
 Run the Python data generator:
 
 ```bash
-cd ~/BV-CAR20-P1/02_datasets/legacy
-python generate_data.py
+cd ~/safety_oncology/02_datasets/legacy
+python3 generate_data.py
 ```
 
 This creates the 5 raw CSV files needed for SDTM programming.
@@ -32,7 +32,7 @@ This creates the 5 raw CSV files needed for SDTM programming.
 ### Step 3: Run SAS Programs
 
 In SAS Studio, open and run `00_config.sas` first:
-- Located at: `~/BV-CAR20-P1/03_programs/00_config.sas`
+- Located at: `~/safety_oncology/03_programs/00_config.sas`
 - This auto-detects your home directory and sets up all paths
 
 Then run SDTM programs in sequence:
@@ -48,10 +48,10 @@ Then run SDTM programs in sequence:
 ## 📁 Post-Clone Structure
 
 ```
-~/BV-CAR20-P1/
+~/safety_oncology/
 ├── 02_datasets/
 │   ├── legacy/           (Python generates CSVs here)
-│   └── tabulations/      (SAS creates XPT files here)
+│   └── tabulations/      (.gitkeep ensures this folder exists)
 └── 03_programs/
     ├── 00_config.sas     (⭐ RUN THIS FIRST)
     └── tabulations/
