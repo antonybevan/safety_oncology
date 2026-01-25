@@ -3,57 +3,56 @@
  * Protocol:     BV-CAR20-P1
  * Purpose:      Auto-detect project root and configure library paths
  * Author:       Clinical Programming Lead
- * Date:         2026-01-22
+ * Date:         2026-01-25
  * SAS Version:  9.4+, SAS OnDemand compatible
  *
- * Usage:        ⭐ RUN THIS FIRST before any other SAS programs
- *
- * Instructions:
- * 1. If using SAS OnDemand: Just open and run (auto-detects ~/safety_oncology)
- * 2. If using local SAS 9.4: Update LOCAL_ROOT below
+ * Instructions: 
+ * 1. Just upload this and your CSVs to ANY folder in SAS OnDemand.
+ * 2. Run this program first.
  ******************************************************************************/
 
-/* Detect environment */
-%let IS_CLOUD = %sysfunc(find(&SYSSCP, LIN));  /* Linux = SAS OnDemand */
+%global IS_CLOUD PROJ_ROOT LEGACY_PATH SDTM_PATH ADAM_PATH;
 
-%macro set_paths;
-    %if &IS_CLOUD > 0 %then %do;
-        /* SAS OnDemand (Linux) - Auto-detect home directory */
-        %let PROJ_ROOT = %sysget(HOME)/safety_oncology;
-        %put NOTE: Running on SAS OnDemand;
+/* 1. Detect Environment and Root */
+%macro set_proj_root;
+    %if %sysfunc(find(&SYSSCP, LIN)) > 0 %then %do;
+        %let HOME = %sysget(HOME);
+        /* Check for multiple possible root names to be safe */
+        %if %sysfunc(fileexist(&HOME/safety_oncology)) %then %let PROJ_ROOT = &HOME/safety_oncology;
+        %else %if %sysfunc(fileexist(&HOME/safety_oncology_git)) %then %let PROJ_ROOT = &HOME/safety_oncology_git;
+        %else %let PROJ_ROOT = &HOME;
+        %let IS_CLOUD = 1;
     %end;
     %else %do;
-        /* Local Windows SAS 9.4 */
         %let PROJ_ROOT = d:\safety_oncology;
-        %put NOTE: Running on local SAS 9.4;
+        %let IS_CLOUD = 0;
     %end;
-    
-    %put NOTE: Project Root = &PROJ_ROOT;
-    
-    /* Assign Libraries */
-    libname raw "&PROJ_ROOT/02_datasets/legacy";
-    libname sdtm "&PROJ_ROOT/02_datasets/tabulations";
-    
-    /* Create output directory if needed */
-    %if %sysfunc(fileexist(&PROJ_ROOT/02_datasets/tabulations)) = 0 %then %do;
-        %put NOTE: Creating tabulations directory;
-        x "mkdir -p &PROJ_ROOT/02_datasets/tabulations";
-    %end;
-    
-    /* Global macro for use in PROC IMPORT */
-    %global LEGACY_PATH SDTM_PATH;
-    %let LEGACY_PATH = &PROJ_ROOT/02_datasets/legacy;
-    %let SDTM_PATH = &PROJ_ROOT/02_datasets/tabulations;
-    
-    /* Verify libraries */
-    proc datasets library=raw nolist;
-    quit;
-    proc datasets library=sdtm nolist;
-    quit;
-    
-    %put NOTE: ✅ Configuration complete. Libraries assigned:;
-    %put NOTE:    RAW  = &PROJ_ROOT/02_datasets/legacy;
-    %put NOTE:    SDTM = &PROJ_ROOT/02_datasets/tabulations;
 %mend;
+%set_proj_root;
+
+/* 2. Setup Paths */
+%macro set_paths;
+    %if %sysfunc(fileexist(&PROJ_ROOT/02_datasets/legacy)) %then %do;
+        %let LEGACY_PATH = &PROJ_ROOT/02_datasets/legacy;
+        %let SDTM_PATH = &PROJ_ROOT/02_datasets/tabulations;
+        %let ADAM_PATH = &PROJ_ROOT/02_datasets/analysis;
+    %end;
+    %else %do;
+        %let LEGACY_PATH = &PROJ_ROOT;
+        %let SDTM_PATH = &PROJ_ROOT;
+        %let ADAM_PATH = &PROJ_ROOT;
+    %end;
+
+    /* Assign Libraries */
+    libname raw "&LEGACY_PATH" access=readonly;
+    libname sdtm "&SDTM_PATH";
+    libname adam "&ADAM_PATH";
+    
+    %put NOTE: ========================================;
+    %put NOTE: Project Root: &PROJ_ROOT;
+    %put NOTE: Legacy Path: &LEGACY_PATH;
+    %put NOTE: ========================================;
+%mend;
+%set_paths;
 
 %set_paths;

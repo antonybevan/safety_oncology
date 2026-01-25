@@ -14,6 +14,11 @@
  *               - CTCAE v5.0 grading applied
  ******************************************************************************/
 
+%macro load_config;
+   %if %sysfunc(fileexist(00_config.sas)) %then %include "00_config.sas";
+   %else %include "../00_config.sas";
+%mend;
+%load_config;
 
 proc import datafile="&LEGACY_PATH/raw_lb.csv"
     out=raw_lb
@@ -81,6 +86,11 @@ data lb;
     retain LBSEQ;
     if first.USUBJID then LBSEQ = 0;
     LBSEQ + 1;
+run;
+
+/* Create permanent SAS dataset for ADaM use */
+data sdtm.lb;
+    set lb;
 run;
 
 /* Create XPT */

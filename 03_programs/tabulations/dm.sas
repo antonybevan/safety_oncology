@@ -16,8 +16,11 @@
  * 2026-01-22 Clinical Programming Lead   Initial version
  ******************************************************************************/
 
-/* Include centralized configuration */
-%include "../00_config.sas";
+%macro load_config;
+   %if %sysfunc(fileexist(00_config.sas)) %then %include "00_config.sas";
+   %else %include "../00_config.sas";
+%mend;
+%load_config;
 
 * Read raw demographics data;
 proc import datafile="&LEGACY_PATH/raw_dm.csv"
@@ -106,6 +109,11 @@ run;
 * Sort by USUBJID;
 proc sort data=dm;
     by USUBJID;
+run;
+
+/* Create permanent SAS dataset for ADaM use */
+data sdtm.dm;
+    set dm;
 run;
 
 * Create XPT file (SAS Transport Format v5);

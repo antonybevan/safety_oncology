@@ -16,6 +16,12 @@
  *               - BV-CAR20 (Study Drug)
  ******************************************************************************/
 
+%macro load_config;
+   %if %sysfunc(fileexist(00_config.sas)) %then %include "00_config.sas";
+   %else %include "../00_config.sas";
+%mend;
+%load_config;
+
 
 proc import datafile="&LEGACY_PATH/raw_ex.csv"
     out=raw_ex
@@ -70,6 +76,11 @@ run;
 /* Assign sequence numbers */
 proc sort data=ex;
     by USUBJID EXSTDTC EXTRT;
+run;
+
+/* Create permanent SAS dataset for ADaM use */
+data sdtm.ex;
+    set ex;
 run;
 
 data ex;

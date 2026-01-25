@@ -15,7 +15,11 @@
  *               - CLL/SLL: iwCLL 2018 guidelines
  ******************************************************************************/
 
-
+%macro load_config;
+   %if %sysfunc(fileexist(00_config.sas)) %then %include "00_config.sas";
+   %else %include "../00_config.sas";
+%mend;
+%load_config;
 proc import datafile="&LEGACY_PATH/raw_rs.csv"
     out=raw_rs
     dbms=csv
@@ -82,6 +86,11 @@ data rs;
     retain RSSEQ;
     if first.USUBJID then RSSEQ = 0;
     RSSEQ + 1;
+run;
+
+/* Create permanent SAS dataset for ADaM use */
+data sdtm.rs;
+    set rs;
 run;
 
 /* Create XPT */

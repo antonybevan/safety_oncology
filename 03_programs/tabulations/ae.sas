@@ -15,6 +15,11 @@
  *               - AESI flagged per SAP Section 8.2.2
  ******************************************************************************/
 
+%macro load_config;
+   %if %sysfunc(fileexist(00_config.sas)) %then %include "00_config.sas";
+   %else %include "../00_config.sas";
+%mend;
+%load_config;
 
 proc import datafile="&LEGACY_PATH/raw_ae.csv"
     out=raw_ae
@@ -85,6 +90,11 @@ data ae;
     retain AESEQ;
     if first.USUBJID then AESEQ = 0;
     AESEQ + 1;
+run;
+
+/* Create permanent SAS dataset for ADaM use */
+data sdtm.ae;
+    set ae;
 run;
 
 /* Create XPT */

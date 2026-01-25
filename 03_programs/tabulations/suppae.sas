@@ -14,6 +14,11 @@
  *               per SAP Section 8.2.2 and CDISC SDTM IG v3.4
  ******************************************************************************/
 
+%macro load_config;
+   %if %sysfunc(fileexist(00_config.sas)) %then %include "00_config.sas";
+   %else %include "../00_config.sas";
+%mend;
+%load_config;
 
 proc import datafile="&LEGACY_PATH/raw_ae.csv"
     out=raw_ae
@@ -87,6 +92,11 @@ run;
 
 proc sort data=suppae;
     by USUBJID IDVARVAL;
+run;
+
+/* Create permanent SAS dataset for ADaM use */
+data sdtm.suppae;
+    set suppae;
 run;
 
 /* Create XPT */
