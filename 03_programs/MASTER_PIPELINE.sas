@@ -33,11 +33,11 @@
 %import_csv(suppae);
 
 /* 2. Execute ADaM Analysis */
-%include "analysis/adsl.sas";
-%include "analysis/adex.sas";
-%include "analysis/adae.sas";
-%include "analysis/adlb.sas";
-%include "analysis/adrs.sas";
+%include "&PROJ_ROOT/03_programs/analysis/adsl.sas";
+%include "&PROJ_ROOT/03_programs/analysis/adex.sas";
+%include "&PROJ_ROOT/03_programs/analysis/adae.sas";
+%include "&PROJ_ROOT/03_programs/analysis/adlb.sas";
+%include "&PROJ_ROOT/03_programs/analysis/adrs.sas";
 
 /* 3. Validation Audit */
 proc sql;

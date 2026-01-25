@@ -13,15 +13,19 @@
 
 %global IS_CLOUD PROJ_ROOT LEGACY_PATH SDTM_PATH ADAM_PATH;
 
-/* 1. Detect Environment and Root */
+/* 1. Detect Environment and Root dynamically */
 %macro set_proj_root;
     %if %sysfunc(find(&SYSSCP, LIN)) > 0 %then %do;
-        %let HOME = %sysget(HOME);
-        /* Check for multiple possible root names to be safe */
-        %if %sysfunc(fileexist(&HOME/safety_oncology)) %then %let PROJ_ROOT = &HOME/safety_oncology;
-        %else %if %sysfunc(fileexist(&HOME/safety_oncology_git)) %then %let PROJ_ROOT = &HOME/safety_oncology_git;
-        %else %let PROJ_ROOT = &HOME;
         %let IS_CLOUD = 1;
+        /* Use the location of THIS config file to find the root */
+        %if %symexist(_SASPROGRAMFILE) %then %do;
+            %let this_path = %sysfunc(prxchange(s/(.*)[\/\\].*$/$1/, 1, &_SASPROGRAMFILE));
+            /* If we are in '03_programs', root is one level up */
+            %if %sysfunc(index(&this_path, 03_programs)) > 0 %then 
+                %let PROJ_ROOT = %sysfunc(prxchange(s/(.*)[\/\\].*$/$1/, 1, &this_path));
+            %else %let PROJ_ROOT = &this_path;
+        %end;
+        %else %let PROJ_ROOT = %sysget(HOME);
     %end;
     %else %do;
         %let PROJ_ROOT = d:\safety_oncology;
