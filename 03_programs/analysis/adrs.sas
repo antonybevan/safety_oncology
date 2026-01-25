@@ -51,8 +51,10 @@ run;
 data rs_adsl;
     set rs_pre;
     
+    length TRT01A $40;
     if _n_ = 1 then do;
-        declare hash a(dataset:'adam.adsl(keep=USUBJID TRTSDT TRT01A TRT01AN)');
+        if 0 then set adam.adsl(keep=USUBJID TRTSDT TRT01A TRT01AN);
+        declare hash a(dataset:'adam.adsl');
         a.defineKey('USUBJID');
         a.defineData('TRTSDT', 'TRT01A', 'TRT01AN');
         a.defineDone();
@@ -67,19 +69,14 @@ data rs_adsl;
 run;
 
 /* 3. Flag Best Response (ANL01FL) */
-/* For BOR parameter, we usually just take the best one recorded. */
-/* In this simple model, SDTM RS already calculated "BOR", so we just flag it. */
-/* However, if multiple records exist, we take the best one. */
-
 proc sort data=rs_adsl;
-    by USUBJID _RANK ADT; /* Sort by Rank (Best First) then Date */
+    by USUBJID _RANK ADT; 
 run;
 
 data adrs;
     set rs_adsl;
     by USUBJID _RANK;
     
-    /* Flag the very first record as the Best one for analysis */
     if first.USUBJID then ANL01FL = 'Y';
     else ANL01FL = 'N';
     
@@ -90,8 +87,6 @@ data adrs;
         TRTA    = "Actual Treatment"
         TRTAN   = "Actual Treatment (N)"
     ;
-    
-    drop _RANK;
 run;
 
 /* Create permanent SAS dataset */
@@ -102,7 +97,7 @@ run;
 /* 4. Export to XPT */
 libname xpt xport "&ADAM_PATH/adrs.xpt";
 data xpt.adrs;
-    set adrs;
+    set adrs(drop=_RANK);
 run;
 libname xpt clear;
 

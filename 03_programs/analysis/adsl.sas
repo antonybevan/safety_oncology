@@ -90,19 +90,16 @@ data adsl;
     else EFFFL = "N";
 
     /* Analysis Treatments per ADaM IG */
+    length TRT01P TRT01A $40;
     TRT01P = ARM;
-    TRT01A = ACTARM;
+    TRT01A = ARM; /* Fallback to ARM since ACTARM is missing in simulation */
     
     /* Numeric Analysis Treatments */
-    if ARMCD = 'DL1'      then TRT01PN = 1;
-    else if ARMCD = 'DL2' then TRT01PN = 2;
-    else if ARMCD = 'DL3' then TRT01PN = 3;
-    
-    if ACTARMCD = 'DL1'      then TRT01AN = 1;
-    else if ACTARMCD = 'DL2' then TRT01AN = 2;
-    else if ACTARMCD = 'DL3' then TRT01AN = 3;
+    TRT01PN = dose_level;
+    TRT01AN = dose_level;
 
     /* Age Grouping */
+    length AGEGR1 $10;
     if missing(AGE) then AGEGR1 = "";
     else if AGE < 65 then AGEGR1 = "<65";
     else AGEGR1 = ">=65";
@@ -131,10 +128,10 @@ data adam.adsl;
     set adsl;
 run;
 
-/* 4. Export to XPT */
+/* 4. Export to XPT - Drop non-standard variables for V6 compatibility */
 libname xpt xport "&ADAM_PATH/adsl.xpt";
 data xpt.adsl;
-    set adsl;
+    set adsl(drop=dose_level subid dt i);
 run;
 libname xpt clear;
 

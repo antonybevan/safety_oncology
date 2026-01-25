@@ -48,8 +48,10 @@ run;
 data adex;
     set ex_pre;
     
+    length TRT01A $40;
     if _n_ = 1 then do;
-        declare hash a(dataset:'adam.adsl(keep=USUBJID TRTSDT TRT01A TRT01AN)');
+        if 0 then set adam.adsl(keep=USUBJID TRTSDT TRT01A TRT01AN);
+        declare hash a(dataset:'adam.adsl');
         a.defineKey('USUBJID');
         a.defineData('TRTSDT', 'TRT01A', 'TRT01AN');
         a.defineDone();
@@ -87,7 +89,7 @@ run;
 /* 3. Export to XPT */
 libname xpt xport "&ADAM_PATH/adex.xpt";
 data xpt.adex;
-    set adex;
+    set adex(drop=EXSEQ); /* Drop unreferenced variable */
 run;
 libname xpt clear;
 

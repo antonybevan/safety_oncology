@@ -50,8 +50,10 @@ proc sort data=lb_pre; by USUBJID; run;
 data lb_adsl;
     set lb_pre;
     
+    length TRT01A $40;
     if _n_ = 1 then do;
-        declare hash a(dataset:'adam.adsl(keep=USUBJID TRTSDT TRT01A TRT01AN)');
+        if 0 then set adam.adsl(keep=USUBJID TRTSDT TRT01A TRT01AN);
+        declare hash a(dataset:'adam.adsl');
         a.defineKey('USUBJID');
         a.defineData('TRTSDT', 'TRT01A', 'TRT01AN');
         a.defineDone();
@@ -73,7 +75,6 @@ data lb_adsl;
 run;
 
 /* 3. Baseline Flagging (ABLFL) */
-/* Definition: Last non-missing value on or before Treatment Start */
 proc sort data=lb_adsl;
     by USUBJID PARAMCD ADT;
 run;
@@ -86,8 +87,8 @@ data lb_base_flags;
     
     if first.PARAMCD then TEMP_BASE_DT = .;
     
-    if not missing(AVAL) and ADT <= TRTSDT then do;
-        TEMP_BASE_DT = ADT;
+    if not missing(AVAL) and not missing(TRTSDT) then do;
+        if ADT <= TRTSDT then TEMP_BASE_DT = ADT;
     end;
     
     /* Check if this record is the baseline */
@@ -98,7 +99,6 @@ data lb_base_flags;
 run;
 
 /* 4. Derive Change from Baseline & Shift */
-/* First, get the baseline value for each parameter/subject and merge it back */
 proc sort data=lb_base_flags out=baseline_vals(keep=USUBJID PARAMCD AVAL rename=(AVAL=BASE)) nodupkey;
     by USUBJID PARAMCD;
     where ABLFL = 'Y';
@@ -112,21 +112,17 @@ data adlb;
     /* Change from Baseline */
     if not missing(AVAL) and not missing(BASE) then CHG = AVAL - BASE;
     
-    /* Normal Range Logic (Simplified for Portfolio) */
+    /* Normal Range Logic */
     length ANRIND $10 BNRIND $10;
     
-    /* Current Range */
     if not missing(AVAL) and not missing(LBORNRLO) and AVAL < LBORNRLO then ANRIND = 'LOW';
     else if not missing(AVAL) and not missing(LBORNRHI) and AVAL > LBORNRHI then ANRIND = 'HIGH';
     else if not missing(AVAL) then ANRIND = 'NORMAL';
     
-    /* Baseline Range (Approximation: Ideally we merge actual baseline indicator, but simplified logic here) */
-    /* For robust production, we'd look up the ANRIND of the ABLFL='Y' record. */
     if not missing(BASE) and not missing(LBORNRLO) and BASE < LBORNRLO then BNRIND = 'LOW';
     else if not missing(BASE) and not missing(LBORNRHI) and BASE > LBORNRHI then BNRIND = 'HIGH';
     else if not missing(BASE) then BNRIND = 'NORMAL';
     
-    /* Shift Variable */
     if not missing(BNRIND) and not missing(ANRIND) then 
         SHIFT1 = catx(' to ', BNRIND, ANRIND);
         
@@ -152,7 +148,7 @@ run;
 /* 5. Export to XPT */
 libname xpt xport "&ADAM_PATH/adlb.xpt";
 data xpt.adlb;
-    set adlb;
+    set adlb(drop=LBORNRLO LBORNRHI);
 run;
 libname xpt clear;
 

@@ -27,7 +27,7 @@
 /* 1. Get ASTCT Grades from SUPPAE */
 data suppae_grades;
     set sdtm.suppae;
-    where QNAM = 'ASTCTGR';
+    where QNAM = 'AETOXGR'; /* Updated to match generator */
     AESEQ = input(IDVARVAL, 8.);
     ASTCTGR = QVAL;
     keep USUBJID AESEQ ASTCTGR;
@@ -38,8 +38,10 @@ data adae;
     set sdtm.ae;
     
     /* Join ADSL variables */
+    length TRT01A $40;
     if _n_ = 1 then do;
-        declare hash a(dataset:'adam.adsl(keep=USUBJID TRTSDT TRT01A TRT01AN)');
+        if 0 then set adam.adsl(keep=USUBJID TRTSDT TRT01A TRT01AN);
+        declare hash a(dataset:'adam.adsl');
         a.defineKey('USUBJID');
         a.defineData('TRTSDT', 'TRT01A', 'TRT01AN');
         a.defineDone();
@@ -49,7 +51,7 @@ data adae;
         TRTSDT = .; TRT01A = ""; TRT01AN = .;
     end;
 
-    /* Join SUPPAE ASTCT Grades */
+    /* Join SUPPAE Grades */
     if _n_ = 1 then do;
         declare hash s(dataset:'suppae_grades');
         s.defineKey('USUBJID', 'AESEQ');
@@ -76,10 +78,10 @@ data adae;
     else TRTEMFL = "N";
 
     /* Numeric Grading */
-    AETOXGRN = input(AETOXGR, 8.);
+    if not missing(AETOXGR) then AETOXGRN = input(AETOXGR, 8.);
+    else AETOXGRN = .;
 
-    /* AESI Flag (Bring from SDTM or manual check) */
-    /* In this study, AESI are CRS, ICANS, GvHD */
+    /* AESI Flag */
     AESIFL = "N";
     if index(upcase(AEDECOD), 'CYTOKINE RELEASE') > 0 or 
        index(upcase(AEDECOD), 'NEUROTOXICITY') > 0 or
@@ -125,7 +127,7 @@ run;
 /* 4. Export to XPT */
 libname xpt xport "&ADAM_PATH/adae.xpt";
 data xpt.adae;
-    set adae;
+    set adae(drop=AETOXGR_NUM); /* Drop non-standard variables */
 run;
 libname xpt clear;
 
