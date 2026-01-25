@@ -16,6 +16,9 @@
 
 %put NOTE: Starting Master Pipeline in &PROJ_ROOT;
 
+/* 0. Generate Raw Data (SAS Native) */
+%include "&PROJ_ROOT/03_programs/generate_data.sas";
+
 /* 1. Force-Import SDTM Baseline */
 %macro import_csv(domain);
    proc import datafile="&LEGACY_PATH/raw_&domain..csv"
