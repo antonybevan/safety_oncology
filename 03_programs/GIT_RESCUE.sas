@@ -5,20 +5,26 @@
 
 %let repo_url = https://github.com/antonybevan/safety_oncology.git;
 %let home_dir = /home/u63849890;
+%let safe_path = &home_dir/clinical_safety;
 
 data _null_;
-    /* Generate a folder name with NO COLONS (e.g., safety_oncology_26JAN26_0018) */
-    unique_name = catx('_', "safety_oncology", put(date(), date9.), compress(put(time(), time5.), ':'));
-    unique_path = catx('/', "&home_dir", unique_name);
-    
-    put "NOTE: Attempting clean clone into: " unique_path;
-    
-    rc = gitfn_clone("&repo_url", unique_path);
-    
-    if rc = 0 then do;
-        put "NOTE: ========================================";
-        put "NOTE: ✅ SUCCESS! Project cloned to: " unique_path;
-        put "NOTE: ========================================";
-    end;
-    else put "ERR" "OR: Clone failed. RC=" rc;
+   /* Attempt PULL first */
+   rc = gitfn_pull("&safe_path");
+   if rc = 0 or rc = 1 then do;
+       put "NOTE: ✅ SUCCESS! Project folder is updated.";
+   end;
+   
+   /* If folder missing (-1) or not a repo (128), CLONE it */
+   else if rc = -1 or rc = 128 then do;
+       put "NOTE: Folder missing. Attempting clean clone into: &safe_path";
+       rc_clone = gitfn_clone("&repo_url", "&safe_path");
+       
+       if rc_clone = 0 then do;
+          put "NOTE: ========================================";
+          put "NOTE: ✅ SUCCESS! Project cloned to: &safe_path";
+          put "NOTE: ========================================";
+       end;
+       else put "ERR" "OR: Clone failed. RC=" rc_clone;
+   end;
+   else put "ERR" "OR: Sync check failed. RC=" rc;
 run;
