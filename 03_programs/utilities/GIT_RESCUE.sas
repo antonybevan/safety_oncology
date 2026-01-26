@@ -14,11 +14,8 @@ data _null_;
    /* Attempt PULL first */
    rc = gitfn_pull("&safe_path");
    
-   /* If it says 'Up to date' (RC=1) but you know it's not, we can force it */
-   /* For now, let's trust the RC unless FORCE_FRESH is on */
-   
-   if rc = 0 then put "NOTE: ✅ SUCCESS! Project updated.";
-   else if rc = 1 then put "NOTE: System says 'Already up to date'. If this is wrong, rename the folder manually.";
+   if rc = 0 then put "NOTE: ✅ SUCCESS! Project updated from GitHub.";
+   else if rc = 1 then put "NOTE: Repository is already up to date.";
    
    /* If folder missing (-1) or not a repo (128), CLONE it */
    else if rc = -1 or rc = 128 then do;
