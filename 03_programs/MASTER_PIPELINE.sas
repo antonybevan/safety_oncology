@@ -49,7 +49,10 @@
 %include "&PROJ_ROOT/03_programs/analysis/adlb.sas";
 %include "&PROJ_ROOT/03_programs/analysis/adrs.sas";
 
-/* 3. Validation Audit */
+/* 3. Execute Safety Reporting (Tables) */
+%include "&PROJ_ROOT/03_programs/reporting/t_ae_summ.sas";
+
+/* 4. Validation Audit */
 proc sql;
    title "BV-CAR20-P1: Final Data Integrity Audit";
    select 'SDTM.DM' as Table, count(*) as Records from sdtm.dm
