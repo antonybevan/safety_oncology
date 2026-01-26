@@ -1,6 +1,13 @@
 /******************************************************************************
  * Program:      MASTER_PIPELINE.sas
- * Purpose:      Execute full project flow (SDTM -> ADaM) in one click
+ * Protocol:     BV-CAR20-P1
+ * Purpose:      Main Execution Pipeline (End-to-End: Raw -> SDTM -> ADaM)
+ * Author:       Clinical Programming Lead
+ * Date:         2026-01-26
+ *
+ * Description:  This program orchestrates the full data flow. It configures
+ *               the environment, generates synthetic raw data, imports it
+ *               into SDTM, and executes ADaM analysis programs.
  ******************************************************************************/
 
 %macro load_config;
