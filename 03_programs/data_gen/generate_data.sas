@@ -4,13 +4,9 @@
  ******************************************************************************/
 
 %macro load_config;
+   %if %symexist(CONFIG_LOADED) %then %if &CONFIG_LOADED=1 %then %return;
    %if %sysfunc(fileexist(00_config.sas)) %then %include "00_config.sas";
    %else %if %sysfunc(fileexist(../00_config.sas)) %then %include "../00_config.sas";
-   %else %if %symexist(_SASPROGRAMFILE) %then %do;
-      %let path = %sysfunc(prxchange(s/(.*)[\/\\].*$/$1/, 1, &_SASPROGRAMFILE));
-      %if %sysfunc(fileexist(&path/00_config.sas)) %then %include "&path/00_config.sas";
-      %else %if %sysfunc(fileexist(&path/../00_config.sas)) %then %include "&path/../00_config.sas";
-   %end;
 %mend;
 %load_config;
 
@@ -18,6 +14,7 @@
 %let target_study = BV-CAR20-P1;
 
 /* 1. Generate Demographics (DM) and Population Flags */
+data raw_dm;
    retain STUDYID USUBJID ARM SEX RACE DISEASE RFSTDTC TRTSDT LDSTDT SAFFL ITTFL EFFFL dose_level i subid AGE dt;
    length STUDYID $20 USUBJID $20 ARM $40 SEX $1 RACE $40 DISEASE $5 RFSTDTC TRTSDT LDSTDT $10;
    length SAFFL ITTFL EFFFL $1;
@@ -58,110 +55,129 @@ run;
 data raw_ex;
    retain STUDYID USUBJID ARM SEX RACE DISEASE RFSTDTC TRTSDT LDSTDT SAFFL ITTFL EFFFL dose_level i subid AGE dt EXTRT EXDOSE EXDOSU EXSTDTC EXENDTC day0 d;
    set raw_dm;
-   length EXTRT $100 EXDOSE 8 EXDOSU $20 EXSTDTC EXENDTC $10;
+   
+   format day0 d yymmdd10.;
    day0 = input(TRTSDT, yymmdd10.);
-   
-   /* Fludarabine Days -5 to -3 */
-   EXTRT = "FLUDARABINE";
-   EXDOSE = 30; EXDOSU = "mg/m^2";
-   do d = -5 to -3;
-      EXSTDTC = put(day0 + d, yymmdd10.);
-      EXENDTC = EXSTDTC;
-      output;
-   end;
-   
-   /* Cyclophosphamide Days -5 to -3 */
-   EXTRT = "CYCLOPHOSPHAMIDE";
-   EXDOSE = 500; EXDOSU = "mg/m^2";
-   do d = -5 to -3;
-      EXSTDTC = put(day0 + d, yymmdd10.);
-      EXENDTC = EXSTDTC;
-      output;
-   end;
-   
-   /* Study Drug Day 0 */
-   EXTRT = "BV-CAR20";
-   EXDOSU = "10^6 cells";
-   if dose_level = 1 then EXDOSE = 1; /* Simplification: assuming avg weight/dose */
-   else if dose_level = 2 then EXDOSE = 3;
-   else EXDOSE = 480;
-   EXSTDTC = put(day0, yymmdd10.);
-   EXENDTC = EXSTDTC;
+
+   /* Infusion Day 0 */
+   EXTRT = "PBCAR20A";
+   EXDOSE = dose_level;
+   EXDOSU = "CELLS";
+   EXSTDTC = TRTSDT;
+   EXENDTC = TRTSDT;
    output;
+
+   /* Lymphodepletion Days -5 to -3 */
+   do d = day0 - 5 to day0 - 3;
+      EXTRT = "Cyclophosphamide";
+      EXDOSE = 500;
+      EXDOSU = "mg/m2";
+      EXSTDTC = put(d, yymmdd10.);
+      EXENDTC = put(d, yymmdd10.);
+      output;
+      
+      EXTRT = "Fludarabine";
+      EXDOSE = 30;
+      EXDOSU = "mg/m2";
+      EXSTDTC = put(d, yymmdd10.);
+      EXENDTC = put(d, yymmdd10.);
+      output;
+   end;
 run;
 
-/* 3. Generate Adverse Events (AE) */
-data raw_ae(drop=dt);
-   retain STUDYID USUBJID ARM SEX RACE DISEASE RFSTDTC TRTSDT LDSTDT SAFFL ITTFL EFFFL dose_level i subid AGE AETERM AEDECOD AESTDTC AEENDTC day0 AETOXGR_NUM AETOXGR AESER;
+/* 3. Generate Adverse Events (AE) with CRS and ICANS */
+data raw_ae;
+   retain STUDYID USUBJID ARM SEX RACE DISEASE RFSTDTC TRTSDT LDSTDT SAFFL ITTFL EFFFL dose_level i subid AGE dt AEDECOD AETERM AETOXGR AESTDTC AEENDTC AESER AESID day0 d;
    set raw_dm;
-   length AETERM AEDECOD $100 AESTDTC AEENDTC $10;
    day0 = input(TRTSDT, yymmdd10.);
    
-   /* CRS simulation (Primary safety endpoint) */
-   if (dose_level=1 and ranuni(0)<0.50) or (dose_level=2 and ranuni(0)<0.7) or (dose_level=3 and ranuni(0)<1.0) then do;
-      AETERM = "Cytokine Release Syndrome";
+   /* Every subject gets a common AE */
+   AEDECOD = "Fatigue";
+   AETERM  = "Fatigue";
+   AETOXGR = "GRADE 1";
+   AESTDTC = put(day0 + 2, yymmdd10.);
+   AEENDTC = put(day0 + 15, yymmdd10.);
+   AESER   = "N";
+   AESID   = 0;
+   output;
+
+   /* CRS for higher dose levels */
+   if dose_level >= 2 then do;
       AEDECOD = "Cytokine release syndrome";
-      AETOXGR_NUM = round(1 + 2*ranuni(0));
-      AETOXGR = put(AETOXGR_NUM, 1.);
-      AESTDTC = put(day0 + 3, yymmdd10.);
+      AETERM  = "Cytokine release syndrome";
+      AETOXGR = "GRADE 2";
+      AESTDTC = put(day0 + 4, yymmdd10.);
       AEENDTC = put(day0 + 10, yymmdd10.);
-      AESER = 'N'; if AETOXGR_NUM >= 3 then AESER = 'Y';
+      AESER   = "Y";
+      AESID   = 1;
+      output;
+   end;
+
+   /* ICANS for Dose level 3 */
+   if dose_level = 3 then do;
+      AEDECOD = "Immune effector cell-associated neurotoxicity syndrome";
+      AETERM  = "ICANS";
+      AETOXGR = "GRADE 3";
+      AESTDTC = put(day0 + 6, yymmdd10.);
+      AEENDTC = put(day0 + 14, yymmdd10.);
+      AESER   = "Y";
+      AESID   = 1;
       output;
    end;
 run;
 
 /* 4. Generate Lab Data (LB) */
 data raw_lb;
-   retain STUDYID USUBJID ARM SEX RACE DISEASE RFSTDTC TRTSDT LDSTDT SAFFL ITTFL EFFFL dose_level i subid AGE dt LBTESTCD LBTEST LBORRES LBORRESU LBDTC VISIT day0 visit_idx LBORNRLO LBORNRHI;
+   retain STUDYID USUBJID ARM SEX RACE DISEASE RFSTDTC TRTSDT LDSTDT SAFFL ITTFL EFFFL dose_level i subid AGE dt LBTESTCD LBTEST LBORRES LBORNRLO LBORNRHI VISIT LBDTC;
    set raw_dm;
-   length LBTESTCD $8 LBTEST $40 LBORRES $20 LBORRESU $20 LBDTC $10 VISIT $20;
    day0 = input(TRTSDT, yymmdd10.);
-   do visit_idx = 0, 7, 14, 28;
-      if visit_idx = 0 then VISIT = "Baseline";
-      else VISIT = catx(' ', "Day", visit_idx);
+   
+   do VISIT = 'Screening', 'Day 0', 'Day 7', 'Day 14';
+      if VISIT = 'Screening' then d = day0 - 10;
+      else if VISIT = 'Day 0' then d = day0;
+      else if VISIT = 'Day 7' then d = day0 + 7;
+      else d = day0 + 14;
       
-      LBDTC = put(day0 + visit_idx, yymmdd10.);
+      LBDTC = put(d, yymmdd10.);
       
-      /* Neutrophils */
-      LBTESTCD = "NEUT"; LBTEST = "Neutrophils"; LBORRESU = "10^9/L";
-      LBORNRLO = 1.8; LBORNRHI = 7.5;
-      LBORRES = put(LBORNRLO + ranuni(0)*(LBORNRHI-LBORNRLO), 8.2);
-      output;
-      
-      /* Platelets */
-      LBTESTCD = "PLAT"; LBTEST = "Platelets"; LBORRESU = "10^9/L";
-      LBORNRLO = 150; LBORNRHI = 400;
-      LBORRES = put(LBORNRLO + ranuni(0)*(LBORNRHI-LBORNRLO), 8.2);
-      output;
+      LBTESTCD = 'NEUT'; LBTEST = 'Neutrophils'; LBORRES = put(2.5 + rannor(123)*0.5, 5.1); LBORNRLO = '1.5'; LBORNRHI = '8.0'; output;
+      LBTESTCD = 'PLAT'; LBTEST = 'Platelets'; LBORRES = put(220 + rannor(123)*50, 5.0);   LBORNRLO = '150'; LBORNRHI = '450'; output;
    end;
 run;
 
 /* 5. Generate Response Data (RS) */
 data raw_rs;
-   retain STUDYID USUBJID ARM SEX RACE DISEASE RFSTDTC TRTSDT LDSTDT SAFFL ITTFL EFFFL dose_level i subid AGE dt RSTESTCD RSTEST RSORRES RSDTC VISIT day0 p;
+   retain STUDYID USUBJID ARM SEX RACE DISEASE RFSTDTC TRTSDT LDSTDT SAFFL ITTFL EFFFL dose_level i subid AGE dt RSTESTCD RSTEST RSORRES RSSTRESC RSSTRESN RSDTC VISIT;
    set raw_dm;
-   length RSTESTCD $8 RSTEST $40 RSORRES $20 RSDTC $10 VISIT $20;
    day0 = input(TRTSDT, yymmdd10.);
    
-   VISIT = "Cycle 3 Day 1";
-   RSDTC = put(day0 + 84, yymmdd10.); /* Approx 3 months */
-   RSTESTCD = "OVRLRESP"; RSTEST = "Overall Response";
-   
-   /* Progression probabilities increase with dose (just for sim) */
-   p = ranuni(0);
-   if p < 0.4 then RSORRES = "CR";
-   else if p < 0.7 then RSORRES = "PR";
-   else if p < 0.9 then RSORRES = "SD";
-   else RSORRES = "PD";
-   
-   output;
+   do VISIT = 'Day 28', 'Day 56';
+      if VISIT = 'Day 28' then d = day0 + 28;
+      else d = day0 + 56;
+      
+      RSDTC = put(d, yymmdd10.);
+      RSTESTCD = 'BOR';
+      RSTEST = 'Best Overall Response';
+      
+      /* Simulating response: Better response for higher dose */
+      r = ranuni(456);
+      if dose_level = 1 then do;
+         if r > 0.6 then RSORRES = 'PR'; else RSORRES = 'SD';
+      end;
+      else do;
+         if r > 0.4 then RSORRES = 'CR'; else RSORRES = 'PR';
+      end;
+      
+      RSSTRESC = RSORRES;
+      output;
+   end;
 run;
 
-/* 6. Export to CSV */
+/* 6. Export all to CSV in Legacy Folder */
 %macro export_raw(ds);
-   proc export data=&ds 
-      outfile="&LEGACY_PATH/&ds..csv"
-      dbms=csv replace;
+   proc export data=&ds
+               outfile="&LEGACY_PATH/&ds..csv"
+               dbms=csv replace;
    run;
 %mend;
 
@@ -171,4 +187,6 @@ run;
 %export_raw(raw_lb);
 %export_raw(raw_rs);
 
-%put NOTE: ✅ Synthetic raw data generated and saved to &LEGACY_PATH;
+%put NOTE: --------------------------------------------------;
+%put NOTE: ✅ SYNTHETIC DATA GENERATION COMPLETE;
+%put NOTE: --------------------------------------------------;
