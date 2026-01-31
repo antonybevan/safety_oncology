@@ -7,44 +7,52 @@
 %let home_dir = /home/u63849890;
 %let safe_path = &home_dir/clinical_safety;
 
-%let FORCE_FRESH = 0; /* Set to 1 to force a clean wipe and clone */
-
-/* Helper to delete directory on SAS OnDemand */
-%macro delete_dir(dir);
+/* 
+   ROBUST CLEANUP MACRO 
+   Uses Linux 'rm -rf' via SYSTEM call to ensure non-empty dirs are gone.
+*/
+%macro force_clean(dir);
    data _null_;
-      rc = filename('dir_t', "&dir");
-      if rc = 0 then do;
-         rc_del = fdelete('dir_t');
-         put "NOTE: Attempted to delete &dir.. RC=" rc_del;
+      fname = "tempfile";
+      rc = filename(fname, "&dir");
+      if fexist(fname) or fileexist("&dir") then do;
+          put "NOTE: Directory exists. Executing recursive delete on: &dir";
+          call system("rm -rf &dir");
       end;
+      else put "NOTE: Directory does not exist, nothing to clean.";
    run;
 %mend;
 
 data _null_;
+   put "NOTE: --------------------------------------------------";
+   put "NOTE: Starting GIT RESCUE Operation...";
+   
    /* 1. Attempt PULL first */
    rc = gitfn_pull("&safe_path");
+   put "NOTE: gitfn_pull returned RC=" rc;
    
    if rc = 0 then put "NOTE: ✅ SUCCESS! Project updated from GitHub.";
    else if rc = 1 then put "NOTE: Repository is already up to date.";
    
-   /* 2. Handle Conflicts (RC=22) or Forced Fresh */
-   else if rc = 22 or &FORCE_FRESH = 1 then do;
-       put "NOTE: Sync conflict (RC=22) or Force Fresh detected. Wiping local directory...";
-       call execute('%delete_dir(&safe_path)');
+   /* 
+      Catch-all for failures:
+      RC = 22 (Conflict)
+      RC = -1 (Generic Failure / Repo missing)
+      RC = 128 (Not a repo)
+   */
+   else do; 
+       put "NOTE: Pull failed (Conflict or Missing). Initiating FRESH CLONE Protocol...";
        
-       put "NOTE: Attempting clean clone into: &safe_path";
+       /* Nuke it from orbit */
+       call execute('%force_clean(&safe_path)');
+       
+       /* Clone fresh */
+       put "NOTE: Cloning from &repo_url...";
        rc_clone = gitfn_clone("&repo_url", "&safe_path");
        
        if rc_clone = 0 then put "NOTE: ✅ SUCCESS! Project reset and re-cloned.";
-       else put "ERR" "OR: Re-clone failed. RC=" rc_clone;
-   end;
-   
-   /* 3. Handle Missing Repo (-1 or 128) */
-   else if rc = -1 or rc = 128 then do;
-       put "NOTE: Folder missing or invalid. Attempting clean clone...";
-       rc_clone = gitfn_clone("&repo_url", "&safe_path");
-       if rc_clone = 0 then put "NOTE: ✅ SUCCESS! Project cloned.";
        else put "ERR" "OR: Clone failed. RC=" rc_clone;
    end;
-   else put "ERR" "OR: Sync check failed. RC=" rc;
+   
+   put "NOTE: --------------------------------------------------";
 run;
