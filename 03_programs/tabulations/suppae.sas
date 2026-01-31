@@ -35,6 +35,7 @@ proc sort data=raw_ae; by USUBJID AETERM AESTDTC AESID; run;
 proc sort data=ae_map; by USUBJID AETERM AESTDTC AESID; run;
 
 data aesi;
+    length AETERM $200;
     merge raw_ae(in=a) ae_map(in=b);
     by USUBJID AETERM AESTDTC AESID;
     if a and b;

@@ -45,7 +45,7 @@ data ae;
         TRTSDT_NUM 8.
     ;
 
-    set raw_ae;
+    set raw_ae(rename=(AETOXGR=_AETOXGR));
 
     /* Standard Variables */
     STUDYID = "&STUDYID";
@@ -64,7 +64,7 @@ data ae;
     AEENDTC = strip(AEENDTC);
     
     /* Grade processing */
-    AETOXGR_ = upcase(strip(AETOXGR));
+    AETOXGR_ = upcase(strip(_AETOXGR));
     if index(AETOXGR_, 'GRADE') > 0 then 
         AETOXGR = compress(AETOXGR_, , 'kd');
     else AETOXGR = substr(strip(AETOXGR_), 1, 2);
@@ -100,7 +100,7 @@ data sdtm.ae;
     set ae;
     by USUBJID;
     
-    retain AESEQ;
+    retain AESEQ 0;
     if first.USUBJID then AESEQ = 1;
     else AESEQ + 1;
 run;

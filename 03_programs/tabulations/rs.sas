@@ -41,7 +41,7 @@ data rs;
         TRTSDT_NUM 8.
     ;
 
-    set raw_rs;
+    set raw_rs(rename=(RSTEST=_RSTEST));
 
     /* Standard Variables */
     STUDYID = "&STUDYID";
@@ -51,7 +51,7 @@ data rs;
     
     /* Test Info */
     RSTESTCD = strip(RSTESTCD);
-    RSTEST = strip(RSTEST);
+    RSTEST = strip(_RSTEST);
     
     /* Response Result */
     RSORRES = strip(RSORRES);

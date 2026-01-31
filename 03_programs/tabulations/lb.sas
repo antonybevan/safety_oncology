@@ -44,7 +44,7 @@ data lb;
         TRTSDT_NUM 8.
     ;
 
-    set raw_lb;
+    set raw_lb(rename=(LBTEST=_LBTEST));
 
     /* Standard Variables */
     STUDYID = "&STUDYID";
@@ -54,7 +54,7 @@ data lb;
     
     /* Lab Test Info */
     LBTESTCD = strip(LBTESTCD);
-    LBTEST = strip(LBTEST);
+    LBTEST = strip(_LBTEST);
     LBORRES = strip(LBORRES);
     
     /* Units and Ranges */
