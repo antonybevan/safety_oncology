@@ -43,6 +43,7 @@ data ae;
         AETOXGR $2
         AESER $1
         AESEV $20
+        TRTSDT 8
     ;
 
     set raw_ae;
@@ -51,6 +52,15 @@ data ae;
     STUDYID = "BV-CAR20-P1";
     DOMAIN = "AE";
     USUBJID = strip(USUBJID);
+    
+    /* Fetch TRTSDT from DM for Study Day derivation */
+    if _n_ = 1 then do;
+        declare hash d(dataset:'sdtm.dm');
+        d.defineKey('USUBJID');
+        d.defineData('RFXSTDTC');
+        d.defineDone();
+    end;
+    if d.find() = 0 then TRTSDT = input(RFXSTDTC, yymmdd10.);
     
     /* Event Terms */
     AETERM = strip(AETERM);
@@ -70,9 +80,15 @@ data ae;
     else if AETOXGR in ('3', '4') then AESEV = 'SEVERE';
     else if AETOXGR in ('5') then AESEV = 'DEATH';
     
-    /* Study Days (placeholder) */
-    AESTDY = .;
-    AEENDY = .;
+    /* Study Days Calculation */
+    if not missing(AESTDTC) and not missing(TRTSDT) then do;
+        _stdt = input(AESTDTC, yymmdd10.);
+        AESTDY = _stdt - TRTSDT + (_stdt >= TRTSDT);
+    end;
+    if not missing(AEENDTC) and not missing(TRTSDT) then do;
+        _endt = input(AEENDTC, yymmdd10.);
+        AEENDY = _endt - TRTSDT + (_endt >= TRTSDT);
+    end;
     
     keep STUDYID DOMAIN USUBJID AETERM AEDECOD AESTDTC AEENDTC 
          AESTDY AEENDY AETOXGR AESER AESEV;

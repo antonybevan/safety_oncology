@@ -94,9 +94,12 @@ data adsl;
     TRT01P = ARM;
     TRT01A = ARM; /* Fallback to ARM since ACTARM is missing in simulation */
     
-    /* Numeric Analysis Treatments */
-    TRT01PN = dose_level;
-    TRT01AN = dose_level;
+    /* Numeric Analysis Treatments based on ARMCD */
+    if ARMCD = 'DL1' then TRT01PN = 1;
+    else if ARMCD = 'DL2' then TRT01PN = 2;
+    else if ARMCD = 'DL3' then TRT01PN = 3;
+    
+    TRT01AN = TRT01PN;
 
     /* Age Grouping */
     length AGEGR1 $10;

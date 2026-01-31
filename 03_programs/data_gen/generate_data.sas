@@ -14,14 +14,20 @@
 %mend;
 %load_config;
 
-/* 1. Generate Demographics (DM) */
+/* Define Study Metadata */
+%let target_study = BV-CAR20-P1;
+
+/* 1. Generate Demographics (DM) and Population Flags */
 data raw_dm;
-   length USUBJID $20 ARM $40 SEX $1 RACE $40 DISEASE $5 RFSTDTC TRTSDT LDSTDT $10;
+   length STUDYID $20 USUBJID $20 ARM $40 SEX $1 RACE $40 DISEASE $5 RFSTDTC TRTSDT LDSTDT $10;
+   length SAFFL ITTFL EFFFL $1;
+   STUDYID = "&target_study";
    do dose_level = 1 to 3;
       do i = 1 to 6;
          subid = 100 + dose_level*100 + i;
          USUBJID = catx('-', '101', subid);
          
+         /* Protocol Defined Doses */
          if dose_level = 1 then ARM = "1x10^6 cells/kg";
          else if dose_level = 2 then ARM = "3x10^6 cells/kg";
          else ARM = "480x10^6 cells";
@@ -29,9 +35,15 @@ data raw_dm;
          AGE = round(45 + (78-45)*ranuni(123));
          SEX = scan("M,F", mod(i,2)+1, ',');
          RACE = "WHITE";
+         /* Target Populations */
          DISEASE = scan("NHL,CLL,SLL", mod(i,3)+1, ',');
          
-         /* Anchor dates - Force ISO 8601 for CSV compatibility */
+         /* Population Flags (All treated in this sim) */
+         SAFFL = 'Y';
+         ITTFL = 'Y';
+         EFFFL = 'Y';
+         
+         /* Anchor dates - CAR-T Infusion is Day 0 */
          dt = '15JAN2023'd + (dose_level-1)*30 + i*5;
          RFSTDTC = put(dt, yymmdd10.);
          TRTSDT  = put(dt + 7, yymmdd10.);
@@ -42,13 +54,48 @@ data raw_dm;
    end;
 run;
 
-/* 2. Generate Adverse Events (AE) and SUPPAE */
-data raw_ae(drop=dt) raw_suppae(keep=USUBJID IDVAR IDVARVAL QNAM QLABEL QVAL);
+/* 2. Generate Exposure (EX) - Lymphodepletion and CAR-T */
+data raw_ex;
    set raw_dm;
-   length AETERM AEDECOD $100 AESTDTC AEENDTC $10 QNAM $8 QLABEL $40 QVAL $20 IDVAR $8;
+   length EXTRT $100 EXDOSE 8 EXDOSU $20 EXSTDTC EXENDTC $10;
    day0 = input(TRTSDT, yymmdd10.);
    
-   /* CRS simulation */
+   /* Fludarabine Days -5 to -3 */
+   EXTRT = "FLUDARABINE";
+   EXDOSE = 30; EXDOSU = "mg/m^2";
+   do d = -5 to -3;
+      EXSTDTC = put(day0 + d, yymmdd10.);
+      EXENDTC = EXSTDTC;
+      output;
+   end;
+   
+   /* Cyclophosphamide Days -5 to -3 */
+   EXTRT = "CYCLOPHOSPHAMIDE";
+   EXDOSE = 500; EXDOSU = "mg/m^2";
+   do d = -5 to -3;
+      EXSTDTC = put(day0 + d, yymmdd10.);
+      EXENDTC = EXSTDTC;
+      output;
+   end;
+   
+   /* Study Drug Day 0 */
+   EXTRT = "BV-CAR20";
+   EXDOSU = "10^6 cells";
+   if dose_level = 1 then EXDOSE = 1; /* Simplification: assuming avg weight/dose */
+   else if dose_level = 2 then EXDOSE = 3;
+   else EXDOSE = 480;
+   EXSTDTC = put(day0, yymmdd10.);
+   EXENDTC = EXSTDTC;
+   output;
+run;
+
+/* 3. Generate Adverse Events (AE) */
+data raw_ae(drop=dt);
+   set raw_dm;
+   length AETERM AEDECOD $100 AESTDTC AEENDTC $10;
+   day0 = input(TRTSDT, yymmdd10.);
+   
+   /* CRS simulation (Primary safety endpoint) */
    if (dose_level=1 and ranuni(0)<0.50) or (dose_level=2 and ranuni(0)<0.7) or (dose_level=3 and ranuni(0)<1.0) then do;
       AETERM = "Cytokine Release Syndrome";
       AEDECOD = "Cytokine release syndrome";
@@ -57,20 +104,11 @@ data raw_ae(drop=dt) raw_suppae(keep=USUBJID IDVAR IDVARVAL QNAM QLABEL QVAL);
       AESTDTC = put(day0 + 3, yymmdd10.);
       AEENDTC = put(day0 + 10, yymmdd10.);
       AESER = 'N'; if AETOXGR_NUM >= 3 then AESER = 'Y';
-      AESEQ = 1;
-      output raw_ae;
-      
-      /* Add Toxicity Grade to SUPPAE */
-      IDVAR = "AESEQ";
-      IDVARVAL = "1";
-      QNAM = "AETOXGR";
-      QLABEL = "Analysis Toxicity Grade";
-      QVAL = AETOXGR;
-      output raw_suppae;
+      output;
    end;
 run;
 
-/* 3. Generate Lab Data (LB) */
+/* 4. Generate Lab Data (LB) */
 data raw_lb;
    set raw_dm;
    length LBTESTCD $8 LBTEST $40 LBORRES $20 LBORRESU $20 LBDTC $10 VISIT $20;
@@ -95,18 +133,39 @@ data raw_lb;
    end;
 run;
 
-/* 4. Export to CSV */
+/* 5. Generate Response Data (RS) */
+data raw_rs;
+   set raw_dm;
+   length RSTESTCD $8 RSTEST $40 RSORRES $20 RSDTC $10 VISIT $20;
+   day0 = input(TRTSDT, yymmdd10.);
+   
+   VISIT = "Cycle 3 Day 1";
+   RSDTC = put(day0 + 84, yymmdd10.); /* Approx 3 months */
+   RSTESTCD = "OVRLRESP"; RSTEST = "Overall Response";
+   
+   /* Progression probabilities increase with dose (just for sim) */
+   p = ranuni(0);
+   if p < 0.4 then RSORRES = "CR";
+   else if p < 0.7 then RSORRES = "PR";
+   else if p < 0.9 then RSORRES = "SD";
+   else RSORRES = "PD";
+   
+   output;
+run;
+
+/* 6. Export to CSV */
 %macro export_raw(ds);
    proc export data=&ds 
-      outfile="&LEGACY_PATH/raw_&ds..csv" 
+      outfile="&LEGACY_PATH/&ds..csv"
       dbms=csv replace;
    run;
 %mend;
 
-%export_raw(dm);
-%export_raw(ae);
-%export_raw(lb);
-%export_raw(suppae);
+%export_raw(raw_dm);
+%export_raw(raw_ex);
+%export_raw(raw_ae);
+%export_raw(raw_lb);
+%export_raw(raw_rs);
 
 /* Manual SDTM creation to bypass PROC IMPORT guessing if needed */
 data sdtm.dm; set raw_dm; run;

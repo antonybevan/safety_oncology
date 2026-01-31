@@ -3,7 +3,7 @@
  * Protocol:     BV-CAR20-P1
  * Purpose:      Create SDTM Disease Response (RS) domain from raw EDC extract
  * Author:       Clinical Programming Lead
- * Date:         2026-01-22
+ * Date:         2026-01-31
  * SAS Version:  9.4
  * SDTM Version: 1.7 / IG v3.4
  *
@@ -47,13 +47,17 @@ data rs;
     set raw_rs;
 
     /* Standard Variables */
-    STUDYID = "BV-CAR20-P1";
+    STUDYID = "&STUDYID";
     DOMAIN = "RS";
     USUBJID = strip(USUBJID);
     
     /* Test Info */
     RSTESTCD = strip(RSTESTCD);
-    if RSTESTCD = 'BOR' then RSTEST = 'Best Overall Response';
+    RSTEST = strip(RSTEST);
+    if missing(RSTEST) then do;
+        if RSTESTCD = 'BOR' then RSTEST = 'Best Overall Response';
+        else if RSTESTCD = 'OVRLRESP' then RSTEST = 'Overall Response';
+    end;
     
     /* Response Result */
     RSORRES = strip(RSORRES);

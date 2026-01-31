@@ -3,15 +3,14 @@
  * Protocol:     BV-CAR20-P1
  * Purpose:      Auto-detect project root and configure library paths
  * Author:       Clinical Programming Lead
- * Date:         2026-01-25
+ * Date:         2026-01-31
  * SAS Version:  9.4+, SAS OnDemand compatible
- *
- * Instructions: 
- * 1. Just upload this and your CSVs to ANY folder in SAS OnDemand.
- * 2. Run this program first.
  ******************************************************************************/
 
-%global IS_CLOUD PROJ_ROOT LEGACY_PATH SDTM_PATH ADAM_PATH;
+%global IS_CLOUD PROJ_ROOT LEGACY_PATH SDTM_PATH ADAM_PATH STUDYID;
+
+/* Define Project-wide Study Identifier */
+%let STUDYID = BV-CAR20-P1;
 
 /* 1. Detect Environment and Root dynamically */
 %macro set_proj_root;
@@ -55,7 +54,7 @@
     libname adam "&ADAM_PATH";
     
     %put NOTE: --------------------------------------------------;
-    %put NOTE: BV-CAR20-P1 PROJECT CONFIGURATION;
+    %put NOTE: &STUDYID PROJECT CONFIGURATION;
     %put NOTE: Root:   &PROJ_ROOT;
     %put NOTE: Legacy: &LEGACY_PATH;
     %put NOTE: --------------------------------------------------;

@@ -59,7 +59,7 @@ data dm;
     set raw_dm;
 
     /* Standard SDTM Variables */
-    STUDYID = "BV-CAR20-P1";
+    STUDYID = "&STUDYID";
     DOMAIN = "DM";
     USUBJID = strip(USUBJID);
     SUBJID = scan(USUBJID, -1, '-');  /* Extract subject number */
@@ -101,9 +101,14 @@ data dm;
     ACTARMCD = ARMCD;  /* Actual Arm = Planned Arm (single dose study) */
     ACTARM = ARM;
     
+    /* Population Flags from raw data */
+    SAFFL = strip(SAFFL);
+    ITTFL = strip(ITTFL);
+    EFFFL = strip(EFFFL);
+    
     keep STUDYID DOMAIN USUBJID SUBJID RFSTDTC RFENDTC RFXSTDTC RFXENDTC 
          RFICDTC RFPENDTC DTHDTC DTHFL SITEID AGE AGEU SEX RACE ETHNIC 
-         ARMCD ARM ACTARMCD ACTARM COUNTRY;
+         ARMCD ARM COUNTRY SAFFL ITTFL EFFFL;
 run;
 
 * Sort by USUBJID;
@@ -116,7 +121,7 @@ data sdtm.dm;
     set dm;
 run;
 
-* Create XPT file (SAS Transport Format v5);
+/* Create XPT */
 libname xpt xport "&SDTM_PATH/dm.xpt";
 data xpt.dm;
     set dm;

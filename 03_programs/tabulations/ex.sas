@@ -50,7 +50,7 @@ data ex;
     set raw_ex;
 
     /* Standard Variables */
-    STUDYID = "BV-CAR20-P1";
+    STUDYID = "&STUDYID";
     DOMAIN = "EX";
     USUBJID = strip(USUBJID);
     
@@ -58,8 +58,9 @@ data ex;
     EXTRT = strip(EXTRT);
     EXDOSE = EXDOSE;
     EXDOSU = strip(EXDOSU);
-    EXDOSFRM = "INFUSION";
-    EXROUTE = "INTRAVENOUS";
+    EXDOSFRM = "STEADY STATE";
+    if upcase(EXTRT) = 'BV-CAR20' then EXROUTE = "INTRAVENOUS";
+    else EXROUTE = "INTRAVENOUS"; /* Both LD and CAR-T are IV */
     
     /* Dates */
     EXSTDTC = strip(EXSTDTC);

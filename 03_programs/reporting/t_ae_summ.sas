@@ -51,34 +51,7 @@ proc format;
     ;
 run;
 
-data summary_rows;
-    set adam.adsl(where=(SAFFL='Y') keep=USUBJID TRT01AN);
-    
-    /* Calculate flags per subject */
-    length row 8;
-    
-    /* Row 1: Any TEAE */
-    row = 1;
-    if USUBJID in (select distinct USUBJID from ae_data) then count = 1; else count = 0;
-    output;
-    
-    /* Row 2: Grade 3-4 */
-    row = 2;
-    if USUBJID in (select distinct USUBJID from ae_data where AETOXGRN >= 3) then count = 1; else count = 0;
-    output;
-    
-    /* Row 3: Serious */
-    row = 3;
-    if USUBJID in (select distinct USUBJID from ae_data where AESER = 'Y') then count = 1; else count = 0;
-    output;
-    
-    /* Row 4: CRS */
-    row = 4;
-    if USUBJID in (select distinct USUBJID from ae_data where index(upcase(AEDECOD), 'CYTOKINE RELEASE') > 0) then count = 1; else count = 0;
-    output;
-run;
-
-/* Note: Since SQL in data step is not standard SAS, let's use a cleaner approach */
+/* 4. Subject Level Flags (Robust SQL Approach) */
 proc sql;
     create table subj_flags as
     select a.USUBJID, a.TRT01AN,

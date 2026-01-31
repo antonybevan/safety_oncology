@@ -1,0 +1,82 @@
+Connecting to NotebookLM...
+Searching 5 notebooks for 'PBCAR20A-01'...
+
+FOUND NOTEBOOK: PBCAR20A-01 (Phase 1/2a Allogeneic CAR-T)
+ID: cb92f159-0b2b-485c-9dfe-47e2ef24c228
+
+SOURCES (75):
+ - [Unknown] - the cross-company R package for Oncology admirers.pdf
+ - [Unknown] A Phase III open-label, multicenter trial of avelumab.pdf
+ - [Unknown] ADAM TRACEABILITY.pdf
+ - [Unknown] ADRG_Completion_Guidelines_v1.2 (2) (3).pdf
+ - [Unknown] ADaM Oncology Examples v1.0_Provisional.pdf
+ - [Unknown] ADaMIG_v1.3.pdf
+ - [Unknown] Advancing Safety Evaluation in Oncology Trials using Estimands.pdf
+ - [Unknown] Application of R® Functions in SAS® to Estimate Dose Limiting Toxicity.pdf
+ - [Unknown] Automation of Report Generation Beyond Macro.pdf
+ - [Unknown] BOIN design.pdf
+ - [Unknown] Bayesian Optimal Interval Design.pdf
+ - [Unknown] Bayesian Optimal Interval Designs for Phase I.pdf
+ - [Unknown] Bayesian adaptive design.pdf
+ - [Unknown] Benefit - Risk Analysis for Oncology Clinical Trials.pdf
+ - [Unknown] CDASHIG v2.3_FINAL.pdf
+ - [Unknown] CLINICAL TRIAL PROTOCOL.pdf
+ - [Unknown] CTCAE_4.01.pdf
+ - [Unknown] CTCAE_v5.pdf
+ - [Unknown] CTCAEv6.pdf
+ - [Unknown] Clinical-Trial-Endpoints-Approval-Cancer-Drugs-Biologics-final-guidance.pdf
+ - [Unknown] Colorectal Cancer Therapeutic Area User Guide v1.0 | CDISC
+ - [Unknown] Data Evaluation and Harmonization in Integrated Summary of Safety (ISS).pdf
+ - [Unknown] Data Handling of Rollover Subjects in Master Protocol Design.pdf
+ - [Unknown] Deconstructing ADRS Tumor Response Analysis Data Set.pdf
+ - [Unknown] Define-XML Terminology.pdf
+ - [Unknown] Define-XML v2.1.pdf
+ - [Unknown] Dose expansion cohorts in Phase I trials.pdf
+ - [Unknown] E3_Guideline.pdf
+ - [Unknown] E9-R1_Step4_Guideline_2019_1203.pdf
+ - [Unknown] E9_Guideline.pdf
+ - [Unknown] Efficient Safety Assessment in Clinical Trials using the Computer-generated AE.pdf
+ - [Unknown] Expansion Cohorts.pdf
+ - [Unknown] Flags for Facilitating Statistical Analysis.pdf
+ - [Unknown] From the Laboratory Toxicity Data Standardization to CTCAE.pdf
+ - [Unknown] ICH_E6(R3).pdf
+ - [Unknown] ISS Challenges and Solutions for a Compound with Multiple Submissions.pdf
+ - [Unknown] Jump Start your Oncology knowledge.pdf
+ - [Unknown] Legacy_AE_Tables.pdf
+ - [Unknown] Long-Term Avelumab in Advanced Non-Small-Cell Lung Cancer  Summaries and post hoc Analyses from JAVELIN Solid Tumor.pdf
+ - [Unknown] Making Customized RTF Output with R Package r2rtf.pdf
+ - [Unknown] Manns-Pharmacovigilance-2014.pdf
+ - [Unknown] Modified Toxicity Probability Interval Design.pdf
+ - [Unknown] Moving Beyond 3+3.pdf
+ - [Unknown] NEWRES~1.PDF
+ - [Unknown] Navigating Statistical Programming Challenges.pdf
+ - [Unknown] New response evaluation criteria in solid tumours_ Revised -- E_A_ Eisenhauer; P_ Therasse; J_ Bogaerts; L_H_ Schwartz; D_ -- European Journal of -- 10_1016_j_ejca_2008_10_026 -- aed0f636570db6411bd2775694ace46b --.pdf
+ - [Unknown] Oncology ADaM Datasets Creation Using R Programming.pdf
+ - [Unknown] Parallel Assignment Study.pdf
+ - [Unknown] Practice and Discussions on TAUGs.pdf
+ - [Unknown] Programming Support for Exposure-Response Analysis in Oncology.pdf
+ - [Unknown] Programming and Reporting on a Master Protocol in Cell & Gene Therapy.pdf
+ - [Unknown] Prostate_Cancer_Therapeutic_Area_User_Guide_v1.0.pdf
+ - [Unknown] Protocol Terminology.pdf
+ - [Unknown] Relative Dose Intensity in Oncology Trials A Discussion of Two.pdf
+ - [Unknown] SAP_001.pdf
+ - [Unknown] SDTM Implementation Guide v3.1.3 (IG 3.1.2 + 3.1.3 Annotations).pdf
+ - [Unknown] SDTM and SDTMIG Conformance Rules Guide v2.0.pdf
+ - [Unknown] SDTM v2.1_FINAL_0.pdf
+ - [Unknown] SDTM-MSG_v2.0.pdf
+ - [Unknown] SDTMIG v3.4-FINAL_2022-07-21.pdf
+ - [Unknown] Stanford-phase-I-II-DF-methodology-slides.pdf
+ - [Unknown] Statistical Analysis Plan (SAP).pdf
+ - [Unknown] Streamlining Patient-Reported Outcome (PRO) Data Standardization &.pdf
+ - [Unknown] Submitting Patient.pdf
+ - [Unknown] TAUG-BrCa v1.0.pdf
+ - [Unknown] TAUG-LuCa_v1.0.pdf
+ - [Unknown] TAUG-Pancreatic_Cancer_v1.0.pdf
+ - [Unknown] a novel Bayesian design platform.pdf
+ - [Unknown] alternative design for therapeutic cancer vaccine development..pdf
+ - [Unknown] analysis-data-reviewers-guide-sample-9999-2019-07-18 (2) (2).pdf
+ - [Unknown] analysis_data_model_v2.1.pdf
+ - [Unknown] avelumab vs docetaxel.pdf
+ - [Unknown] non-small-cell lung cancer.pdf
+ - [Unknown] reporting guidelines.pdf
+ - [Unknown] sdTCG_v4.4.pdf
