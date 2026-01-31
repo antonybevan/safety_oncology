@@ -17,17 +17,18 @@
  ******************************************************************************/
 
 %macro load_config;
+   %if %symexist(CONFIG_LOADED) %then %if &CONFIG_LOADED=1 %then %return;
    %if %sysfunc(fileexist(00_config.sas)) %then %include "00_config.sas";
-   %else %include "../00_config.sas";
+   %else %if %sysfunc(fileexist(../00_config.sas)) %then %include "../00_config.sas";
 %mend;
 %load_config;
 
 
-proc import datafile="&LEGACY_PATH/raw_ex.csv"
-    out=raw_ex
-    dbms=csv
-    replace;
-    getnames=yes;
+* Read raw EX data;
+data raw_ex;
+    infile "&LEGACY_PATH/raw_ex.csv" dlm=',' dsd firstobs=2;
+    length STUDYID USUBJID ARM SEX RACE DISEASE RFSTDTC TRTSDT LDSTDT SAFFL ITTFL EFFFL EXTRT EXDOSU EXSTDTC EXENDTC $100;
+    input STUDYID $ USUBJID $ ARM $ SEX $ RACE $ DISEASE $ RFSTDTC $ TRTSDT $ LDSTDT $ SAFFL $ ITTFL $ EFFFL $ dose_level i subid AGE dt EXTRT $ EXDOSE EXDOSU $ EXSTDTC $ EXENDTC $ day0 d;
 run;
 
 data ex;
@@ -79,10 +80,7 @@ proc sort data=ex;
     by USUBJID EXSTDTC EXTRT;
 run;
 
-/* Create permanent SAS dataset for ADaM use */
-data sdtm.ex;
-    set ex;
-run;
+/* Sequence numbers added below */
 
 data ex;
     set ex;
@@ -98,6 +96,11 @@ libname xpt xport "&SDTM_PATH/ex.xpt";
 data xpt.ex;
     set ex;
 run;
+/* Create permanent SAS dataset for ADaM use */
+data sdtm.ex;
+    set ex;
+run;
+
 libname xpt clear;
 
 proc print data=ex(obs=10);

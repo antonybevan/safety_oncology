@@ -16,16 +16,17 @@
  ******************************************************************************/
 
 %macro load_config;
+   %if %symexist(CONFIG_LOADED) %then %if &CONFIG_LOADED=1 %then %return;
    %if %sysfunc(fileexist(00_config.sas)) %then %include "00_config.sas";
-   %else %include "../00_config.sas";
+   %else %if %sysfunc(fileexist(../00_config.sas)) %then %include "../00_config.sas";
 %mend;
 %load_config;
 
-proc import datafile="&LEGACY_PATH/raw_ae.csv"
-    out=raw_ae
-    dbms=csv
-    replace;
-    getnames=yes;
+* Read raw AE data;
+data raw_ae;
+    infile "&LEGACY_PATH/raw_ae.csv" dlm=',' dsd firstobs=2;
+    length STUDYID USUBJID ARM SEX RACE DISEASE RFSTDTC TRTSDT LDSTDT SAFFL ITTFL EFFFL AETERM AEDECOD AESTDTC AEENDTC AETOXGR AESER $100;
+    input STUDYID $ USUBJID $ ARM $ SEX $ RACE $ DISEASE $ RFSTDTC $ TRTSDT $ LDSTDT $ SAFFL $ ITTFL $ EFFFL $ dose_level i subid AGE AETERM $ AEDECOD $ AESTDTC $ AEENDTC $ day0 AETOXGR_NUM AETOXGR $ AESER $;
 run;
 
 data ae;

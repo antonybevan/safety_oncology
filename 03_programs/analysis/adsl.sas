@@ -12,17 +12,9 @@
  ******************************************************************************/
 
 %macro load_config;
-   /* 1. Try to find config in the same directory as this script (SAS Studio only) */
-   %if %symexist(_SASPROGRAMFILE) %then %do;
-      %let path = %sysfunc(prxchange(s/(.*)[\/\\].*$/$1/, 1, &_SASPROGRAMFILE));
-      %if %sysfunc(fileexist(&path/00_config.sas)) %then %include "&path/00_config.sas";
-      %else %if %sysfunc(fileexist(&path/../00_config.sas)) %then %include "&path/../00_config.sas";
-   %end;
-   /* 2. Fallback to relative paths for local PC / Batch mode */
-   %else %if %sysfunc(fileexist(00_config.sas)) %then %include "00_config.sas";
+   %if %symexist(CONFIG_LOADED) %then %if &CONFIG_LOADED=1 %then %return;
+   %if %sysfunc(fileexist(00_config.sas)) %then %include "00_config.sas";
    %else %if %sysfunc(fileexist(../00_config.sas)) %then %include "../00_config.sas";
-   %else %if %sysfunc(fileexist(../../03_programs/00_config.sas)) %then %include "../../03_programs/00_config.sas";
-   %else %put ERROR: Could not find 00_config.sas;
 %mend;
 %load_config;
 
@@ -134,7 +126,7 @@ run;
 /* 4. Export to XPT - Drop non-standard variables for V6 compatibility */
 libname xpt xport "&ADAM_PATH/adsl.xpt";
 data xpt.adsl;
-    set adsl(drop=dose_level subid dt i);
+    set adsl;
 run;
 libname xpt clear;
 

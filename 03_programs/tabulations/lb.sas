@@ -15,16 +15,17 @@
  ******************************************************************************/
 
 %macro load_config;
+   %if %symexist(CONFIG_LOADED) %then %if &CONFIG_LOADED=1 %then %return;
    %if %sysfunc(fileexist(00_config.sas)) %then %include "00_config.sas";
-   %else %include "../00_config.sas";
+   %else %if %sysfunc(fileexist(../00_config.sas)) %then %include "../00_config.sas";
 %mend;
 %load_config;
 
-proc import datafile="&LEGACY_PATH/raw_lb.csv"
-    out=raw_lb
-    dbms=csv
-    replace;
-    getnames=yes;
+* Read raw LB data;
+data raw_lb;
+    infile "&LEGACY_PATH/raw_lb.csv" dlm=',' dsd firstobs=2;
+    length STUDYID USUBJID ARM SEX RACE DISEASE RFSTDTC TRTSDT LDSTDT SAFFL ITTFL EFFFL LBTESTCD LBTEST LBORRES LBORRESU LBDTC VISIT $100;
+    input STUDYID $ USUBJID $ ARM $ SEX $ RACE $ DISEASE $ RFSTDTC $ TRTSDT $ LDSTDT $ SAFFL $ ITTFL $ EFFFL $ dose_level i subid AGE dt LBTESTCD $ LBTEST $ LBORRES $ LBORRESU $ LBDTC $ VISIT $ day0 visit_idx LBORNRLO LBORNRHI;
 run;
 
 data lb;

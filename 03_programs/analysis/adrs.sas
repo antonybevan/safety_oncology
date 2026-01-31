@@ -12,15 +12,10 @@
  ******************************************************************************/
 
 %macro load_config;
-   %if %symexist(_SASPROGRAMFILE) %then %do;
-      %let path = %sysfunc(prxchange(s/(.*)[\/\\].*$/$1/, 1, &_SASPROGRAMFILE));
-      %if %sysfunc(fileexist(&path/00_config.sas)) %then %include "&path/00_config.sas";
-      %else %if %sysfunc(fileexist(&path/../00_config.sas)) %then %include "../00_config.sas";
-   %end;
-   %else %if %sysfunc(fileexist(00_config.sas)) %then %include "00_config.sas";
+   %if %symexist(CONFIG_LOADED) %then %if &CONFIG_LOADED=1 %then %return;
+   %if %sysfunc(fileexist(00_config.sas)) %then %include "00_config.sas";
    %else %if %sysfunc(fileexist(../00_config.sas)) %then %include "../00_config.sas";
-   %else %if %sysfunc(fileexist(../../03_programs/00_config.sas)) %then %include "../../03_programs/00_config.sas";
-   %mend;
+%mend;
 %load_config;
 
 /* 1. Setup ADRS */

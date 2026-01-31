@@ -18,7 +18,7 @@
 %let target_study = BV-CAR20-P1;
 
 /* 1. Generate Demographics (DM) and Population Flags */
-data raw_dm;
+   retain STUDYID USUBJID ARM SEX RACE DISEASE RFSTDTC TRTSDT LDSTDT SAFFL ITTFL EFFFL dose_level i subid AGE dt;
    length STUDYID $20 USUBJID $20 ARM $40 SEX $1 RACE $40 DISEASE $5 RFSTDTC TRTSDT LDSTDT $10;
    length SAFFL ITTFL EFFFL $1;
    STUDYID = "&target_study";
@@ -56,6 +56,7 @@ run;
 
 /* 2. Generate Exposure (EX) - Lymphodepletion and CAR-T */
 data raw_ex;
+   retain STUDYID USUBJID ARM SEX RACE DISEASE RFSTDTC TRTSDT LDSTDT SAFFL ITTFL EFFFL dose_level i subid AGE dt EXTRT EXDOSE EXDOSU EXSTDTC EXENDTC day0 d;
    set raw_dm;
    length EXTRT $100 EXDOSE 8 EXDOSU $20 EXSTDTC EXENDTC $10;
    day0 = input(TRTSDT, yymmdd10.);
@@ -91,6 +92,7 @@ run;
 
 /* 3. Generate Adverse Events (AE) */
 data raw_ae(drop=dt);
+   retain STUDYID USUBJID ARM SEX RACE DISEASE RFSTDTC TRTSDT LDSTDT SAFFL ITTFL EFFFL dose_level i subid AGE AETERM AEDECOD AESTDTC AEENDTC day0 AETOXGR_NUM AETOXGR AESER;
    set raw_dm;
    length AETERM AEDECOD $100 AESTDTC AEENDTC $10;
    day0 = input(TRTSDT, yymmdd10.);
@@ -110,6 +112,7 @@ run;
 
 /* 4. Generate Lab Data (LB) */
 data raw_lb;
+   retain STUDYID USUBJID ARM SEX RACE DISEASE RFSTDTC TRTSDT LDSTDT SAFFL ITTFL EFFFL dose_level i subid AGE dt LBTESTCD LBTEST LBORRES LBORRESU LBDTC VISIT day0 visit_idx LBORNRLO LBORNRHI;
    set raw_dm;
    length LBTESTCD $8 LBTEST $40 LBORRES $20 LBORRESU $20 LBDTC $10 VISIT $20;
    day0 = input(TRTSDT, yymmdd10.);
@@ -135,6 +138,7 @@ run;
 
 /* 5. Generate Response Data (RS) */
 data raw_rs;
+   retain STUDYID USUBJID ARM SEX RACE DISEASE RFSTDTC TRTSDT LDSTDT SAFFL ITTFL EFFFL dose_level i subid AGE dt RSTESTCD RSTEST RSORRES RSDTC VISIT day0 p;
    set raw_dm;
    length RSTESTCD $8 RSTEST $40 RSORRES $20 RSDTC $10 VISIT $20;
    day0 = input(TRTSDT, yymmdd10.);
@@ -167,12 +171,4 @@ run;
 %export_raw(raw_lb);
 %export_raw(raw_rs);
 
-/* Manual SDTM creation to bypass PROC IMPORT guessing if needed */
-data sdtm.dm; set raw_dm; run;
-data sdtm.ae; set raw_ae; run;
-data sdtm.lb; set raw_lb; run;
-data sdtm.suppae; set raw_suppae; run;
-
-%put NOTE: ✅ Synthetic data (including SUPPAE) generated and saved to &LEGACY_PATH;
-
-%put NOTE: ✅ Synthetic data generated and saved to &LEGACY_PATH;
+%put NOTE: ✅ Synthetic raw data generated and saved to &LEGACY_PATH;

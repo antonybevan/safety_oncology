@@ -17,17 +17,17 @@
  ******************************************************************************/
 
 %macro load_config;
+   %if %symexist(CONFIG_LOADED) %then %if &CONFIG_LOADED=1 %then %return;
    %if %sysfunc(fileexist(00_config.sas)) %then %include "00_config.sas";
-   %else %include "../00_config.sas";
+   %else %if %sysfunc(fileexist(../00_config.sas)) %then %include "../00_config.sas";
 %mend;
 %load_config;
 
 * Read raw demographics data;
-proc import datafile="&LEGACY_PATH/raw_dm.csv"
-    out=raw_dm
-    dbms=csv
-    replace;
-    getnames=yes;
+data raw_dm;
+    infile "&LEGACY_PATH/raw_dm.csv" dlm=',' dsd firstobs=2;
+    length STUDYID USUBJID ARM SEX RACE DISEASE RFSTDTC TRTSDT LDSTDT SAFFL ITTFL EFFFL $100;
+    input STUDYID $ USUBJID $ ARM $ SEX $ RACE $ DISEASE $ RFSTDTC $ TRTSDT $ LDSTDT $ SAFFL $ ITTFL $ EFFFL $ dose_level i subid AGE dt;
 run;
 
 * Create DM domain per SDTM IG v3.4;

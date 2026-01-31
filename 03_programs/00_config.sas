@@ -7,7 +7,8 @@
  * SAS Version:  9.4+, SAS OnDemand compatible
  ******************************************************************************/
 
-%global IS_CLOUD PROJ_ROOT LEGACY_PATH SDTM_PATH ADAM_PATH STUDYID;
+%global IS_CLOUD PROJ_ROOT LEGACY_PATH SDTM_PATH ADAM_PATH STUDYID CONFIG_LOADED;
+%let CONFIG_LOADED = 1;
 
 /* Define Project-wide Study Identifier */
 %let STUDYID = BV-CAR20-P1;

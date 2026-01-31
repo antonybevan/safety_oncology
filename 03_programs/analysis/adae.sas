@@ -12,22 +12,16 @@
  ******************************************************************************/
 
 %macro load_config;
-   %if %symexist(_SASPROGRAMFILE) %then %do;
-      %let path = %sysfunc(prxchange(s/(.*)[\/\\].*$/$1/, 1, &_SASPROGRAMFILE));
-      %if %sysfunc(fileexist(&path/00_config.sas)) %then %include "&path/00_config.sas";
-      %else %if %sysfunc(fileexist(&path/../00_config.sas)) %then %include "&path/../00_config.sas";
-   %end;
-   %else %if %sysfunc(fileexist(00_config.sas)) %then %include "00_config.sas";
+   %if %symexist(CONFIG_LOADED) %then %if &CONFIG_LOADED=1 %then %return;
+   %if %sysfunc(fileexist(00_config.sas)) %then %include "00_config.sas";
    %else %if %sysfunc(fileexist(../00_config.sas)) %then %include "../00_config.sas";
-   %else %if %sysfunc(fileexist(../../03_programs/00_config.sas)) %then %include "../../03_programs/00_config.sas";
-   %else %put ERROR: Could not find 00_config.sas;
 %mend;
 %load_config;
 
 /* 1. Get ASTCT Grades from SUPPAE */
 data suppae_grades;
     set sdtm.suppae;
-    where QNAM = 'AETOXGR'; /* Updated to match generator */
+    where QNAM = 'ASTCTGR';
     AESEQ = input(IDVARVAL, 8.);
     ASTCTGR = QVAL;
     keep USUBJID AESEQ ASTCTGR;
@@ -127,7 +121,7 @@ run;
 /* 4. Export to XPT */
 libname xpt xport "&ADAM_PATH/adae.xpt";
 data xpt.adae;
-    set adae(drop=AETOXGR_NUM); /* Drop non-standard variables */
+    set adae;
 run;
 libname xpt clear;
 

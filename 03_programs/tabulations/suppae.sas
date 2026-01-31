@@ -15,16 +15,17 @@
  ******************************************************************************/
 
 %macro load_config;
+   %if %symexist(CONFIG_LOADED) %then %if &CONFIG_LOADED=1 %then %return;
    %if %sysfunc(fileexist(00_config.sas)) %then %include "00_config.sas";
-   %else %include "../00_config.sas";
+   %else %if %sysfunc(fileexist(../00_config.sas)) %then %include "../00_config.sas";
 %mend;
 %load_config;
 
-proc import datafile="&LEGACY_PATH/raw_ae.csv"
-    out=raw_ae
-    dbms=csv
-    replace;
-    getnames=yes;
+* Read raw AE data for supplemental mapping;
+data raw_ae;
+    infile "&LEGACY_PATH/raw_ae.csv" dlm=',' dsd firstobs=2;
+    length STUDYID USUBJID ARM SEX RACE DISEASE RFSTDTC TRTSDT LDSTDT SAFFL ITTFL EFFFL AETERM AEDECOD AESTDTC AEENDTC AETOXGR AESER $100;
+    input STUDYID $ USUBJID $ ARM $ SEX $ RACE $ DISEASE $ RFSTDTC $ TRTSDT $ LDSTDT $ SAFFL $ ITTFL $ EFFFL $ dose_level i subid AGE AETERM $ AEDECOD $ AESTDTC $ AEENDTC $ day0 AETOXGR_NUM AETOXGR $ AESER $;
 run;
 
 /* First, ensure we have the actual SDTM AE domain to get the real AESEQ */
@@ -35,10 +36,21 @@ run;
 
 /* Filter raw data to AESI only and join with AE map */
 proc sort data=raw_ae; by USUBJID AETERM AESTDTC; run;
+
+/* Check if AESI_FL exists, if not, assume standard keywords identify AESIs */
+data raw_ae_rev;
+    set raw_ae;
+    _term = upcase(AETERM);
+    if index(_term, 'SYNDROME') > 0 or 
+       index(_term, 'NEURO') > 0 or 
+       index(_term, 'GRAFT') > 0 then _aesi = 'Y';
+    else _aesi = 'N';
+run;
+
 proc sort data=ae_map; by USUBJID AETERM AESTDTC; run;
 
 data aesi;
-    merge raw_ae(where=(AESI_FL='Y') in=a) ae_map(in=b);
+    merge raw_ae_rev(in=a) ae_map(in=b);
     by USUBJID AETERM AESTDTC;
     if a and b;
 run;
@@ -61,7 +73,7 @@ data suppae;
     set aesi;
 
     /* Standard Variables */
-    STUDYID = "BV-CAR20-P1";
+    STUDYID = "&STUDYID";
     RDOMAIN = "AE";
     USUBJID = strip(USUBJID);
     IDVAR = "AESEQ";
@@ -73,17 +85,13 @@ data suppae;
     QNAM = "ASTCTGR";
     QLABEL = "ASTCT 2019 Grade";
     
-    /* Map AEDECOD to ASTCT grading system */
-    if upcase(AEDECOD) contains 'CYTOKINE RELEASE' then do;
-        QVAL = strip(put(AETOXGR, 1.));  /* CRS uses ASTCT 1-4 */
-        output;
-    end;
-    else if upcase(AEDECOD) contains 'NEUROTOXICITY' then do;
-        QVAL = strip(put(AETOXGR, 1.));  /* ICANS uses ASTCT 1-4 */
-        output;
-    end;
-    else if upcase(AEDECOD) contains 'GRAFT' then do;
-        QVAL = strip(put(AETOXGR, 1.));  /* GvHD grading */
+    /* Map AEDECOD to ASTCT grading system using index() instead of contains */
+    _term = upcase(strip(AEDECOD));
+    if index(_term, 'CYTOKINE RELEASE') > 0 or 
+       index(_term, 'NEUROTOXICITY') > 0 or 
+       index(_term, 'IMMUNE EFFECTOR') > 0 or
+       index(_term, 'GRAFT') > 0 then do;
+        QVAL = strip(put(AETOXGR, 1.));  /* Map Grade */
         output;
     end;
     

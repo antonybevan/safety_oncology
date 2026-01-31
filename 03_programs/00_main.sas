@@ -29,6 +29,8 @@
     %include "&path/analysis/adsl.sas";
     %include "&path/analysis/adae.sas";
     %include "&path/analysis/adrs.sas";
+    %include "&path/analysis/adex.sas";
+    %include "&path/analysis/adlb.sas";
 
     /* 5. Execute Tables, Listings, and Figures (TLFs) */
     %include "&path/reporting/t_ae_summ.sas";
