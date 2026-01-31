@@ -20,9 +20,9 @@ data raw_lb;
     /* Aligned with LB specs */
     length STUDYID $20 USUBJID $40 ARM $100 SEX $1 RACE $40 DISEASE $5 RFSTDTC TRTSDT LDSTDT SAFFL ITTFL EFFFL $100
            dose_level i subid AGE dt 8
-           LBTESTCD $8 LBTEST $100 LBORRES LBORNRLO LBORNRHI $20 VISIT $20 LBDTC $10 day0 d 8;
+           LBTESTCD $8 LBTEST $100 LBORRES _LBORNRLO _LBORNRHI $20 VISIT $20 LBDTC $10 day0 d 8;
     input STUDYID $ USUBJID $ ARM $ SEX $ RACE $ DISEASE $ RFSTDTC $ TRTSDT $ LDSTDT $ SAFFL $ ITTFL $ EFFFL $ 
-          dose_level i subid AGE dt LBTESTCD $ LBTEST $ LBORRES $ LBORNRLO $ LBORNRHI $ VISIT $ LBDTC $ day0 d;
+          dose_level i subid AGE dt LBTESTCD $ LBTEST $ LBORRES $ _LBORNRLO $ _LBORNRHI $ VISIT $ LBDTC $ day0 d;
 run;
 
 data lb;
@@ -60,8 +60,8 @@ data lb;
     if LBTESTCD = 'NEUT' then LBORRESU = '10^9/L';
     else if LBTESTCD = 'PLAT' then LBORRESU = '10^9/L';
     
-    _lo = input(LBORNRLO, ?? 8.);
-    _hi = input(LBORNRHI, ?? 8.);
+    _lo = input(_LBORNRLO, ?? 8.);
+    _hi = input(_LBORNRHI, ?? 8.);
     LBORNRLO = _lo;
     LBORNRHI = _hi;
     

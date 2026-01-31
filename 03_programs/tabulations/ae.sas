@@ -27,7 +27,9 @@ data raw_ae;
 run;
 
 data ae;
-        DOMAINS $2
+    length 
+        STUDYID $20
+        DOMAIN $2
         USUBJID $40
         AESEQ 8
         AETERM $200
