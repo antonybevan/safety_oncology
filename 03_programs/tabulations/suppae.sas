@@ -17,8 +17,8 @@
 * Read raw AE data for supplemental mapping;
 data raw_ae;
     infile "&LEGACY_PATH/raw_ae.csv" dlm=',' dsd firstobs=2;
-    /* Aligned with generate_data.sas: raw_dm (17 vars) + AE specific (8 vars) */
-    length STUDYID USUBJID ARM SEX RACE DISEASE RFSTDTC TRTSDT LDSTDT SAFFL ITTFL EFFFL $100
+    /* Aligned with AE specs */
+    length STUDYID $20 USUBJID $40 ARM $100 SEX $1 RACE $40 DISEASE $5 RFSTDTC TRTSDT LDSTDT SAFFL ITTFL EFFFL $100
            dose_level i subid AGE dt 8
            AEDECOD AETERM AETOXGR $100 AESTDTC AEENDTC $10 AESER $1 AESID 8 day0 8;
     input STUDYID $ USUBJID $ ARM $ SEX $ RACE $ DISEASE $ RFSTDTC $ TRTSDT $ LDSTDT $ SAFFL $ ITTFL $ EFFFL $ 

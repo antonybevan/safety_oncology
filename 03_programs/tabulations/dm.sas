@@ -17,8 +17,8 @@
 * Read raw demographics data;
 data raw_dm;
     infile "&LEGACY_PATH/raw_dm.csv" dlm=',' dsd firstobs=2;
-    /* Aligned with generate_data.sas (17 vars) */
-    length STUDYID USUBJID ARM SEX RACE DISEASE RFSTDTC TRTSDT LDSTDT SAFFL ITTFL EFFFL $100
+    /* Aligned with DM specs */
+    length STUDYID $20 USUBJID $40 ARM $200 SEX $1 RACE $100 DISEASE $5 RFSTDTC TRTSDT LDSTDT SAFFL ITTFL EFFFL $100
            dose_level i subid AGE dt 8;
     input STUDYID $ USUBJID $ ARM $ SEX $ RACE $ DISEASE $ RFSTDTC $ TRTSDT $ LDSTDT $ SAFFL $ ITTFL $ EFFFL $ 
           dose_level i subid AGE dt;

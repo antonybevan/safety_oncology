@@ -17,8 +17,8 @@
 * Read raw LB data;
 data raw_lb;
     infile "&LEGACY_PATH/raw_lb.csv" dlm=',' dsd firstobs=2;
-    /* Aligned with generate_data.sas: raw_dm (17 vars) + LB specific (9 vars) */
-    length STUDYID USUBJID ARM SEX RACE DISEASE RFSTDTC TRTSDT LDSTDT SAFFL ITTFL EFFFL $100
+    /* Aligned with LB specs */
+    length STUDYID $20 USUBJID $40 ARM $100 SEX $1 RACE $40 DISEASE $5 RFSTDTC TRTSDT LDSTDT SAFFL ITTFL EFFFL $100
            dose_level i subid AGE dt 8
            LBTESTCD $8 LBTEST $100 LBORRES LBORNRLO LBORNRHI $20 VISIT $20 LBDTC $10 day0 d 8;
     input STUDYID $ USUBJID $ ARM $ SEX $ RACE $ DISEASE $ RFSTDTC $ TRTSDT $ LDSTDT $ SAFFL $ ITTFL $ EFFFL $ 
@@ -30,7 +30,6 @@ data lb;
         STUDYID $20
         DOMAIN $2
         USUBJID $40
-        LBSEQ 8
         LBTESTCD $8
         LBTEST $40
         LBORRES $20

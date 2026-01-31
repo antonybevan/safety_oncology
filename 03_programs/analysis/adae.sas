@@ -71,8 +71,8 @@ data adae;
     end;
     else TRTEMFL = "N";
 
-    /* Numeric Grading */
-    if not missing(AETOXGR) then AETOXGRN = input(AETOXGR, 8.);
+    /* Numeric Grading - Use ?? to suppress invalid argument errors */
+    if not missing(AETOXGR) then AETOXGRN = input(AETOXGR, ?? 8.);
     else AETOXGRN = .;
 
     /* AESI Flag */

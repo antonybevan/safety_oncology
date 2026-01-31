@@ -116,9 +116,9 @@ footnote1 "Note: Percentages are based on the number of subjects in the Safety P
 footnote2 "TEAE: Treatment-Emergent Adverse Event. CRS: Cytokine Release Syndrome.";
 
 proc report data=final_report nowd headline headskip split='|';
-    column row_label ("Dose Level 1|(N=&n_dl1)" "1") ("Dose Level 2|(N=&n_dl2)" "2") ("Dose Level 3|(N=&n_dl3)" "3");
+    column row_label ("Dose Level 1|(N=&n_dl1)" _1) ("Dose Level 2|(N=&n_dl2)" _2) ("Dose Level 3|(N=&n_dl3)" _3);
     define row_label / "Adverse Event Category" width=50;
-    define "1" / "n (%)" center width=15;
-    define "2" / "n (%)" center width=15;
-    define "3" / "n (%)" center width=15;
+    define _1 / "n (%)" center width=15;
+    define _2 / "n (%)" center width=15;
+    define _3 / "n (%)" center width=15;
 run;

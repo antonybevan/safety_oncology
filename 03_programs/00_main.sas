@@ -23,6 +23,7 @@
     %include "&path/tabulations/ex.sas";
     %include "&path/tabulations/ae.sas";
     %include "&path/tabulations/rs.sas";
+    %include "&path/tabulations/lb.sas";
     %include "&path/tabulations/suppae.sas";
 
     /* 4. Execute ADaM Analysis Datasets */

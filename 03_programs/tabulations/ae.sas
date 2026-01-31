@@ -27,9 +27,7 @@ data raw_ae;
 run;
 
 data ae;
-    length 
-        STUDYID $20
-        DOMAIN $2
+        DOMAINS $2
         USUBJID $40
         AESEQ 8
         AETERM $200
@@ -38,6 +36,7 @@ data ae;
         AEENDTC $10
         AESTDY 8
         AEENDY 8
+        AETOXGR_ $100
         AETOXGR $2
         AESER $1
         AESEV $20
@@ -62,10 +61,11 @@ data ae;
     AESTDTC = strip(AESTDTC);
     AEENDTC = strip(AEENDTC);
     
-    /* Severity/Grading - Extract numeric digit if Grade X */
-    if index(upcase(AETOXGR), 'GRADE') > 0 then 
-        AETOXGR = compress(AETOXGR, , 'kd');
-    else AETOXGR = strip(AETOXGR);
+    /* Grade processing */
+    AETOXGR_ = upcase(strip(AETOXGR));
+    if index(AETOXGR_, 'GRADE') > 0 then 
+        AETOXGR = compress(AETOXGR_, , 'kd');
+    else AETOXGR = substr(strip(AETOXGR_), 1, 2);
     
     AESER = strip(AESER);
     
