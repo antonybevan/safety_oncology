@@ -18,7 +18,8 @@
 data raw_dm;
     infile "&LEGACY_PATH/raw_dm.csv" dlm=',' dsd firstobs=2;
     /* Aligned with DM specs */
-    length STUDYID $20 USUBJID $40 ARM $200 SEX $1 RACE $100 DISEASE $5 RFSTDTC TRTSDT LDSTDT SAFFL ITTFL EFFFL $100
+    length STUDYID $20 USUBJID $40 ARM $200 SEX $1 RACE $100 DISEASE $5 RFSTDTC TRTSDT LDSTDT $10
+           SAFFL ITTFL EFFFL $1
            dose_level i subid AGE dt 8;
     input STUDYID $ USUBJID $ ARM $ SEX $ RACE $ DISEASE $ RFSTDTC $ TRTSDT $ LDSTDT $ SAFFL $ ITTFL $ EFFFL $ 
           dose_level i subid AGE dt;

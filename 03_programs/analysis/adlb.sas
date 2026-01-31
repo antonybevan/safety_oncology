@@ -44,7 +44,7 @@ proc sort data=lb_pre; by USUBJID; run;
 data lb_adsl;
     set lb_pre;
     
-    length TRT01A $40;
+    length TRT01A $200;
     if _n_ = 1 then do;
         if 0 then set adam.adsl(keep=USUBJID TRTSDT TRT01A TRT01AN);
         declare hash a(dataset:'adam.adsl');

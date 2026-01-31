@@ -82,7 +82,7 @@ data adsl;
     else EFFFL = "N";
 
     /* Analysis Treatments per ADaM IG */
-    length TRT01P TRT01A $40;
+    length TRT01P TRT01A $200;
     TRT01P = ARM;
     TRT01A = ARM; /* Fallback to ARM since ACTARM is missing in simulation */
     

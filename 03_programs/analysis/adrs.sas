@@ -23,7 +23,7 @@ data adrs;
     set sdtm.rs;
     
     /* Join ADSL variables */
-    length TRT01A $40;
+    length TRT01A $200;
     if _n_ = 1 then do;
         if 0 then set adam.adsl(keep=USUBJID TRTSDT TRT01A TRT01AN ITTFL SAFFL EFFFL);
         declare hash a(dataset:'adam.adsl');

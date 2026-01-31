@@ -28,15 +28,15 @@ run;
 /* First, ensure we have the actual SDTM AE domain to get the real AESEQ */
 data ae_map;
     length AETERM $200;
-    set sdtm.ae(keep=USUBJID AETERM AESTDTC AESEQ);
+    set sdtm.ae(keep=USUBJID AETERM AESTDTC AESEQ AESID);
 run;
 
-proc sort data=raw_ae; by USUBJID AETERM AESTDTC; run;
-proc sort data=ae_map; by USUBJID AETERM AESTDTC; run;
+proc sort data=raw_ae; by USUBJID AETERM AESTDTC AESID; run;
+proc sort data=ae_map; by USUBJID AETERM AESTDTC AESID; run;
 
 data aesi;
     merge raw_ae(in=a) ae_map(in=b);
-    by USUBJID AETERM AESTDTC;
+    by USUBJID AETERM AESTDTC AESID;
     if a and b;
 run;
 

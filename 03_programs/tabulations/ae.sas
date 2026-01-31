@@ -19,8 +19,8 @@
 data raw_ae;
     infile "&LEGACY_PATH/raw_ae.csv" dlm=',' dsd firstobs=2;
     /* Aligned with generate_data.sas: raw_dm (17 vars) + AE specific (8 vars) */
-    length STUDYID USUBJID ARM SEX RACE DISEASE RFSTDTC TRTSDT LDSTDT SAFFL ITTFL EFFFL $100
-           dose_level i subid AGE dt 8
+    length STUDYID $20 USUBJID $40 ARM $200 SEX $1 RACE $100 DISEASE $5 RFSTDTC TRTSDT LDSTDT $10
+           SAFFL ITTFL EFFFL $1
            AEDECOD AETERM AETOXGR $100 AESTDTC AEENDTC $10 AESER $1 AESID 8 day0 8;
     input STUDYID $ USUBJID $ ARM $ SEX $ RACE $ DISEASE $ RFSTDTC $ TRTSDT $ LDSTDT $ SAFFL $ ITTFL $ EFFFL $ 
           dose_level i subid AGE dt AEDECOD $ AETERM $ AETOXGR $ AESTDTC $ AEENDTC $ AESER $ AESID day0;
@@ -88,7 +88,7 @@ data ae;
     end;
     
     keep STUDYID DOMAIN USUBJID AETERM AEDECOD AESTDTC AEENDTC 
-         AESTDY AEENDY AETOXGR AESER AESEV;
+         AESTDY AEENDY AETOXGR AESER AESEV AESID;
 run;
 
 /* Assign sequence numbers */
