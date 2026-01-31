@@ -27,6 +27,7 @@ run;
 
 /* First, ensure we have the actual SDTM AE domain to get the real AESEQ */
 data ae_map;
+    length AETERM $200;
     set sdtm.ae(keep=USUBJID AETERM AESTDTC AESEQ);
 run;
 

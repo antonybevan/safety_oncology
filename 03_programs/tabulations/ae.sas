@@ -101,8 +101,8 @@ data sdtm.ae;
     by USUBJID;
     
     retain AESEQ;
-    if first.USUBJID then AESEQ = 0;
-    AESEQ + 1;
+    if first.USUBJID then AESEQ = 1;
+    else AESEQ + 1;
 run;
 
 /* Create XPT */
