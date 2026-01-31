@@ -61,11 +61,9 @@ data lb_adsl;
     TRTA = TRT01A;
     TRTAN = TRT01AN;
     
-    /* Relative Day */
-    if not missing(ADT) and not missing(TRTSDT) then do;
-        ADY = ADT - TRTSDT;
-        if ADY >= 0 then ADY = ADY + 1;
-    end;
+    /* Relative Day per CDISC: No Day 0 */
+    if not missing(ADT) and not missing(TRTSDT) then 
+        ADY = ADT - TRTSDT + (ADT >= TRTSDT);
 run;
 
 /* 3. Baseline Flagging (ABLFL) */

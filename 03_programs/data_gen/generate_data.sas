@@ -15,9 +15,11 @@
 
 /* 1. Generate Demographics (DM) and Population Flags */
 data raw_dm;
+   /* Standardize column order for all child datasets */
    retain STUDYID USUBJID ARM SEX RACE DISEASE RFSTDTC TRTSDT LDSTDT SAFFL ITTFL EFFFL dose_level i subid AGE dt;
    length STUDYID $20 USUBJID $20 ARM $40 SEX $1 RACE $40 DISEASE $5 RFSTDTC TRTSDT LDSTDT $10;
    length SAFFL ITTFL EFFFL $1;
+   
    STUDYID = "&target_study";
    do dose_level = 1 to 3;
       do i = 1 to 6;
@@ -53,14 +55,15 @@ run;
 
 /* 2. Generate Exposure (EX) - Lymphodepletion and CAR-T */
 data raw_ex;
-   retain STUDYID USUBJID ARM SEX RACE DISEASE RFSTDTC TRTSDT LDSTDT SAFFL ITTFL EFFFL dose_level i subid AGE dt EXTRT EXDOSE EXDOSU EXSTDTC EXENDTC day0 d;
+   retain STUDYID USUBJID ARM SEX RACE DISEASE RFSTDTC TRTSDT LDSTDT SAFFL ITTFL EFFFL dose_level i subid AGE dt 
+          EXTRT EXDOSE EXDOSU EXSTDTC EXENDTC day0 d;
+   length EXTRT $40 EXDOSU $10 EXSTDTC EXENDTC $10;
    set raw_dm;
    
-   format day0 d yymmdd10.;
    day0 = input(TRTSDT, yymmdd10.);
 
    /* Infusion Day 0 */
-   EXTRT = "PBCAR20A";
+   EXTRT = "BV-CAR20";
    EXDOSE = dose_level;
    EXDOSU = "CELLS";
    EXSTDTC = TRTSDT;
@@ -87,7 +90,9 @@ run;
 
 /* 3. Generate Adverse Events (AE) with CRS and ICANS */
 data raw_ae;
-   retain STUDYID USUBJID ARM SEX RACE DISEASE RFSTDTC TRTSDT LDSTDT SAFFL ITTFL EFFFL dose_level i subid AGE dt AEDECOD AETERM AETOXGR AESTDTC AEENDTC AESER AESID day0 d;
+   retain STUDYID USUBJID ARM SEX RACE DISEASE RFSTDTC TRTSDT LDSTDT SAFFL ITTFL EFFFL dose_level i subid AGE dt 
+          AEDECOD AETERM AETOXGR AESTDTC AEENDTC AESER AESID day0;
+   length AEDECOD AETERM AETOXGR $100 AESTDTC AEENDTC $10 AESER $1;
    set raw_dm;
    day0 = input(TRTSDT, yymmdd10.);
    
@@ -128,7 +133,9 @@ run;
 
 /* 4. Generate Lab Data (LB) */
 data raw_lb;
-   retain STUDYID USUBJID ARM SEX RACE DISEASE RFSTDTC TRTSDT LDSTDT SAFFL ITTFL EFFFL dose_level i subid AGE dt LBTESTCD LBTEST LBORRES LBORNRLO LBORNRHI VISIT LBDTC;
+   retain STUDYID USUBJID ARM SEX RACE DISEASE RFSTDTC TRTSDT LDSTDT SAFFL ITTFL EFFFL dose_level i subid AGE dt 
+          LBTESTCD LBTEST LBORRES LBORNRLO LBORNRHI VISIT LBDTC day0 d;
+   length LBTESTCD $8 LBTEST $40 LBORRES LBORNRLO LBORNRHI $20 VISIT $20 LBDTC $10;
    set raw_dm;
    day0 = input(TRTSDT, yymmdd10.);
    
@@ -147,15 +154,17 @@ run;
 
 /* 5. Generate Response Data (RS) */
 data raw_rs;
-   retain STUDYID USUBJID ARM SEX RACE DISEASE RFSTDTC TRTSDT LDSTDT SAFFL ITTFL EFFFL dose_level i subid AGE dt RSTESTCD RSTEST RSORRES RSSTRESC RSSTRESN RSDTC VISIT;
+   retain STUDYID USUBJID ARM SEX RACE DISEASE RFSTDTC TRTSDT LDSTDT SAFFL ITTFL EFFFL dose_level i subid AGE dt 
+          RSTESTCD RSTEST RSORRES RSSTRESC RSDTC VISIT day0 r;
+   length RSTESTCD $8 RSTEST $40 RSORRES RSSTRESC $20 RSDTC $10 VISIT $20;
    set raw_dm;
    day0 = input(TRTSDT, yymmdd10.);
    
    do VISIT = 'Day 28', 'Day 56';
-      if VISIT = 'Day 28' then d = day0 + 28;
-      else d = day0 + 56;
+      if VISIT = 'Day 28' then d_rs = day0 + 28;
+      else d_rs = day0 + 56;
       
-      RSDTC = put(d, yymmdd10.);
+      RSDTC = put(d_rs, yymmdd10.);
       RSTESTCD = 'BOR';
       RSTEST = 'Best Overall Response';
       

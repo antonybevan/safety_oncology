@@ -3,16 +3,9 @@
  * Protocol:     BV-CAR20-P1
  * Purpose:      Create SDTM Adverse Events (AE) domain from raw EDC extract
  * Author:       Clinical Programming Lead
- * Date:         2026-01-22
+ * Date:         2026-01-31
  * SAS Version:  9.4
  * SDTM Version: 1.7 / IG v3.4
- *
- * Input:        &LEGACY_PATH/raw_ae.csv
- * Output:       &SDTM_PATH/ae.xpt
- *
- * Notes:        - MedDRA v22.1 coding already in raw data
- *               - CTCAE v5.0 grading in AETOXGR
- *               - AESI flagged per SAP Section 8.2.2
  ******************************************************************************/
 
 %macro load_config;
@@ -25,8 +18,12 @@
 * Read raw AE data;
 data raw_ae;
     infile "&LEGACY_PATH/raw_ae.csv" dlm=',' dsd firstobs=2;
-    length STUDYID USUBJID ARM SEX RACE DISEASE RFSTDTC TRTSDT LDSTDT SAFFL ITTFL EFFFL AETERM AEDECOD AESTDTC AEENDTC AETOXGR AESER $100;
-    input STUDYID $ USUBJID $ ARM $ SEX $ RACE $ DISEASE $ RFSTDTC $ TRTSDT $ LDSTDT $ SAFFL $ ITTFL $ EFFFL $ dose_level i subid AGE AETERM $ AEDECOD $ AESTDTC $ AEENDTC $ day0 AETOXGR_NUM AETOXGR $ AESER $;
+    /* Aligned with generate_data.sas: raw_dm (17 vars) + AE specific (8 vars) */
+    length STUDYID USUBJID ARM SEX RACE DISEASE RFSTDTC TRTSDT LDSTDT SAFFL ITTFL EFFFL $100
+           dose_level i subid AGE dt 8
+           AEDECOD AETERM AETOXGR $100 AESTDTC AEENDTC $10 AESER $1 AESID 8 day0 8;
+    input STUDYID $ USUBJID $ ARM $ SEX $ RACE $ DISEASE $ RFSTDTC $ TRTSDT $ LDSTDT $ SAFFL $ ITTFL $ EFFFL $ 
+          dose_level i subid AGE dt AEDECOD $ AETERM $ AETOXGR $ AESTDTC $ AEENDTC $ AESER $ AESID day0;
 run;
 
 data ae;
@@ -44,24 +41,18 @@ data ae;
         AETOXGR $2
         AESER $1
         AESEV $20
-        TRTSDT 8
+        TRTSDT_NUM 8.
     ;
 
     set raw_ae;
 
     /* Standard Variables */
-    STUDYID = "BV-CAR20-P1";
+    STUDYID = "&STUDYID";
     DOMAIN = "AE";
     USUBJID = strip(USUBJID);
     
-    /* Fetch TRTSDT from DM for Study Day derivation */
-    if _n_ = 1 then do;
-        declare hash d(dataset:'sdtm.dm');
-        d.defineKey('USUBJID');
-        d.defineData('RFXSTDTC');
-        d.defineDone();
-    end;
-    if d.find() = 0 then TRTSDT = input(RFXSTDTC, yymmdd10.);
+    /* Variable TRTSDT is character in input, convert to numeric for day calculation */
+    TRTSDT_NUM = input(TRTSDT, yymmdd10.);
     
     /* Event Terms */
     AETERM = strip(AETERM);
@@ -71,8 +62,11 @@ data ae;
     AESTDTC = strip(AESTDTC);
     AEENDTC = strip(AEENDTC);
     
-    /* Severity/Grading */
-    AETOXGR = strip(put(AETOXGR, 1.));
+    /* Severity/Grading - Extract numeric digit if Grade X */
+    if index(upcase(AETOXGR), 'GRADE') > 0 then 
+        AETOXGR = compress(AETOXGR, , 'kd');
+    else AETOXGR = strip(AETOXGR);
+    
     AESER = strip(AESER);
     
     /* Map Grade to Severity */
@@ -82,13 +76,13 @@ data ae;
     else if AETOXGR in ('5') then AESEV = 'DEATH';
     
     /* Study Days Calculation */
-    if not missing(AESTDTC) and not missing(TRTSDT) then do;
+    if not missing(AESTDTC) and not missing(TRTSDT_NUM) then do;
         _stdt = input(AESTDTC, yymmdd10.);
-        AESTDY = _stdt - TRTSDT + (_stdt >= TRTSDT);
+        AESTDY = _stdt - TRTSDT_NUM + (_stdt >= TRTSDT_NUM);
     end;
-    if not missing(AEENDTC) and not missing(TRTSDT) then do;
+    if not missing(AEENDTC) and not missing(TRTSDT_NUM) then do;
         _endt = input(AEENDTC, yymmdd10.);
-        AEENDY = _endt - TRTSDT + (_endt >= TRTSDT);
+        AEENDY = _endt - TRTSDT_NUM + (_endt >= TRTSDT_NUM);
     end;
     
     keep STUDYID DOMAIN USUBJID AETERM AEDECOD AESTDTC AEENDTC 
@@ -100,7 +94,7 @@ proc sort data=ae;
     by USUBJID AESTDTC AETERM;
 run;
 
-data ae;
+data sdtm.ae;
     set ae;
     by USUBJID;
     
@@ -109,24 +103,18 @@ data ae;
     AESEQ + 1;
 run;
 
-/* Create permanent SAS dataset for ADaM use */
-data sdtm.ae;
-    set ae;
-run;
-
 /* Create XPT */
 libname xpt xport "&SDTM_PATH/ae.xpt";
 data xpt.ae;
-    set ae;
+    set sdtm.ae;
 run;
 libname xpt clear;
 
-proc freq data=ae;
+proc freq data=sdtm.ae;
     tables AEDECOD*AETOXGR / nocum;
     title "AE Frequencies by MedDRA PT and Grade";
 run;
 
-proc print data=ae(obs=10);
+proc print data=sdtm.ae(obs=10);
     title "SDTM AE Domain - First 10 Records";
 run;
-

@@ -58,11 +58,9 @@ data adex;
     TRTA = TRT01A;
     TRTAN = TRT01AN;
     
-    /* Relative Day */
-    if not missing(ASTDT) and not missing(TRTSDT) then do;
-        ADY = ASTDT - TRTSDT;
-        if ADY >= 0 then ADY = ADY + 1;
-    end;
+    /* Relative Day per CDISC: No Day 0 */
+    if not missing(ASTDT) and not missing(TRTSDT) then 
+        ADY = ASTDT - TRTSDT + (ASTDT >= TRTSDT);
     
     label
         ASTDT = "Analysis Start Date"

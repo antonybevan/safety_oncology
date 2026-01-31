@@ -3,15 +3,8 @@
  * Protocol:     BV-CAR20-P1
  * Purpose:      Create SDTM Supplemental AE (SUPPAE) domain for ASTCT grading
  * Author:       Clinical Programming Lead
- * Date:         2026-01-22
+ * Date:         2026-01-31
  * SAS Version:  9.4
- * SDTM Version: 1.7 / IG v3.4
- *
- * Input:        &LEGACY_PATH/raw_ae.csv
- * Output:       &SDTM_PATH/suppae.xpt
- *
- * Notes:        ASTCT 2019 grading for CRS/ICANS stored as supplemental qualifiers
- *               per SAP Section 8.2.2 and CDISC SDTM IG v3.4
  ******************************************************************************/
 
 %macro load_config;
@@ -24,33 +17,24 @@
 * Read raw AE data for supplemental mapping;
 data raw_ae;
     infile "&LEGACY_PATH/raw_ae.csv" dlm=',' dsd firstobs=2;
-    length STUDYID USUBJID ARM SEX RACE DISEASE RFSTDTC TRTSDT LDSTDT SAFFL ITTFL EFFFL AETERM AEDECOD AESTDTC AEENDTC AETOXGR AESER $100;
-    input STUDYID $ USUBJID $ ARM $ SEX $ RACE $ DISEASE $ RFSTDTC $ TRTSDT $ LDSTDT $ SAFFL $ ITTFL $ EFFFL $ dose_level i subid AGE AETERM $ AEDECOD $ AESTDTC $ AEENDTC $ day0 AETOXGR_NUM AETOXGR $ AESER $;
+    /* Aligned with generate_data.sas: raw_dm (17 vars) + AE specific (8 vars) */
+    length STUDYID USUBJID ARM SEX RACE DISEASE RFSTDTC TRTSDT LDSTDT SAFFL ITTFL EFFFL $100
+           dose_level i subid AGE dt 8
+           AEDECOD AETERM AETOXGR $100 AESTDTC AEENDTC $10 AESER $1 AESID 8 day0 8;
+    input STUDYID $ USUBJID $ ARM $ SEX $ RACE $ DISEASE $ RFSTDTC $ TRTSDT $ LDSTDT $ SAFFL $ ITTFL $ EFFFL $ 
+          dose_level i subid AGE dt AEDECOD $ AETERM $ AETOXGR $ AESTDTC $ AEENDTC $ AESER $ AESID day0;
 run;
 
 /* First, ensure we have the actual SDTM AE domain to get the real AESEQ */
-/* Note: In a real environment, AE would be run before SUPPAE */
 data ae_map;
     set sdtm.ae(keep=USUBJID AETERM AESTDTC AESEQ);
 run;
 
-/* Filter raw data to AESI only and join with AE map */
 proc sort data=raw_ae; by USUBJID AETERM AESTDTC; run;
-
-/* Check if AESI_FL exists, if not, assume standard keywords identify AESIs */
-data raw_ae_rev;
-    set raw_ae;
-    _term = upcase(AETERM);
-    if index(_term, 'SYNDROME') > 0 or 
-       index(_term, 'NEURO') > 0 or 
-       index(_term, 'GRAFT') > 0 then _aesi = 'Y';
-    else _aesi = 'N';
-run;
-
 proc sort data=ae_map; by USUBJID AETERM AESTDTC; run;
 
 data aesi;
-    merge raw_ae_rev(in=a) ae_map(in=b);
+    merge raw_ae(in=a) ae_map(in=b);
     by USUBJID AETERM AESTDTC;
     if a and b;
 run;
@@ -81,17 +65,16 @@ data suppae;
     QORIG = "CRF";
     QEVAL = "";
     
-    /* ASTCT Grade */
+    /* ASTCT Grade mapping */
     QNAM = "ASTCTGR";
     QLABEL = "ASTCT 2019 Grade";
     
-    /* Map AEDECOD to ASTCT grading system using index() instead of contains */
     _term = upcase(strip(AEDECOD));
     if index(_term, 'CYTOKINE RELEASE') > 0 or 
        index(_term, 'NEUROTOXICITY') > 0 or 
-       index(_term, 'IMMUNE EFFECTOR') > 0 or
-       index(_term, 'GRAFT') > 0 then do;
-        QVAL = strip(put(AETOXGR, 1.));  /* Map Grade */
+       index(_term, 'IMMUNE EFFECTOR') > 0 then do;
+        /* Extract only the digit from GRADE X */
+        QVAL = compress(AETOXGR, , 'kd');
         output;
     end;
     
@@ -113,8 +96,3 @@ data xpt.suppae;
     set suppae;
 run;
 libname xpt clear;
-
-proc print data=suppae;
-    title "SDTM SUPPAE Domain - ASTCT Grading for AESI";
-run;
-

@@ -5,14 +5,6 @@
  * Author:       Clinical Programming Lead
  * Date:         2026-01-31
  * SAS Version:  9.4
- * SDTM Version: 1.7 / IG v3.4
- *
- * Input:        &LEGACY_PATH/raw_rs.csv
- * Output:       &SDTM_PATH/rs.xpt
- *
- * Notes:        Best Overall Response per SAP Section 7.1.1
- *               - NHL: Lugano 2016 criteria
- *               - CLL/SLL: iwCLL 2018 guidelines
  ******************************************************************************/
 
 %macro load_config;
@@ -21,11 +13,16 @@
    %else %if %sysfunc(fileexist(../00_config.sas)) %then %include "../00_config.sas";
 %mend;
 %load_config;
+
 * Read raw RS data;
 data raw_rs;
     infile "&LEGACY_PATH/raw_rs.csv" dlm=',' dsd firstobs=2;
-    length STUDYID USUBJID ARM SEX RACE DISEASE RFSTDTC TRTSDT LDSTDT SAFFL ITTFL EFFFL RSTESTCD RSTEST RSORRES RSDTC VISIT $100;
-    input STUDYID $ USUBJID $ ARM $ SEX $ RACE $ DISEASE $ RFSTDTC $ TRTSDT $ LDSTDT $ SAFFL $ ITTFL $ EFFFL $ dose_level i subid AGE dt RSTESTCD $ RSTEST $ RSORRES $ RSDTC $ VISIT $ day0 p;
+    /* Aligned with generate_data.sas: raw_dm (17 vars) + RS specific (8 vars) */
+    length STUDYID USUBJID ARM SEX RACE DISEASE RFSTDTC TRTSDT LDSTDT SAFFL ITTFL EFFFL $100
+           dose_level i subid AGE dt 8
+           RSTESTCD $8 RSTEST $100 RSORRES RSSTRESC $20 RSDTC $10 VISIT $20 day0 r 8;
+    input STUDYID $ USUBJID $ ARM $ SEX $ RACE $ DISEASE $ RFSTDTC $ TRTSDT $ LDSTDT $ SAFFL $ ITTFL $ EFFFL $ 
+          dose_level i subid AGE dt RSTESTCD $ RSTEST $ RSORRES $ RSSTRESC $ RSDTC $ VISIT $ day0 r;
 run;
 
 data rs;
@@ -41,8 +38,8 @@ data rs;
         RSDTC $10
         RSDY 8
         RSEVAL $20
-        RSEVALID $20
         RSCAT $40
+        TRTSDT_NUM 8.
     ;
 
     set raw_rs;
@@ -51,32 +48,31 @@ data rs;
     STUDYID = "&STUDYID";
     DOMAIN = "RS";
     USUBJID = strip(USUBJID);
+    TRTSDT_NUM = input(TRTSDT, yymmdd10.);
     
     /* Test Info */
     RSTESTCD = strip(RSTESTCD);
     RSTEST = strip(RSTEST);
-    if missing(RSTEST) then do;
-        if RSTESTCD = 'BOR' then RSTEST = 'Best Overall Response';
-        else if RSTESTCD = 'OVRLRESP' then RSTEST = 'Overall Response';
-    end;
     
     /* Response Result */
     RSORRES = strip(RSORRES);
-    RSSTRESC = strip(RSORRES);  /* Standardized = Original for CR/PR/SD/PD */
+    RSSTRESC = strip(RSSTRESC);
     
     /* Date */
     RSDTC = strip(RSDTC);
-    RSDY = .;  /* Placeholder */
     
-    /* Evaluator */
+    /* Study Day */
+    if not missing(RSDTC) and not missing(TRTSDT_NUM) then do;
+        _rsdt = input(RSDTC, yymmdd10.);
+        RSDY = _rsdt - TRTSDT_NUM + (_rsdt >= TRTSDT_NUM);
+    end;
+    
+    /* Evaluator and Category */
     RSEVAL = "INVESTIGATOR";
-    RSEVALID = "";
-    
-    /* Category */
     RSCAT = "DISEASE ASSESSMENT";
     
     keep STUDYID DOMAIN USUBJID RSTESTCD RSTEST RSORRES RSSTRESC 
-         RSDTC RSDY RSEVAL RSEVALID RSCAT;
+         RSDTC RSDY RSEVAL RSCAT;
 run;
 
 /* Assign sequence numbers */
@@ -84,7 +80,7 @@ proc sort data=rs;
     by USUBJID RSDTC;
 run;
 
-data rs;
+data sdtm.rs;
     set rs;
     by USUBJID;
     
@@ -93,24 +89,9 @@ data rs;
     RSSEQ + 1;
 run;
 
-/* Create permanent SAS dataset for ADaM use */
-data sdtm.rs;
-    set rs;
-run;
-
 /* Create XPT */
 libname xpt xport "&SDTM_PATH/rs.xpt";
 data xpt.rs;
-    set rs;
+    set sdtm.rs;
 run;
 libname xpt clear;
-
-proc freq data=rs;
-    tables RSORRES / nocum;
-    title "Best Overall Response Frequencies";
-run;
-
-proc print data=rs;
-    title "SDTM RS Domain - Disease Response";
-run;
-

@@ -3,17 +3,8 @@
  * Protocol:     BV-CAR20-P1
  * Purpose:      Create SDTM Demographics (DM) domain from raw EDC extract
  * Author:       Clinical Programming Lead
- * Date:         2026-01-22
+ * Date:         2026-01-31
  * SAS Version:  9.4
- * SDTM Version: 1.7 / IG v3.4
- *
- * Input:        &LEGACY_PATH/raw_dm.csv
- * Output:       &SDTM_PATH/dm.xpt
- *
- * Modifications:
- * Date       Programmer    Description
- * ---------- ------------- ------------------------------------------------
- * 2026-01-22 Clinical Programming Lead   Initial version
  ******************************************************************************/
 
 %macro load_config;
@@ -26,8 +17,11 @@
 * Read raw demographics data;
 data raw_dm;
     infile "&LEGACY_PATH/raw_dm.csv" dlm=',' dsd firstobs=2;
-    length STUDYID USUBJID ARM SEX RACE DISEASE RFSTDTC TRTSDT LDSTDT SAFFL ITTFL EFFFL $100;
-    input STUDYID $ USUBJID $ ARM $ SEX $ RACE $ DISEASE $ RFSTDTC $ TRTSDT $ LDSTDT $ SAFFL $ ITTFL $ EFFFL $ dose_level i subid AGE dt;
+    /* Aligned with generate_data.sas (17 vars) */
+    length STUDYID USUBJID ARM SEX RACE DISEASE RFSTDTC TRTSDT LDSTDT SAFFL ITTFL EFFFL $100
+           dose_level i subid AGE dt 8;
+    input STUDYID $ USUBJID $ ARM $ SEX $ RACE $ DISEASE $ RFSTDTC $ TRTSDT $ LDSTDT $ SAFFL $ ITTFL $ EFFFL $ 
+          dose_level i subid AGE dt;
 run;
 
 * Create DM domain per SDTM IG v3.4;
@@ -54,6 +48,7 @@ data dm;
         ARMCD $20
         ARM $200
         COUNTRY $3
+        SAFFL ITTFL EFFFL $1
     ;
 
     set raw_dm;
@@ -83,7 +78,7 @@ data dm;
     ETHNIC = "NOT HISPANIC OR LATINO";  /* Default for US trial */
     COUNTRY = "USA";
     
-    /* Treatment Arms - Per SAP Section 5.3 */
+    /* Treatment Arms */
     if DOSE_LEVEL = 1 then do;
         ARMCD = "DL1";
         ARM = "DL1: 1x10E6 cells/kg";
@@ -97,11 +92,7 @@ data dm;
         ARM = "DL3: 480x10E6 cells";
     end;
     
-    /* Additional Planned Variables (not in raw data) */
-    ACTARMCD = ARMCD;  /* Actual Arm = Planned Arm (single dose study) */
-    ACTARM = ARM;
-    
-    /* Population Flags from raw data */
+    /* Population Flags */
     SAFFL = strip(SAFFL);
     ITTFL = strip(ITTFL);
     EFFFL = strip(EFFFL);
@@ -109,11 +100,6 @@ data dm;
     keep STUDYID DOMAIN USUBJID SUBJID RFSTDTC RFENDTC RFXSTDTC RFXENDTC 
          RFICDTC RFPENDTC DTHDTC DTHFL SITEID AGE AGEU SEX RACE ETHNIC 
          ARMCD ARM COUNTRY SAFFL ITTFL EFFFL;
-run;
-
-* Sort by USUBJID;
-proc sort data=dm;
-    by USUBJID;
 run;
 
 /* Create permanent SAS dataset for ADaM use */
@@ -127,21 +113,3 @@ data xpt.dm;
     set dm;
 run;
 libname xpt clear;
-
-* Print first 5 records for QC;
-proc print data=dm(obs=5);
-    title "SDTM DM Domain - First 5 Records";
-run;
-
-* Generate basic statistics;
-proc freq data=dm;
-    tables ARMCD ARM SEX RACE / nocum;
-    title "Demographics Frequencies";
-run;
-
-proc means data=dm n mean std min max;
-    var AGE;
-    class ARMCD;
-    title "Age Statistics by Dose Level";
-run;
-

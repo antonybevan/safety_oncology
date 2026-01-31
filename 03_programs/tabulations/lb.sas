@@ -3,15 +3,8 @@
  * Protocol:     BV-CAR20-P1
  * Purpose:      Create SDTM Laboratory (LB) domain from raw EDC extract
  * Author:       Clinical Programming Lead
- * Date:         2026-01-22
+ * Date:         2026-01-31
  * SAS Version:  9.4
- * SDTM Version: 1.7 / IG v3.4
- *
- * Input:        &LEGACY_PATH/raw_lb.csv
- * Output:       &SDTM_PATH/lb.xpt
- *
- * Notes:        - Hematology parameters (NEUT, PLAT, HGB)
- *               - CTCAE v5.0 grading applied
  ******************************************************************************/
 
 %macro load_config;
@@ -24,8 +17,12 @@
 * Read raw LB data;
 data raw_lb;
     infile "&LEGACY_PATH/raw_lb.csv" dlm=',' dsd firstobs=2;
-    length STUDYID USUBJID ARM SEX RACE DISEASE RFSTDTC TRTSDT LDSTDT SAFFL ITTFL EFFFL LBTESTCD LBTEST LBORRES LBORRESU LBDTC VISIT $100;
-    input STUDYID $ USUBJID $ ARM $ SEX $ RACE $ DISEASE $ RFSTDTC $ TRTSDT $ LDSTDT $ SAFFL $ ITTFL $ EFFFL $ dose_level i subid AGE dt LBTESTCD $ LBTEST $ LBORRES $ LBORRESU $ LBDTC $ VISIT $ day0 visit_idx LBORNRLO LBORNRHI;
+    /* Aligned with generate_data.sas: raw_dm (17 vars) + LB specific (9 vars) */
+    length STUDYID USUBJID ARM SEX RACE DISEASE RFSTDTC TRTSDT LDSTDT SAFFL ITTFL EFFFL $100
+           dose_level i subid AGE dt 8
+           LBTESTCD $8 LBTEST $100 LBORRES LBORNRLO LBORNRHI $20 VISIT $20 LBDTC $10 day0 d 8;
+    input STUDYID $ USUBJID $ ARM $ SEX $ RACE $ DISEASE $ RFSTDTC $ TRTSDT $ LDSTDT $ SAFFL $ ITTFL $ EFFFL $ 
+          dose_level i subid AGE dt LBTESTCD $ LBTEST $ LBORRES $ LBORNRLO $ LBORNRHI $ VISIT $ LBDTC $ day0 d;
 run;
 
 data lb;
@@ -44,32 +41,48 @@ data lb;
         LBDY 8
         VISIT $40
         LBNRIND $20
+        TRTSDT_NUM 8.
     ;
 
     set raw_lb;
 
     /* Standard Variables */
-    STUDYID = "BV-CAR20-P1";
+    STUDYID = "&STUDYID";
     DOMAIN = "LB";
     USUBJID = strip(USUBJID);
+    TRTSDT_NUM = input(TRTSDT, yymmdd10.);
     
     /* Lab Test Info */
     LBTESTCD = strip(LBTESTCD);
     LBTEST = strip(LBTEST);
-    LBORRES = strip(put(LBORRES, 8.2));
-    LBORRESU = strip(LBORRESU);
-    LBORNRLO = LBORNRLO;
-    LBORNRHI = LBORNRHI;
+    LBORRES = strip(LBORRES);
+    
+    /* Units and Ranges */
+    if LBTESTCD = 'NEUT' then LBORRESU = '10^9/L';
+    else if LBTESTCD = 'PLAT' then LBORRESU = '10^9/L';
+    
+    _lo = input(LBORNRLO, ?? 8.);
+    _hi = input(LBORNRHI, ?? 8.);
+    LBORNRLO = _lo;
+    LBORNRHI = _hi;
     
     /* Date and Visit */
     LBDTC = strip(LBDTC);
     VISIT = strip(VISIT);
-    LBDY = .;  /* Placeholder */
+    
+    /* Study Day */
+    if not missing(LBDTC) and not missing(TRTSDT_NUM) then do;
+        _lbdt = input(LBDTC, yymmdd10.);
+        LBDY = _lbdt - TRTSDT_NUM + (_lbdt >= TRTSDT_NUM);
+    end;
     
     /* Derive Normal Range Indicator */
-    if input(LBORRES, ?? 8.) < LBORNRLO then LBNRIND = 'LOW';
-    else if input(LBORRES, ?? 8.) > LBORNRHI then LBNRIND = 'HIGH';
-    else if not missing(input(LBORRES, ?? 8.)) then LBNRIND = 'NORMAL';
+    _val = input(LBORRES, ?? 8.);
+    if not missing(_val) then do;
+        if not missing(_lo) and _val < _lo then LBNRIND = 'LOW';
+        else if not missing(_hi) and _val > _hi then LBNRIND = 'HIGH';
+        else LBNRIND = 'NORMAL';
+    end;
     
     keep STUDYID DOMAIN USUBJID LBTESTCD LBTEST LBORRES LBORRESU 
          LBORNRLO LBORNRHI LBDTC LBDY VISIT LBNRIND;
@@ -80,7 +93,7 @@ proc sort data=lb;
     by USUBJID LBDTC LBTESTCD;
 run;
 
-data lb;
+data sdtm.lb;
     set lb;
     by USUBJID;
     
@@ -89,25 +102,9 @@ data lb;
     LBSEQ + 1;
 run;
 
-/* Create permanent SAS dataset for ADaM use */
-data sdtm.lb;
-    set lb;
-run;
-
 /* Create XPT */
 libname xpt xport "&SDTM_PATH/lb.xpt";
 data xpt.lb;
-    set lb;
+    set sdtm.lb;
 run;
 libname xpt clear;
-
-proc means data=lb n mean std min max;
-    var LBORNRLO LBORNRHI;
-    class LBTESTCD;
-    title "Lab Reference Ranges by Test";
-run;
-
-proc print data=lb(obs=15);
-    title "SDTM LB Domain - First 15 Records";
-run;
-

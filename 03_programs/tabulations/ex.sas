@@ -3,17 +3,8 @@
  * Protocol:     BV-CAR20-P1
  * Purpose:      Create SDTM Exposure (EX) domain from raw EDC extract
  * Author:       Clinical Programming Lead
- * Date:         2026-01-22
+ * Date:         2026-01-31
  * SAS Version:  9.4
- * SDTM Version: 1.7 / IG v3.4
- *
- * Input:        &LEGACY_PATH/raw_ex.csv
- * Output:       &SDTM_PATH/ex.xpt
- *
- * Notes:        Per SAP Section 1.3, creates separate records for:
- *               - Fludarabine (LD)
- *               - Cyclophosphamide (LD)
- *               - BV-CAR20 (Study Drug)
  ******************************************************************************/
 
 %macro load_config;
@@ -23,12 +14,15 @@
 %mend;
 %load_config;
 
-
 * Read raw EX data;
 data raw_ex;
     infile "&LEGACY_PATH/raw_ex.csv" dlm=',' dsd firstobs=2;
-    length STUDYID USUBJID ARM SEX RACE DISEASE RFSTDTC TRTSDT LDSTDT SAFFL ITTFL EFFFL EXTRT EXDOSU EXSTDTC EXENDTC $100;
-    input STUDYID $ USUBJID $ ARM $ SEX $ RACE $ DISEASE $ RFSTDTC $ TRTSDT $ LDSTDT $ SAFFL $ ITTFL $ EFFFL $ dose_level i subid AGE dt EXTRT $ EXDOSE EXDOSU $ EXSTDTC $ EXENDTC $ day0 d;
+    /* Aligned with generate_data.sas: raw_dm (17 vars) + EX specific (7 vars) */
+    length STUDYID USUBJID ARM SEX RACE DISEASE RFSTDTC TRTSDT LDSTDT SAFFL ITTFL EFFFL $100
+           dose_level i subid AGE dt 8
+           EXTRT $100 EXDOSE 8 EXDOSU $20 EXSTDTC EXENDTC $10 day0 d 8;
+    input STUDYID $ USUBJID $ ARM $ SEX $ RACE $ DISEASE $ RFSTDTC $ TRTSDT $ LDSTDT $ SAFFL $ ITTFL $ EFFFL $ 
+          dose_level i subid AGE dt EXTRT $ EXDOSE EXDOSU $ EXSTDTC $ EXENDTC $ day0 d;
 run;
 
 data ex;
@@ -46,6 +40,7 @@ data ex;
         EXENDTC $10
         EXSTDY 8
         EXENDY 8
+        TRTSDT_NUM 8.
     ;
 
     set raw_ex;
@@ -54,22 +49,28 @@ data ex;
     STUDYID = "&STUDYID";
     DOMAIN = "EX";
     USUBJID = strip(USUBJID);
+    TRTSDT_NUM = input(TRTSDT, yymmdd10.);
     
     /* Treatment Info */
     EXTRT = strip(EXTRT);
     EXDOSE = EXDOSE;
     EXDOSU = strip(EXDOSU);
     EXDOSFRM = "STEADY STATE";
-    if upcase(EXTRT) = 'BV-CAR20' then EXROUTE = "INTRAVENOUS";
-    else EXROUTE = "INTRAVENOUS"; /* Both LD and CAR-T are IV */
-    
+    EXROUTE = "INTRAVENOUS";
+
     /* Dates */
     EXSTDTC = strip(EXSTDTC);
     EXENDTC = strip(EXENDTC);
     
-    /* Study Days will be derived in a separate step */
-    EXSTDY = .;
-    EXENDY = .;
+    /* Study Days Calculation */
+    if not missing(EXSTDTC) and not missing(TRTSDT_NUM) then do;
+        _stdt = input(EXSTDTC, yymmdd10.);
+        EXSTDY = _stdt - TRTSDT_NUM + (_stdt >= TRTSDT_NUM);
+    end;
+    if not missing(EXENDTC) and not missing(TRTSDT_NUM) then do;
+        _endt = input(EXENDTC, yymmdd10.);
+        EXENDY = _endt - TRTSDT_NUM + (_endt >= TRTSDT_NUM);
+    end;
     
     keep STUDYID DOMAIN USUBJID EXTRT EXDOSE EXDOSU EXDOSFRM EXROUTE 
          EXSTDTC EXENDTC EXSTDY EXENDY;
@@ -80,9 +81,7 @@ proc sort data=ex;
     by USUBJID EXSTDTC EXTRT;
 run;
 
-/* Sequence numbers added below */
-
-data ex;
+data sdtm.ex;
     set ex;
     by USUBJID;
     
@@ -94,16 +93,6 @@ run;
 /* Create XPT */
 libname xpt xport "&SDTM_PATH/ex.xpt";
 data xpt.ex;
-    set ex;
+    set sdtm.ex;
 run;
-/* Create permanent SAS dataset for ADaM use */
-data sdtm.ex;
-    set ex;
-run;
-
 libname xpt clear;
-
-proc print data=ex(obs=10);
-    title "SDTM EX Domain - First 10 Records";
-run;
-

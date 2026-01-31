@@ -51,7 +51,7 @@ data adrs;
     ADT = input(RSDTC, yymmdd10.);
     format ADT date9.;
 
-    /* Treatment Analysis Day */
+    /* Treatment Analysis Day per CDISC: No Day 0 */
     if not missing(ADT) and not missing(TRTSDT) then 
         ADY = ADT - TRTSDT + (ADT >= TRTSDT);
 

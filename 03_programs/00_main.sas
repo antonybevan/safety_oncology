@@ -40,8 +40,10 @@
     proc sql;
        select 'SDTM.DM' as Table, count(*) as Records from sdtm.dm
        union all select 'SDTM.AE', count(*) from sdtm.ae
+       union all select 'SDTM.SUPPAE (Grades)', count(*) from sdtm.suppae where QNAM='ASTCTGR'
        union all select 'ADAM.ADSL', count(*) from adam.adsl
        union all select 'ADAM.ADAE', count(*) from adam.adae
+       union all select 'ADAM.ADAE (AESIs)', count(*) from adam.adae where AESIFL='Y'
        union all select 'ADAM.ADRS', count(*) from adam.adrs;
     quit;
 %mend;
