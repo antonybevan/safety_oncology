@@ -73,10 +73,10 @@ data adae;
 
     /* Post CAR-T Flag (Specific to Infusion) */
     if not missing(ASTDT) and not missing(CARTDT) then do;
-        if ASTDT >= CARTDT then POSTCARFL = "Y";
-        else POSTCARFL = "N";
+        if ASTDT >= CARTDT then PSTCARFL = "Y";
+        else PSTCARFL = "N";
     end;
-    else POSTCARFL = "N";
+    else PSTCARFL = "N";
 
     /* Numeric Grading - Use Centralized Macro */
     %calc_astct(source_grade=AETOXGR, out_grade=AETOXGRN);
@@ -106,7 +106,7 @@ data adae;
         TRTA     = "Actual Treatment"
         TRTAN    = "Actual Treatment (N)"
         TRTEMFL  = "Treatment Emergent Analysis Flag (Regimen)"
-        POSTCARFL = "Post-CAR-T Infusion Flag"
+        PSTCARFL = "Post-CAR-T Infusion Flag"
         AETOXGRN = "Analysis Toxicity Grade (N)"
         AESIFL   = "Adverse Event of Special Interest Flag"
         ASTCTGR  = "ASTCT 2019 Grade"

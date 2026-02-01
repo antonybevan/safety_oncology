@@ -15,12 +15,8 @@
     /* Configuration and Library Setup */
     %include "&path/00_config.sas";
 
-    /* Ensure Output Folders Exist */
-    options noxwait;
-    x "mkdir ""&OUT_TABLES"" 2>nul";
-    x "mkdir ""&OUT_LISTINGS"" 2>nul";
-    x "mkdir ""&OUT_FIGURES"" 2>nul";
-    x "mkdir ""&OUT_META"" 2>nul";
+    /* Configuration and Library Setup */
+    %include "&path/00_config.sas";
 
     /* 2. Execute Data Generation */
     %include "&path/data_gen/generate_data.sas";
@@ -62,7 +58,6 @@
        union all select 'ADAM.ADSL (Safety Population)', count(SAFFL) from adam.adsl where SAFFL='Y'
        union all select 'ADAM.ADSL (Efficacy Population)', count(EFFFL) from adam.adsl where EFFFL='Y'
        union all select 'ADAM.ADAE (TEAEs)', count(*) from adam.adae where TRTEMFL='Y'
-       union all select 'ADAM.ADAE (DLTs Found)', count(*) from adam.adae where DLTFL='Y'
        union all select 'ADAM.ADAE (CRS Identified)', count(*) from adam.adae where index(upcase(AEDECOD), 'CYTOKINE RELEASE') > 0
        union all select 'ADAM.ADRS (Best Response Records)', count(*) from adam.adrs where ANL01FL='Y';
     quit;
