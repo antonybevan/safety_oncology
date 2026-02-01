@@ -15,9 +15,6 @@
     /* Configuration and Library Setup */
     %include "&path/00_config.sas";
 
-    /* Configuration and Library Setup */
-    %include "&path/00_config.sas";
-
     /* 2. Execute Data Generation */
     %include "&path/data_gen/generate_data.sas";
 

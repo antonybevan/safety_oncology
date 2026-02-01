@@ -48,6 +48,7 @@
 | **TRTEMFL** | Treatment Emergent Flag | "Y" if `ASTDT` >= `adsl.TRTSDT` |
 | **AESIFL** | AESI Flag | `sdtm.ae.AESI_FL` |
 | **ASTCTGR** | ASTCT 2019 Grade | Merged from `sdtm.suppae` where `QNAM`='ASTCTGR' |
+| **PSTCARFL** | Post-CAR-T Infusion Flag | "Y" if `ASTDT` >= `adsl.CARTDT` |
 | **AOCCPFL** | First Primary Occurrence | "Y" for first occurrence of PT per subject |
 
 ---
