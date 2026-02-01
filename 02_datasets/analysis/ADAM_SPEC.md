@@ -18,7 +18,7 @@
 | **TRT01PN** | Planned Trt (N) | 1 if DL1, 2 if DL2, 3 if DL3 |
 | **TRT01A** | Actual Trt for Period 01 | Copy of `ACTARM` |
 | **TRT01AN** | Actual Trt (N) | 1 if DL1, 2 if DL2, 3 if DL3 |
-| **TRTSDT** | Date of First Dose | First `EXSTDTC` where `EXTRT` = 'BV-CAR20' |
+| **TRTSDT** | Date of First Dose | First `EXSTDTC` (Start of Regimen/Lymphodepletion) |
 | **TRTEDT** | Date of Last Dose | Last `EXENDTC` where `EXTRT` = 'BV-CAR20' |
 | **RFSTDTC** | Subject Ref Start Date | `sdtm.dm.RFSTDTC` |
 | **ITTFL** | Intent-To-Treat Pop Flag | "Y" for all subjects in DM |
