@@ -34,15 +34,15 @@ data adae;
     /* Join ADSL variables */
     length TRT01A $200;
     if _n_ = 1 then do;
-        if 0 then set adam.adsl(keep=USUBJID TRTSDT TRT01A TRT01AN);
+        if 0 then set adam.adsl(keep=USUBJID TRTSDT CARTDT TRT01A TRT01AN);
         declare hash a(dataset:'adam.adsl');
         a.defineKey('USUBJID');
-        a.defineData('TRTSDT', 'TRT01A', 'TRT01AN');
+        a.defineData('TRTSDT', 'CARTDT', 'TRT01A', 'TRT01AN');
         a.defineDone();
     end;
     
     if a.find() ne 0 then do;
-        TRTSDT = .; TRT01A = ""; TRT01AN = .;
+        TRTSDT = .; CARTDT = .; TRT01A = ""; TRT01AN = .;
     end;
 
     /* Join SUPPAE Grades */
@@ -56,31 +56,48 @@ data adae;
     if s.find() ne 0 then ASTCTGR = "";
 
     /* Analysis Dates */
-    ASTDT = input(AESTDTC, yymmdd10.);
-    AENDT = input(AEENDTC, yymmdd10.);
+    %iso_to_sas(iso_var=AESTDTC, sas_var=ASTDT);
+    %iso_to_sas(iso_var=AEENDTC, sas_var=AENDT);
     format ASTDT AENDT date9.;
 
     /* Actual Treatment */
     TRTA = TRT01A;
     TRTAN = TRT01AN;
 
-    /* Treatment Emergent Flag */
+    /* Treatment Emergent Flag (Regimen-based: On/After LD Start) */
     if not missing(ASTDT) and not missing(TRTSDT) then do;
         if ASTDT >= TRTSDT then TRTEMFL = "Y";
         else TRTEMFL = "N";
     end;
     else TRTEMFL = "N";
 
-    /* Numeric Grading - Use ?? to suppress invalid argument errors */
-    if not missing(AETOXGR) then AETOXGRN = input(AETOXGR, ?? 8.);
-    else AETOXGRN = .;
+    /* Post CAR-T Flag (Specific to Infusion) */
+    if not missing(ASTDT) and not missing(CARTDT) then do;
+        if ASTDT >= CARTDT then POSTCARFL = "Y";
+        else POSTCARFL = "N";
+    end;
+    else POSTCARFL = "N";
 
-    /* AESI Flag */
+    /* Numeric Grading - Use Centralized Macro */
+    %calc_astct(source_grade=AETOXGR, out_grade=AETOXGRN);
+
+    /* AESI Flag and DLT logic */
     AESIFL = "N";
+    DLTFL = "N";
+    
     if index(upcase(AEDECOD), 'CYTOKINE RELEASE') > 0 or 
        index(upcase(AEDECOD), 'NEUROTOXICITY') > 0 or
        index(upcase(AEDECOD), 'IMMUNE EFFECTOR') > 0 or
-       index(upcase(AEDECOD), 'GRAFT') > 0 then AESIFL = "Y";
+       index(upcase(AEDECOD), 'GRAFT') > 0 then do;
+        AESIFL = "Y";
+        
+        /* ICANS 72-hour DLT Rule */
+        if index(upcase(AEDECOD), 'IMMUNE EFFECTOR') > 0 or index(upcase(AEDECOD), 'NEUROTOXICITY') > 0 then do;
+            if not missing(ASTDT) and not missing(AENDT) then do;
+                if (AENDT - ASTDT + 1) > 3 and AETOXGRN >= 3 then DLTFL = "Y";
+            end;
+        end;
+    end;
 
     /* Labels */
     label 
@@ -88,10 +105,12 @@ data adae;
         AENDT    = "Analysis End Date"
         TRTA     = "Actual Treatment"
         TRTAN    = "Actual Treatment (N)"
-        TRTEMFL  = "Treatment Emergent Analysis Flag"
+        TRTEMFL  = "Treatment Emergent Analysis Flag (Regimen)"
+        POSTCARFL = "Post-CAR-T Infusion Flag"
         AETOXGRN = "Analysis Toxicity Grade (N)"
         AESIFL   = "Adverse Event of Special Interest Flag"
         ASTCTGR  = "ASTCT 2019 Grade"
+        DLTFL    = "Dose-Limiting Toxicity Flag"
     ;
 run;
 

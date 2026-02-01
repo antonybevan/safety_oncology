@@ -122,3 +122,8 @@ proc report data=final_report nowd headline headskip split='|';
     define _2 / "n (%)" center width=15;
     define _3 / "n (%)" center width=15;
 run;
+
+/* Export results */
+ods html body="&OUT_TABLES/t_ae_summ.html";
+proc print data=final_report(obs=10); run;
+ods html close;

@@ -22,29 +22,32 @@
 data adrs;
     set sdtm.rs;
     
-    /* Join ADSL variables */
-    length TRT01A $200;
+    /* Analysis Parameters with Criteria-Specific Mapping */
     if _n_ = 1 then do;
-        if 0 then set adam.adsl(keep=USUBJID TRTSDT TRT01A TRT01AN ITTFL SAFFL EFFFL);
-        declare hash a(dataset:'adam.adsl');
-        a.defineKey('USUBJID');
-        a.defineData('TRTSDT', 'TRT01A', 'TRT01AN', 'ITTFL', 'SAFFL', 'EFFFL');
-        a.defineDone();
+        if 0 then set adam.adsl(keep=USUBJID TRTSDT TRT01A TRT01AN ITTFL SAFFL EFFFL DISEASE);
+        declare hash b(dataset:'adam.adsl');
+        b.defineKey('USUBJID');
+        b.defineData('TRTSDT', 'TRT01A', 'TRT01AN', 'ITTFL', 'SAFFL', 'EFFFL', 'DISEASE');
+        b.defineDone();
     end;
     
-    if a.find() ne 0 then do;
-        TRTSDT = .; TRT01A = ""; TRT01AN = .; ITTFL = ""; SAFFL = ""; EFFFL = "";
-    end;
+    if b.find() = 0; /* Subset to subjects in ADSL */
 
-    /* Analysis Parameters */
-    PARAMCD = "OVRLRESP";
-    PARAM = "Overall Response";
+    PARAMCD = "BOR";
+    PARAM = "Best Overall Response";
     
-    AVALC = RSSTRESC;
-    if AVALC = "CR" then AVAL = 1;
-    else if AVALC = "PR" then AVAL = 2;
-    else if AVALC = "SD" then AVAL = 3;
-    else if AVALC = "PD" then AVAL = 4;
+    /* Lugano 2016 for NHL, iwCLL 2018 for CLL */
+    length CRIT1 $100;
+    if DISEASE = 'NHL' then CRIT1 = "Lugano 2016 (Metabolic)";
+    else if DISEASE = 'CLL' then CRIT1 = "iwCLL 2018";
+    
+    AVALC = strip(upcase(RSSTRESC));
+    
+    /* Standardized Ranking: CR=1, PR=2, SD=3, PD=4 */
+    if AVALC = "CR" or AVALC = "CMR" then do; AVAL = 1; AVALC = "CR"; end;
+    else if AVALC = "PR" or AVALC = "PMR" then do; AVAL = 2; AVALC = "PR"; end;
+    else if AVALC = "SD" or AVALC = "NMR" then do; AVAL = 3; AVALC = "SD"; end;
+    else if AVALC = "PD" or AVALC = "PMD" then do; AVAL = 4; AVALC = "PD"; end;
     else AVAL = .;
 
     /* Analysis Date */

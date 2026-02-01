@@ -117,18 +117,42 @@ data adlb;
     
     if not missing(BNRIND) and not missing(ANRIND) then 
         SHIFT1 = catx(' to ', BNRIND, ANRIND);
-        
+
+    /* Toxicity Grading (Bi-directional per Oncology Standards) */
+    ATOXGRL = 0; ATOXGRH = 0;
+    length ATOXDSCL ATOXDSCH $100;
+    
+    if not missing(AVAL) and not missing(LBORNRLO) and AVAL < LBORNRLO then do;
+        ATOXGRL = 1; /* Analysis Toxicity Grade Low */
+        if AVAL < LBORNRLO * 0.8 then ATOXGRL = 2;
+        if AVAL < LBORNRLO * 0.5 then ATOXGRL = 3;
+        if AVAL < LBORNRLO * 0.2 then ATOXGRL = 4;
+        ATOXDSCL = strip(PARAM) || " (Low)";
+    end;
+    
+    if not missing(AVAL) and not missing(LBORNRHI) and AVAL > LBORNRHI then do;
+        ATOXGRH = 1; /* Analysis Toxicity Grade High */
+        if AVAL > LBORNRHI * 1.2 then ATOXGRH = 2;
+        if AVAL > LBORNRHI * 1.5 then ATOXGRH = 3;
+        if AVAL > LBORNRHI * 2.0 then ATOXGRH = 4;
+        ATOXDSCH = strip(PARAM) || " (High)";
+    end;
+
     label
-        ADT    = "Analysis Date"
-        ADY    = "Analysis Relative Day"
-        ABLFL  = "Baseline Record Flag"
-        BASE   = "Baseline Value"
-        CHG    = "Change from Baseline"
-        ANRIND = "Analysis Range Indicator"
-        BNRIND = "Baseline Range Indicator"
-        SHIFT1 = "Shift from Baseline to Analysis"
-        TRTA   = "Actual Treatment"
-        TRTAN  = "Actual Treatment (N)"
+        ADT      = "Analysis Date"
+        ADY      = "Analysis Relative Day"
+        ABLFL    = "Baseline Record Flag"
+        BASE     = "Baseline Value"
+        CHG      = "Change from Baseline"
+        ANRIND   = "Analysis Range Indicator"
+        BNRIND   = "Baseline Range Indicator"
+        SHIFT1   = "Shift from Baseline to Analysis"
+        ATOXGRL  = "Analysis Toxicity Grade Low"
+        ATOXGRH  = "Analysis Toxicity Grade High"
+        ATOXDSCL = "Analysis Toxicity Description Low"
+        ATOXDSCH = "Analysis Toxicity Description High"
+        TRTA     = "Actual Treatment"
+        TRTAN    = "Actual Treatment (N)"
     ;
 run;
 

@@ -18,29 +18,34 @@
 %mend;
 %load_config;
 
-/* 1. Get First/Last Dose from EX (Traceability) */
+/* 1. Get Dates from EX (Regimen Alignment) */
 proc sort data=sdtm.ex out=ex_sorted;
     by USUBJID EXSTDTC;
-    where upcase(EXTRT) = 'BV-CAR20';
 run;
 
 data car_dates;
     set ex_sorted;
     by USUBJID;
     
-    retain TRTSDT TRTEDT;
-    format TRTSDT TRTEDT date9.;
+    retain TRTSDT TRTEDT CARTDT;
+    format TRTSDT TRTEDT CARTDT date9.;
     
+    /* Regimen Start (Lymphodepletion or CAR-T) */
     if first.USUBJID then do;
-        TRTSDT = input(EXSTDTC, yymmdd10.);
+        %iso_to_sas(iso_var=EXSTDTC, sas_var=TRTSDT);
+    end;
+    
+    /* Specific CAR-T Infusion Date */
+    if upcase(EXTRT) = 'BV-CAR20' and missing(CARTDT) then do;
+        %iso_to_sas(iso_var=EXSTDTC, sas_var=CARTDT);
     end;
     
     if last.USUBJID then do;
-        TRTEDT = input(EXENDTC, yymmdd10.);
+        %iso_to_sas(iso_var=EXENDTC, sas_var=TRTEDT);
         output;
     end;
     
-    keep USUBJID TRTSDT TRTEDT;
+    keep USUBJID TRTSDT TRTEDT CARTDT;
 run;
 
 /* 2. Check for Efficacy Assessments in RS */
@@ -56,13 +61,14 @@ data adsl;
     if _n_ = 1 then do;
         declare hash h(dataset:'car_dates');
         h.defineKey('USUBJID');
-        h.defineData('TRTSDT', 'TRTEDT');
+        h.defineData('TRTSDT', 'TRTEDT', 'CARTDT');
         h.defineDone();
     end;
     
     if h.find() ne 0 then do;
         TRTSDT = .;
         TRTEDT = .;
+        CARTDT = .;
     end;
 
     /* Merge in Efficacy Flag */
@@ -100,12 +106,13 @@ data adsl;
     else AGEGR1 = ">=65";
 
     /* Dates Formatting */
-    format TRTSDT TRTEDT date9.;
+    format TRTSDT TRTEDT CARTDT date9.;
     
     /* Labels per CDISC */
     label 
-        TRTSDT   = "Date of First Exposure to Study Drug"
-        TRTEDT   = "Date of Last Exposure to Study Drug"
+        TRTSDT   = "Date of First Exposure to Study Regimen"
+        TRTEDT   = "Date of Last Exposure to Study Regimen"
+        CARTDT   = "Date of CAR-T Infusion"
         ITTFL    = "Intent-To-Treat Population Flag"
         SAFFL    = "Safety Population Flag"
         EFFFL    = "Efficacy Population Flag"

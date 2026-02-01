@@ -61,10 +61,12 @@ data dm;
     SUBJID = scan(USUBJID, -1, '-');  /* Extract subject number */
     SITEID = scan(USUBJID, 1, '-');   /* Extract site number */
     
-    /* Dates */
+    /* Dates: First Study Treatment Date is the start of the Regimen (LD or CAR-T) */
     RFSTDTC = strip(RFSTDTC);         /* Subject Reference Start Date */
-    RFXSTDTC = strip(TRTSDT);         /* First Study Treatment Date */
-    RFXENDTC = strip(TRTSDT);         /* Last Study Treatment Date (single dose) */
+    if not missing(LDSTDT) then RFXSTDTC = strip(LDSTDT);
+    else RFXSTDTC = strip(TRTSDT);
+    
+    RFXENDTC = strip(TRTSDT);         /* Last Study Treatment Date (single dose infusion) */
     RFENDTC = "";                     /* Reference End Date (ongoing) */
     RFICDTC = strip(RFSTDTC);         /* Informed Consent Date */
     RFPENDTC = "";                    /* End of Participation (ongoing) */
@@ -100,8 +102,8 @@ data dm;
     
     keep STUDYID DOMAIN USUBJID SUBJID RFSTDTC RFENDTC RFXSTDTC RFXENDTC 
          RFICDTC RFPENDTC DTHDTC DTHFL SITEID AGE AGEU SEX RACE ETHNIC 
-         ARMCD ARM COUNTRY SAFFL ITTFL EFFFL;
-run;
+         ARMCD ARM COUNTRY SAFFL ITTFL EFFFL DISEASE;
+ run;
 
 /* Create permanent SAS dataset for ADaM use */
 data sdtm.dm;
