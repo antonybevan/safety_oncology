@@ -75,8 +75,8 @@ title2 "Summary of Objective Response Rate (ORR)";
 proc report data=orr_summary nowd headskip split='|';
     column ARMCD orr_count n_subj orr_pct;
     define ARMCD / "Dose Level" width=20;
-    define orr_count / "ORR (n)" center;
-    define n_subj / "Number Evaluated (N)" center;
+    define orr_count / "ORR (n)" center display;
+    define n_subj / "Number Evaluated (N)" center display;
     define orr_pct / computed "ORR (%)" format=6.1 center;
     
     compute orr_pct;

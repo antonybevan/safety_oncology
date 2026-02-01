@@ -105,7 +105,7 @@ data adae;
         AENDT    = "Analysis End Date"
         TRTA     = "Actual Treatment"
         TRTAN    = "Actual Treatment (N)"
-        TRTEMFL  = "Treatment Emergent Analysis Flag (Regimen)"
+        TRTEMFL  = "Trt Emergent Analysis Flag (Regimen)"
         PSTCARFL = "Post-CAR-T Infusion Flag"
         AETOXGRN = "Analysis Toxicity Grade (N)"
         AESIFL   = "Adverse Event of Special Interest Flag"

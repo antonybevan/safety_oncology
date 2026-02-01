@@ -31,7 +31,6 @@ data ae;
         STUDYID $20
         DOMAIN $2
         USUBJID $40
-        AESEQ 8
         AETERM $200
         AEDECOD $200
         AESTDTC $10
