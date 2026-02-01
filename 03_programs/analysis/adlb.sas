@@ -49,7 +49,7 @@ data lb_adsl;
         if 0 then set adam.adsl(keep=USUBJID TRTSDT TRT01A TRT01AN ARM ARMCD);
         declare hash a(dataset:'adam.adsl');
         a.defineKey('USUBJID');
-        a.defineData('TRTSDT', 'TRT01A', 'TRTAN', 'ARM', 'ARMCD');
+        a.defineData('TRTSDT', 'TRT01A', 'TRT01AN', 'ARM', 'ARMCD');
         a.defineDone();
     end;
     

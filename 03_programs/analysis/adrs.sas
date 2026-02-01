@@ -24,10 +24,10 @@ data adrs;
     
     /* Analysis Parameters with Criteria-Specific Mapping */
     if _n_ = 1 then do;
-        if 0 then set adam.adsl(keep=USUBJID TRTSDT TRT01A TRT01AN ITTFL SAFFL EFFFL DISEASE ARMCD);
+        if 0 then set adam.adsl(keep=USUBJID TRTSDT TRT01A TRT01AN ITTFL SAFFL EFFFL DISEASE ARMCD ARM);
         declare hash b(dataset:'adam.adsl');
         b.defineKey('USUBJID');
-        b.defineData('TRTSDT', 'TRT01A', 'TRT01AN', 'ITTFL', 'SAFFL', 'EFFFL', 'DISEASE', 'ARMCD');
+        b.defineData('TRTSDT', 'TRT01A', 'TRT01AN', 'ITTFL', 'SAFFL', 'EFFFL', 'DISEASE', 'ARMCD', 'ARM');
         b.defineDone();
     end;
     
