@@ -10,11 +10,9 @@ __pycache__/
 *.pyo
 .ipynb_checkpoints/
 
-# Data outputs (generated, not source)
-02_datasets/tabulations/*.xpt
-04_output/**/*.rtf
-04_output/**/*.pdf
-04_output/**/*.png
+# Data outputs (generated results - ignore content but keep structure)
+04_outputs/**/*
+!04_outputs/**/.gitkeep
 
 # OS Files
 .DS_Store
