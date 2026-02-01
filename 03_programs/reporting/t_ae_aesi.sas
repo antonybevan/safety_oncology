@@ -39,7 +39,7 @@ proc sql;
            max(case when index(upcase(AEDECOD), 'IMMUNE EFFECTOR') > 0 or 
                          index(upcase(AEDECOD), 'NEUROTOXICITY') > 0 then 1 else 0 end) as ICANS_FL,
            max(case when index(upcase(AEDECOD), 'GRAFT') > 0 then 1 else 0 end) as GVHD_FL,
-           max(input(ASTCTGR, ?? 8.)) as MAX_ASTCT_GR
+           max(input(ASTCTGR, 8.)) as MAX_ASTCT_GR
     from aesi_data
     group by USUBJID, ARMCD;
 quit;

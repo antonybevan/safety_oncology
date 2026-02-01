@@ -42,9 +42,9 @@ run;
 /* 4. Subject Level Max Grade Summary */
 proc sql;
     create table lb_subj_summ as
-    select USUBJID, ARMCD, TOX_LABEL, count(*) as n_events
+    select USUBJID, ARM, TOX_LABEL, count(*) as n_events
     from lb_summary_prep
-    group by USUBJID, ARMCD, TOX_LABEL;
+    group by USUBJID, ARM, TOX_LABEL;
 quit;
 
 /* 5. Reporting */
@@ -56,9 +56,9 @@ footnote1 "Note: Laboratory toxicities are graded via NCI-CTCAE v5.0.";
 footnote2 "Bi-directional grading (Low/High) is used to capture metabolic and electrolyte imbalances.";
 
 proc report data=lb_subj_summ nowd headskip split='|' style(report)={outputwidth=100%};
-    column TOX_LABEL ARMCD, (n_events);
+    column TOX_LABEL ARM, (n_events);
     define TOX_LABEL / "Laboratory Parameter (Direction)" width=50;
-    define ARMCD / across "Dose Level";
+    define ARM / across "Dose Level";
     define n_events / "n" center;
     
     compute after _page_;

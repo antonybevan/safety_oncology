@@ -34,10 +34,10 @@ data adae;
     /* Join ADSL variables */
     length TRT01A $200;
     if _n_ = 1 then do;
-        if 0 then set adam.adsl(keep=USUBJID TRTSDT CARTDT TRT01A TRT01AN);
+        if 0 then set adam.adsl(keep=USUBJID TRTSDT CARTDT TRT01A TRT01AN ARM ARMCD);
         declare hash a(dataset:'adam.adsl');
         a.defineKey('USUBJID');
-        a.defineData('TRTSDT', 'CARTDT', 'TRT01A', 'TRT01AN');
+        a.defineData('TRTSDT', 'CARTDT', 'TRT01A', 'TRT01AN', 'ARM', 'ARMCD');
         a.defineDone();
     end;
     
