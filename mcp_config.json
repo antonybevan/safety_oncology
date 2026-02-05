@@ -1,0 +1,12 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "mcpServers": {
+        "notebooklm": {
+            "command": "C:\\Users\\91936\\miniconda3\\Scripts\\notebooklm-mcp.exe",
+            "args": [],
+            "env": {
+                "PYTHONUNBUFFERED": "1"
+            }
+        }
+    }
+}

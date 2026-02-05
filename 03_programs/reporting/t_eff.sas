@@ -1,7 +1,7 @@
 /******************************************************************************
  * Program:      t_eff.sas
  * Protocol:     BV-CAR20-P1
- * Purpose:      Table 14.2 - Best Overall Response (BOR)
+ * Purpose:      Generate Table 2.1 - Summary of Objective Response Rate by Initial Treatment
  * Author:       Clinical Programming Lead
  * Date:         2026-02-01
  * SAS Version:  9.4
@@ -14,17 +14,17 @@
 %mend;
 %load_config;
 
-/* 1. Prepare Efficacy Data (ITT Population) */
+/* 1. Prepare Efficacy Data (Response Evaluable Population) */
 data t_eff_data;
     set adam.adrs;
-    where ITTFL = 'Y';
+    where EFFFL = 'Y';
 run;
 
 /* 2. Calculate Big N per subgroup */
 proc sql noprint;
-    select count(*) into :N_DL1 from adam.adsl where ITTFL = 'Y' and ARMCD = 'DL1';
-    select count(*) into :N_DL2 from adam.adsl where ITTFL = 'Y' and ARMCD = 'DL2';
-    select count(*) into :N_DL3 from adam.adsl where ITTFL = 'Y' and ARMCD = 'DL3';
+    select count(*) into :N_DL1 from adam.adsl where EFFFL = 'Y' and ARMCD = 'DL1';
+    select count(*) into :N_DL2 from adam.adsl where EFFFL = 'Y' and ARMCD = 'DL2';
+    select count(*) into :N_DL3 from adam.adsl where EFFFL = 'Y' and ARMCD = 'DL3';
 quit;
 
 %let N_DL1 = %trim(&N_DL1);
@@ -52,8 +52,8 @@ quit;
 
 /* 5. Production Reporting Logic */
 title1 "BV-CAR20-P1: CAR-T Efficacy Summary";
-title2 "Table 14.2: Best Overall Response (BOR) and Objective Response Rate";
-title3 "Intent-To-Treat (ITT) Population";
+title2 "Table 2.1: Summary of Objective Response Rate by Initial Treatment";
+title3 "Response Evaluable (RE) Population";
 
 footnote1 "Note: BOR is assessed via Lugano 2016 for NHL and iwCLL 2018 for CLL/SLL cohorts.";
 footnote2 "ORR (Objective Response Rate) = CR + PR.";

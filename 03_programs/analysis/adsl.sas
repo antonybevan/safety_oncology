@@ -27,12 +27,13 @@ data car_dates;
     set ex_sorted;
     by USUBJID;
     
-    retain TRTSDT TRTEDT CARTDT;
-    format TRTSDT TRTEDT CARTDT date9.;
+    retain TRTSDT TRTEDT CARTDT LDSTDT;
+    format TRTSDT TRTEDT CARTDT LDSTDT date9.;
     
     /* Regimen Start (Lymphodepletion or CAR-T) */
     if first.USUBJID then do;
         %iso_to_sas(iso_var=EXSTDTC, sas_var=TRTSDT);
+        if upcase(EXTRT) in ('FLUDARABINE', 'CYCLOPHOSPHAMIDE') then LDSTDT = TRTSDT;
     end;
     
     /* Specific CAR-T Infusion Date */
@@ -45,7 +46,7 @@ data car_dates;
         output;
     end;
     
-    keep USUBJID TRTSDT TRTEDT CARTDT;
+    keep USUBJID TRTSDT TRTEDT CARTDT LDSTDT;
 run;
 
 /* 2. Check for Efficacy Assessments in RS */
@@ -61,7 +62,7 @@ data adsl;
     if _n_ = 1 then do;
         declare hash h(dataset:'car_dates');
         h.defineKey('USUBJID');
-        h.defineData('TRTSDT', 'TRTEDT', 'CARTDT');
+        h.defineData('TRTSDT', 'TRTEDT', 'CARTDT', 'LDSTDT');
         h.defineDone();
     end;
     
@@ -69,6 +70,7 @@ data adsl;
         TRTSDT = .;
         TRTEDT = .;
         CARTDT = .;
+        LDSTDT = .;
     end;
 
     /* Merge in Efficacy Flag */
@@ -87,6 +89,11 @@ data adsl;
     if SAFFL = "Y" and e.find() = 0 then EFFFL = "Y";
     else EFFFL = "N";
 
+    /* mBOIN Dose-Escalation Set Flag (CAR-T recipients only) */
+    /* Per Protocol: MBOINFL = Y if subject received CAR-T infusion */
+    if not missing(CARTDT) then MBOINFL = "Y";
+    else MBOINFL = "N";
+
     /* Analysis Treatments per ADaM IG */
     length TRT01P TRT01A $200;
     TRT01P = ARM;
@@ -98,6 +105,28 @@ data adsl;
     else if ARMCD = 'DL3' then TRT01PN = 3;
     
     TRT01AN = TRT01PN;
+
+    /* Disease Cohort and Evaluation Criteria (Lugano vs iwCLL) */
+    length COHORT $10 EVALCRIT $25;
+    if DISEASE = 'NHL' then do;
+        COHORT = 'NHL';
+        EVALCRIT = 'LUGANO 2016';
+    end;
+    else if DISEASE in ('CLL', 'SLL') then do;
+        COHORT = 'CLL';
+        EVALCRIT = 'iwCLL 2018';
+    end;
+
+    /* DLT Evaluable Population Flag (Per Protocol Section 6.2.3) */
+    /* DLTEVALFL = Y if MBOINFL = Y AND (DLT or completed 28-day window) */
+    length DLTEVALFL $1;
+    if MBOINFL = 'Y' then do;
+        TRTDUR = TRTEDT - TRTSDT + 1;
+        /* Evaluability: 28-day window completion or early DLT (Manual adjudication expected) */
+        if TRTDUR >= 28 then DLTEVALFL = 'Y';
+        else DLTEVALFL = 'N';
+    end;
+    else DLTEVALFL = 'N';
 
     /* Age Grouping */
     length AGEGR1 $10;
@@ -113,13 +142,18 @@ data adsl;
         TRTSDT   = "Date of First Exposure to Study Regimen"
         TRTEDT   = "Date of Last Exposure to Study Regimen"
         CARTDT   = "Date of CAR-T Infusion"
+        LDSTDT   = "Date of First Lymphodepletion"
         ITTFL    = "Intent-To-Treat Population Flag"
         SAFFL    = "Safety Population Flag"
         EFFFL    = "Efficacy Population Flag"
+        MBOINFL  = "mBOIN Dose-Escalation Set Flag"
+        DLTEVALFL = "DLT Evaluable Population Flag"
         TRT01P   = "Planned Treatment for Period 01"
         TRT01PN  = "Planned Treatment for Period 01 (N)"
         TRT01A   = "Actual Treatment for Period 01"
         TRT01AN  = "Actual Treatment for Period 01 (N)"
+        COHORT   = "Disease Cohort"
+        EVALCRIT = "Analysis Evaluation Criteria"
         AGEGR1   = "Pooled Age Group 1"
     ;
     

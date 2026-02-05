@@ -24,10 +24,10 @@ data adrs;
     
     /* Analysis Parameters with Criteria-Specific Mapping */
     if _n_ = 1 then do;
-        if 0 then set adam.adsl(keep=USUBJID TRTSDT TRT01A TRT01AN ITTFL SAFFL EFFFL DISEASE ARMCD ARM);
+        if 0 then set adam.adsl(keep=USUBJID TRTSDT TRT01A TRT01AN ITTFL SAFFL EFFFL DISEASE ARMCD ARM EVALCRIT);
         declare hash b(dataset:'adam.adsl');
         b.defineKey('USUBJID');
-        b.defineData('TRTSDT', 'TRT01A', 'TRT01AN', 'ITTFL', 'SAFFL', 'EFFFL', 'DISEASE', 'ARMCD', 'ARM');
+        b.defineData('TRTSDT', 'TRT01A', 'TRT01AN', 'ITTFL', 'SAFFL', 'EFFFL', 'DISEASE', 'ARMCD', 'ARM', 'EVALCRIT');
         b.defineDone();
     end;
     
@@ -37,9 +37,16 @@ data adrs;
     PARAM = "Best Overall Response";
     
     /* Lugano 2016 for NHL, iwCLL 2018 for CLL */
-    length CRIT1 $100;
+    length CRIT1 PARCAT3 $100;
     if DISEASE = 'NHL' then CRIT1 = "Lugano 2016 (Metabolic)";
     else if DISEASE = 'CLL' then CRIT1 = "iwCLL 2018";
+    
+    PARCAT3 = EVALCRIT;
+
+    /* Traceability Variables */
+    SRCDOM  = "RS";
+    SRCVAR  = "RSORRES";
+    SRCSEQ  = RSSEQ;
     
     AVALC = strip(upcase(RSSTRESC));
     
@@ -69,13 +76,73 @@ data adrs;
         PARAM    = "Parameter"
         AVALC    = "Analysis Value (C)"
         AVAL     = "Analysis Value"
+        CNSR     = "Censor Flag"
+        PARCAT1  = "Parameter Category 1"
+        PARCAT3  = "Evaluation Criteria"
+        SRCDOM   = "Source Domain"
+        SRCVAR   = "Source Variable"
+        SRCSEQ   = "Source Sequence Number"
         ANL01FL  = "Analysis Record Flag 01"
     ;
 run;
 
-/* Create permanent SAS dataset */
+/* 2. Add PFS Parameter (SAP §7.1.2) */
+data adrs_pfs;
+    set adam.adsl(keep=USUBJID TRTSDT CARTDT ITTFL SAFFL EFFFL EVALCRIT TRTEDT);
+    
+    PARAMCD = "PFS";
+    PARAM = "Progression-Free Survival (Days)";
+    PARCAT1 = "TIME-TO-EVENT";
+    
+    /* Find progression date from RS (Simplified check) */
+    if _n_ = 1 then do;
+        declare hash p(dataset:'sdtm.rs(where=(upcase(RSSTRESC) in ("PD", "PMD")))');
+        p.defineKey('USUBJID');
+        p.defineData('RSDTC');
+        p.defineDone();
+    end;
+    
+    length PD_DTC $10;
+    if p.find() = 0 then PD_DTC = RSDTC;
+    else PD_DTC = "";
+    
+    format PD_DT date9.;
+    if not missing(PD_DTC) then PD_DT = input(PD_DTC, yymmdd10.);
+    
+    /* Censoring Logic (SAP Table 6) */
+    /* 1. If PD found -> Event (CNSR=0) */
+    if not missing(PD_DT) then do;
+        ADT = PD_DT;
+        CNSR = 0;
+    end;
+    /* 2. Otherwise -> Censored at last exposure/contact (Simplified) */
+    else do;
+        ADT = TRTEDT;
+        CNSR = 1;
+    end;
+    
+    if not missing(ADT) and not missing(TRTSDT) then do;
+        AVAL = ADT - TRTSDT + 1;
+    end;
+    
+    format ADT date9.;
+    label CNSR = "Censor Flag (0=Event, 1=Censored)";
+    
+    /* Essential traceability */
+    SRCDOM = "RS/ADSL";
+    SRCVAR = "RSDTC/TRTEDT";
+    
+    drop PD_DTC PD_DT TRTSDT CARTDT;
+run;
+
+/* 3. Combine and Finalize */
+data adrs_combined;
+    set adrs(in=a) adrs_pfs(in=b);
+    if a and missing(PARCAT1) then PARCAT1 = "EFFICIENCY";
+run;
+
 data adam.adrs;
-    set adrs;
+    set adrs_combined;
 run;
 
 /* 2. Export to XPT */

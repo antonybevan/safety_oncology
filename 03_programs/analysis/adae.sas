@@ -84,18 +84,126 @@ data adae;
     /* AESI Flag and DLT logic */
     AESIFL = "N";
     DLTFL = "N";
+    length AESICAT $10;
+    AESICAT = "";
     
-    if index(upcase(AEDECOD), 'CYTOKINE RELEASE') > 0 or 
-       index(upcase(AEDECOD), 'NEUROTOXICITY') > 0 or
-       index(upcase(AEDECOD), 'IMMUNE EFFECTOR') > 0 or
-       index(upcase(AEDECOD), 'GRAFT') > 0 then do;
+    if index(upcase(AEDECOD), 'CYTOKINE RELEASE') > 0 then do;
         AESIFL = "Y";
+        AESICAT = "CRS";
+    end;
+    else if index(upcase(AEDECOD), 'NEUROTOXICITY') > 0 or
+            index(upcase(AEDECOD), 'IMMUNE EFFECTOR') > 0 then do;
+        AESIFL = "Y";
+        AESICAT = "ICANS";
+    end;
+    else if index(upcase(AEDECOD), 'GRAFT') > 0 then do;
+        AESIFL = "Y";
+        AESICAT = "GVHD";
+    end;
+
+    /* Infection Flag (SAP §8.2.2 requirement) */
+    if index(upcase(AEDECOD), 'INFECT') > 0 or 
+       index(upcase(AEDECOD), 'SEPSIS') > 0 or 
+       index(upcase(AEDECOD), 'PNEUMONIA') > 0 then INFFL = "Y";
+    else INFFL = "N";
+
+    /* ========================================================================
+       DLT DERIVATION LOGIC (Per Protocol Section 3.8)
+       Complex duration-dependent rules: 72h, 7d, 14d, 42d windows
+       ======================================================================== */
+    DLTFL = "N";
+    length DLTREAS $100;
+    DLTREAS = "";
+    
+    /* Calculate event duration (days) */
+    if not missing(ASTDT) and not missing(AENDT) then 
+        AEDUR = AENDT - ASTDT + 1;
+    else AEDUR = .;
+    
+    /* DLT Window Check: Day 0 to Day 28 from CAR-T infusion */
+    if not missing(ASTDT) and not missing(CARTDT) then do;
+        DLTWINDY = ASTDT - CARTDT;
+        if 0 <= DLTWINDY <= 28 then DLTWINFL = "Y";
+        else DLTWINFL = "N";
+    end;
+    else DLTWINFL = "N";
+    
+    /* Only derive DLT if within DLT window */
+    if DLTWINFL = "Y" then do;
         
-        /* ICANS 72-hour DLT Rule */
-        if index(upcase(AEDECOD), 'IMMUNE EFFECTOR') > 0 or index(upcase(AEDECOD), 'NEUROTOXICITY') > 0 then do;
-            if not missing(ASTDT) and not missing(AENDT) then do;
-                if (AENDT - ASTDT + 1) > 3 and AETOXGRN >= 3 then DLTFL = "Y";
+        /* --- AESI-Specific DLT Rules --- */
+        /* CRS Grade 4: Immediate DLT */
+        if AESICAT = "CRS" and AETOXGRN = 4 then do;
+            DLTFL = "Y";
+            DLTREAS = "CRS Grade 4 (Immediate DLT)";
+        end;
+        /* CRS Grade 3: DLT if not resolved to Gr<=2 within 72h */
+        else if AESICAT = "CRS" and AETOXGRN = 3 then do;
+            if AEDUR > 3 then do;
+                DLTFL = "Y";
+                DLTREAS = "CRS Grade 3 not resolved within 72h";
             end;
+        end;
+        /* ICANS Grade 3+: DLT if not resolved to Gr<=2 within 72h */
+        else if AESICAT = "ICANS" and AETOXGRN >= 3 then do;
+            if AEDUR > 3 then do;
+                DLTFL = "Y";
+                DLTREAS = "ICANS Grade 3+ not resolved within 72h";
+            end;
+        end;
+        /* GvHD Grade 2+: DLT if not resolved within 14 days */
+        else if AESICAT = "GVHD" and AETOXGRN >= 2 then do;
+            if AEDUR > 14 then do;
+                DLTFL = "Y";
+                DLTREAS = "GvHD Grade 2+ not resolved within 14 days";
+            end;
+        end;
+        
+        /* --- General Toxicity DLT Rules --- */
+        /* Cardiac/Respiratory Grade 3: Immediate DLT */
+        else if AESOC in ('Cardiac disorders', 'Respiratory, thoracic and mediastinal disorders') 
+                and AETOXGRN = 3 then do;
+            DLTFL = "Y";
+            DLTREAS = "Cardiac/Respiratory Grade 3 (Immediate DLT)";
+        end;
+        /* Non-Hematologic Grade 4: Immediate DLT */
+        else if AETOXGRN = 4 and AESOC not in 
+                ('Blood and lymphatic system disorders', 'Investigations') then do;
+            DLTFL = "Y";
+            DLTREAS = "Non-Hematologic Grade 4 (Immediate DLT)";
+        end;
+        /* Hematologic Grade 4 (excl Lymphopenia): DLT if not resolved within 42 days */
+        else if AETOXGRN = 4 and AESOC in ('Blood and lymphatic system disorders', 'Investigations')
+                and upcase(AEDECOD) not in ('LYMPHOCYTE COUNT DECREASED', 'LYMPHOPENIA') then do;
+            if AEDUR > 42 then do;
+                DLTFL = "Y";
+                DLTREAS = "Hematologic Grade 4 not resolved within 42 days";
+            end;
+        end;
+        /* Renal/Hepatic Grade 3: DLT if not resolved within 7 days */
+        else if AESOC in ('Renal and urinary disorders', 'Hepatobiliary disorders') 
+                and AETOXGRN = 3 then do;
+            if AEDUR > 7 then do;
+                DLTFL = "Y";
+                DLTREAS = "Renal/Hepatic Grade 3 not resolved within 7 days";
+            end;
+        end;
+        /* Seizure (Any Grade): Immediate DLT */
+        else if upcase(AEDECOD) in ('SEIZURE', 'CONVULSION', 'EPILEPSY') then do;
+            DLTFL = "Y";
+            DLTREAS = "Seizure (Any Grade - Immediate DLT)";
+        end;
+        /* Other Organ Grade 3: DLT if not resolved within 72h */
+        else if AETOXGRN = 3 and AESIFL = "N" then do;
+            if AEDUR > 3 then do;
+                DLTFL = "Y";
+                DLTREAS = "Other Grade 3 not resolved within 72h";
+            end;
+        end;
+        /* Death (Grade 5): DLT if not due to underlying malignancy */
+        else if AETOXGRN = 5 and AEREL not in ('NOT RELATED') then do;
+            DLTFL = "Y";
+            DLTREAS = "Grade 5 (Death) related to treatment";
         end;
     end;
 
@@ -109,8 +217,13 @@ data adae;
         PSTCARFL = "Post-CAR-T Infusion Flag"
         AETOXGRN = "Analysis Toxicity Grade (N)"
         AESIFL   = "Adverse Event of Special Interest Flag"
+        AESICAT  = "AESI Category"
         ASTCTGR  = "ASTCT 2019 Grade"
         DLTFL    = "Dose-Limiting Toxicity Flag"
+        DLTREAS  = "DLT Reason"
+        DLTWINFL = "DLT Window Flag (Day 0-28)"
+        AEDUR    = "Event Duration (Days)"
+        INFFL    = "Infection Flag"
     ;
 run;
 

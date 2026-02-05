@@ -1,7 +1,7 @@
 /******************************************************************************
  * Program:      t_ae_aesi.sas
  * Protocol:     BV-CAR20-P1
- * Purpose:      Table 14.3.2 - Summary of Adverse Events of Special Interest (AESI)
+ * Purpose:      Generate Table 3.5 - Summary of AEs of Special Interest and Infections by Max Toxicity Grade and Dose
  * Author:       Clinical Programming Lead
  * Date:         2026-02-01
  * SAS Version:  9.4
@@ -28,18 +28,18 @@ quit;
 /* 2. Process AESI Data */
 data aesi_data;
     set adam.adae;
-    where AESIFL = 'Y' and TRTEMFL = 'Y';
+    where (AESIFL = 'Y' or INFFL = 'Y') and TRTEMFL = 'Y';
 run;
 
 /* 3. Categorize by AESI Type and Max ASTCT Grade */
 proc sql;
     create table aesi_summary as
     select USUBJID, ARMCD, 
-           max(case when index(upcase(AEDECOD), 'CYTOKINE RELEASE') > 0 then 1 else 0 end) as CRS_FL,
-           max(case when index(upcase(AEDECOD), 'IMMUNE EFFECTOR') > 0 or 
-                         index(upcase(AEDECOD), 'NEUROTOXICITY') > 0 then 1 else 0 end) as ICANS_FL,
-           max(case when index(upcase(AEDECOD), 'GRAFT') > 0 then 1 else 0 end) as GVHD_FL,
-           max(input(ASTCTGR, 8.)) as MAX_ASTCT_GR
+           max(case when AESICAT = 'CRS' then 1 else 0 end) as CRS_FL,
+           max(case when AESICAT = 'ICANS' then 1 else 0 end) as ICANS_FL,
+           max(case when AESICAT = 'GVHD' then 1 else 0 end) as GVHD_FL,
+           max(case when INFFL = 'Y' then 1 else 0 end) as INF_FL,
+           max(AETOXGRN) as MAX_ASTCT_GR
     from aesi_data
     group by USUBJID, ARMCD;
 quit;
@@ -49,21 +49,23 @@ proc freq data=aesi_summary noprint;
     tables ARMCD * CRS_FL / out=crs_counts;
     tables ARMCD * ICANS_FL / out=icans_counts;
     tables ARMCD * GVHD_FL / out=gvhd_counts;
+    tables ARMCD * INF_FL / out=inf_counts;
 run;
 
-/* 5. Specialized Formatting for CAR-T Safety */
+/* 5. Production Table Formatting (Mockup logic for Portfolio) */
 title1 "BV-CAR20-P1: CAR-T Safety Analysis";
-title2 "Table 14.3.2: Summary of Adverse Events of Special Interest (AESI)";
+title2 "Table 3.5: Summary of AEs of Special Interest and Infections by Max Toxicity Grade and Dose";
 title3 "Safety Population";
 
 footnote1 "Note: CRS and ICANS are graded via ASTCT 2019 Consensus Criteria.";
 footnote2 "GvHD is assessed via Protocol-specified organ grading.";
 
 proc report data=aesi_summary nowd headskip split='|' style(report)={outputwidth=100%};
-    column ("AESI Category" CRS_FL ICANS_FL GVHD_FL) ARMCD, (sum);
+    column ("Safety Category" CRS_FL ICANS_FL GVHD_FL INF_FL) ARMCD, (sum);
     define CRS_FL / "Subjects with CRS" sum center;
     define ICANS_FL / "Subjects with ICANS" sum center;
     define GVHD_FL / "Subjects with GvHD" sum center;
+    define INF_FL / "Subjects with Infections" sum center;
     define ARMCD / across "Dose Level";
     
     compute after _page_;

@@ -1,7 +1,7 @@
 /******************************************************************************
  * Program:      t_dm.sas
  * Protocol:     BV-CAR20-P1
- * Purpose:      Generate Table 14.1 - Demographics and Baseline Characteristics
+ * Purpose:      Generate Table 1.3 - Summary of Demographics and Baseline Characteristics
  * Author:       Clinical Programming Lead
  * Date:         2026-02-01
  * SAS Version:  9.4
@@ -39,10 +39,11 @@ run;
 proc freq data=t_dm_data noprint;
     tables ARMCD * SEX / out=sex_freq;
     tables ARMCD * RACE / out=race_freq;
+    tables ARMCD * AGEGR1 / out=agegr_freq;
 run;
 
 /* 5. Production Table Formatting (Mockup logic for Portfolio) */
-title "Table 14.1: Demographics and Baseline Characteristics";
+title "Table 1.3: Summary of Demographics and Baseline Characteristics";
 title2 "Safety Population";
 
 /* Handle the DL2 "Skipped" Logic per SAP §1.1 */
@@ -56,6 +57,7 @@ title2 "Safety Population";
 proc report data=t_dm_data nowd headskip split='|' style(report)={outputwidth=100%};
     column ("Characteristic" AGE SEX RACE) ARMCD, (n);
     define AGE / "Age (Years)";
+    define AGEGR1 / "Age Group";
     define SEX / "Gender";
     define RACE / "Race";
     define ARMCD / across "Dose Level";
