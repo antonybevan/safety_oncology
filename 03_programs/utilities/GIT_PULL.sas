@@ -11,6 +11,8 @@ filename zipfile "&zip_file";
 proc http 
    url="&repo_url" 
    method="GET" 
+   ssl_verify_host=0
+   ssl_verify_peer=0
    out=zipfile; 
 run;
 
