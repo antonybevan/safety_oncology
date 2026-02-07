@@ -1,6 +1,6 @@
 /******************************************************************************
  * Program:      t_mrd.sas
- * Protocol:     PBCAR20A-01 (Phase 2a Expansion - Portfolio Extension)
+ * Protocol:     BV-CAR20-P1 (Phase 2a Expansion - Portfolio Extension)
  * Purpose:      Minimal Residual Disease (MRD) Analysis
  * Author:       Clinical Programming Lead
  * Date:         2026-02-05
@@ -41,7 +41,7 @@ data mrd_data;
     rename DISEASETYPE=DISEASE;
     where ITTFL = 'Y';
     
-    STUDYID = "PBCAR20A-01";
+    STUDYID = "BV-CAR20-P1";
     
     /* MRD rates vary by disease and response */
     if DISEASE = 'NHL' then _mrd_neg_rate = 0.55;  /* 55% MRD-neg for NHL */
@@ -89,7 +89,7 @@ run;
 proc freq data=mrd_data;
     tables DISEASE * TIMEPOINT * MRDRESULT / nocum nopercent;
     title1 "Table 2.4: MRD Status by Disease and Timepoint";
-    title2 "PBCAR20A-01 Phase 1/2a — Efficacy Evaluable Population";
+    title2 "BV-CAR20-P1 Phase 1/2a — Efficacy Evaluable Population";
 run;
 
 /* 3. Summary Table */
@@ -127,7 +127,7 @@ proc sgplot data=mrd_summary;
     keylegend / position=bottom title="Disease";
     
     title1 "Figure F-MRD1: MRD Negativity Rate Over Time";
-    title2 "PBCAR20A-01 Phase 1/2a — Efficacy Evaluable Population";
+    title2 "BV-CAR20-P1 Phase 1/2a — Efficacy Evaluable Population";
     footnote1 "MRD assessed by flow cytometry at 10^-4 sensitivity.";
 run;
 

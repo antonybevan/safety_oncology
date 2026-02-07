@@ -1,6 +1,6 @@
 /******************************************************************************
  * Program:      00_phase2a_full_driver.sas
- * Protocol:     PBCAR20A-01 (Full Phase 2a per Original Protocol V5.0)
+ * Protocol:     BV-CAR20-P1 (Full Phase 2a per Original Protocol V5.0)
  * Purpose:      Master Driver for COMPLETE Phase 2a Implementation
  * Author:       Clinical Programming Lead
  * Date:         2026-02-05
@@ -35,7 +35,7 @@
     /* Configuration */
     %include "&path/00_config.sas";
     
-    title "PBCAR20A-01: FULL Phase 1/2a Implementation per Protocol V5.0";
+    title "BV-CAR20-P1: FULL Phase 1/2a Implementation per Protocol V5.0";
 
     
     %put NOTE: ==================================================;

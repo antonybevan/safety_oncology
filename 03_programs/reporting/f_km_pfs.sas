@@ -1,6 +1,6 @@
 /******************************************************************************
  * Program:      f_km_pfs.sas
- * Protocol:     PBCAR20A-01
+ * Protocol:     BV-CAR20-P1
  * Purpose:      Kaplan-Meier Survival Curve for Progression-Free Survival (PFS)
  * Author:       Clinical Programming Lead
  * Date:         2026-02-05
@@ -77,7 +77,7 @@ proc lifetest data=pfs_data method=KM
     time AVAL_MONTHS * CNSR(1);
     strata ARMCD / order=internal;
     title1 "Figure F-EFF1: Kaplan-Meier Curve for Progression-Free Survival";
-    title2 "PBCAR20A-01 Phase 1 — Response Evaluable Population";
+    title2 "BV-CAR20-P1 Phase 1 — Response Evaluable Population";
     footnote1 "PFS defined as time from Day 0 to disease progression or death.";
     footnote2 "Censoring per SAP Table 6 and FDA Clinical Trial Endpoints Guidance.";
     footnote3 "Tick marks indicate censored observations.";

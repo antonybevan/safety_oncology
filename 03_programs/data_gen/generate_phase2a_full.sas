@@ -1,6 +1,6 @@
 /******************************************************************************
  * Program:      generate_phase2a_full.sas
- * Protocol:     PBCAR20A-01
+ * Protocol:     BV-CAR20-P1
  * Purpose:      Synthetic Data Generation for Phase 2a Expansion Arms
  * Author:       Clinical Programming Lead
  * Date:         2026-02-05
@@ -40,7 +40,7 @@ data dm_arm_a;
            PHASE $3 COHORT $30 DISEASETYPE $20 PRIORLINES 8
            CYTOGENETICS $50 PRIORIBRUTINIB $1;
     
-    STUDYID = "PBCAR20A-01";
+    STUDYID = "BV-CAR20-P1";
     DOMAIN = "DM";
     PHASE = "2a";
     COHORT = "Arm A: CLL/SLL Ibrutinib";
@@ -85,7 +85,7 @@ data dm_arm_b;
            PHASE $3 COHORT $30 DISEASETYPE $20 PRIORLINES 8
            PRIORCHOP $1 PRIORCHOPRESPONSE $20;
     
-    STUDYID = "PBCAR20A-01";
+    STUDYID = "BV-CAR20-P1";
     DOMAIN = "DM";
     PHASE = "2a";
     COHORT = "Arm B: DLBCL post-R-CHOP";
@@ -128,7 +128,7 @@ data dm_arm_c;
            PHASE $3 COHORT $30 DISEASETYPE $20 PRIORLINES 8
            PRIORCART $1 PRIORCARTPRODUCT $30;
     
-    STUDYID = "PBCAR20A-01";
+    STUDYID = "BV-CAR20-P1";
     DOMAIN = "DM";
     PHASE = "2a";
     COHORT = "Arm C: High-grade NHL post-CAR-T";
@@ -183,7 +183,7 @@ data rs_phase2a_full;
     
     set dm_phase2a_full(keep=USUBJID COHORT DISEASETYPE);
     
-    STUDYID = "PBCAR20A-01";
+    STUDYID = "BV-CAR20-P1";
     DOMAIN = "RS";
     RSSEQ = 1;
     RSTESTCD = "OVRLRESP";
@@ -239,7 +239,7 @@ data cart_kinetics;
     
     set dm_phase2a_full(keep=USUBJID);
     
-    STUDYID = "PBCAR20A-01";
+    STUDYID = "BV-CAR20-P1";
     
     call streaminit(&SEED + 5000);
     
@@ -273,7 +273,7 @@ data cytokines;
     
     set dm_phase2a_full(keep=USUBJID);
     
-    STUDYID = "PBCAR20A-01";
+    STUDYID = "BV-CAR20-P1";
     
     call streaminit(&SEED + 6000);
     
@@ -310,7 +310,7 @@ data ae_phase2a_full;
     
     set dm_phase2a_full(keep=USUBJID COHORT DISEASETYPE);
     
-    STUDYID = "PBCAR20A-01";
+    STUDYID = "BV-CAR20-P1";
     DOMAIN = "AE";
     
     call streaminit(&SEED + 8000);

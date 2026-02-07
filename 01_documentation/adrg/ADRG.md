@@ -1,19 +1,19 @@
 # Analysis Data Reviewer Guide (ADRG)
-**Study**: PBCAR20A-01  
+**Study**: BV-CAR20-P1  
 **Product**: PBCAR20A (Allogeneic CD19 CAR-T)  
 **Date**: 2026-02-05
 
 ---
 
 ## 1. Introduction
-This Analysis Data Reviewer's Guide (ADRG) provides additional information and documentation to support the regulatory review of the ADaM datasets for Study PBCAR20A-01. This guide follows the PhUSE ADRG template.
+This Analysis Data Reviewer's Guide (ADRG) provides additional information and documentation to support the regulatory review of the ADaM datasets for Study BV-CAR20-P1. This guide follows the PhUSE ADRG template.
 
 ### 1.1 Controlled Terminology
 All analysis datasets use **CDISC Controlled Terminology (v2025-12-20)**. No custom codelists were utilized outside of the standard regulatory descriptors for CAR-T specific cell counts.
 
 ## 2. Protocol Design & Clinical Alignment
 ### 2.1 Study Design
-PBCAR20A-01 is a Phase 1/2a, open-label, dose-escalation study. The primary objective is to evaluate the safety and MTD of PBCAR20A in subjects with r/r NHL or r/r CLL/SLL.
+BV-CAR20-P1 is a Phase 1/2a, open-label, dose-escalation study. The primary objective is to evaluate the safety and MTD of PBCAR20A in subjects with r/r NHL or r/r CLL/SLL.
 - **Design**: Standard 3+3 Dose Escalation.
 - **Dose Levels**: 
   - DL1: 100 x 10^6 cells

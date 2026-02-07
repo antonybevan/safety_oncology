@@ -1,6 +1,6 @@
 /******************************************************************************
  * Program:      interim_analysis.sas
- * Protocol:     PBCAR20A-01 (Phase 2a Expansion - Portfolio Extension)
+ * Protocol:     BV-CAR20-P1 (Phase 2a Expansion - Portfolio Extension)
  * Purpose:      Interim Analysis Shell/Template
  * Author:       Clinical Programming Lead
  * Date:         2026-02-05
@@ -59,7 +59,7 @@ run;
 
 proc print data=alpha_spent noobs;
     title1 "Table IA-1: Alpha Spending Function (O'Brien-Fleming)";
-    title2 "PBCAR20A-01 Interim Analysis";
+    title2 "BV-CAR20-P1 Interim Analysis";
 run;
 
 /* -------------------------------------------------------------------------

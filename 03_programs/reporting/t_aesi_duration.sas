@@ -1,6 +1,6 @@
 /******************************************************************************
  * Program:      t_aesi_duration.sas
- * Protocol:     PBCAR20A-01
+ * Protocol:     BV-CAR20-P1
  * Purpose:      Table 3.3: Summary of Onset and Duration for All AESIs
  * Author:       Clinical Programming Lead
  * Date:         2026-02-05
@@ -115,7 +115,7 @@ proc report data=aesi_report nowd split='*';
     define Duration_Display / display "Duration (days)*Median (Range)" center;
     
     title1 "Table 3.3: Summary of Onset and Duration for Adverse Events of Special Interest";
-    title2 "PBCAR20A-01 Phase 1 — Safety Population";
+    title2 "BV-CAR20-P1 Phase 1 — Safety Population";
     footnote1 "Time to onset = Date of AE onset – Day 0 (CAR-T infusion) + 1.";
     footnote2 "Duration = Date of resolution – Date of onset + 1.";
     footnote3 "For ongoing AESIs, duration calculated to data cutoff date.";

@@ -1,6 +1,6 @@
 /******************************************************************************
  * Program:      cp.sas
- * Protocol:     PBCAR20A-01
+ * Protocol:     BV-CAR20-P1
  * Purpose:      Create SDTM Cell Phenotype Domain (CP) for CAR-T Cellular Kinetics
  * Author:       Clinical Programming Lead
  * Date:         2026-02-05
@@ -40,7 +40,7 @@ data cp;
            CPSTRESC $200 CPSTRESN 8 CPSTRESU $20 CPMETHOD $40 
            CPBLFL $1 VISITNUM 8 VISIT $40 CPDTC $20 CPDY 8;
     
-    STUDYID = "PBCAR20A-01";
+    STUDYID = "BV-CAR20-P1";
     DOMAIN = "CP";
     
     /* -------------------------------------------------------------------------
@@ -49,7 +49,7 @@ data cp;
        ------------------------------------------------------------------------- */
     
     /* Subject 1: Complete expansion and persistence data */
-    USUBJID = "PBCAR20A-01-001-0001"; CPSEQ = 1;
+    USUBJID = "BV-CAR20-P1-001-0001"; CPSEQ = 1;
     CPCAT = "CAR-T CELLULAR KINETICS"; CPTESTCD = "CARTEXP"; 
     CPTEST = "CAR-T Cell Expansion (Peak)";
     CPORRES = "125000"; CPORRESU = "copies/μg DNA";
@@ -75,7 +75,7 @@ data cp;
     VISITNUM = 1; CPDTC = "2026-01-08"; CPDY = 0; CPBLFL = "Y"; output;
     
     /* Subject 2: Lower expansion */
-    USUBJID = "PBCAR20A-01-001-0002"; CPSEQ = 1; CPBLFL = "";
+    USUBJID = "BV-CAR20-P1-001-0002"; CPSEQ = 1; CPBLFL = "";
     CPTESTCD = "CARTEXP"; CPTEST = "CAR-T Cell Expansion (Peak)";
     CPORRES = "75000"; CPSTRESN = 75000; CPORRESU = "copies/μg DNA"; CPSTRESU = "copies/μg DNA";
     CPMETHOD = "qPCR"; VISITNUM = 101; VISIT = "DAY 7";

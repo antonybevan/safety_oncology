@@ -1,6 +1,6 @@
 /******************************************************************************
  * Program:      f_cart_kinetics.sas
- * Protocol:     PBCAR20A-01 (Full Phase 2a per Original Protocol)
+ * Protocol:     BV-CAR20-P1 (Full Phase 2a per Original Protocol)
  * Purpose:      CAR-T Cellular Kinetics Figures (VCN, Persistence)
  * Author:       Clinical Programming Lead
  * Date:         2026-02-05
@@ -57,7 +57,7 @@ proc sgpanel data=sdtm.cart_kinetics;
     panelby VISIT / columns=7 novarname;
     histogram VCN / scale=count;
     title1 "Figure F-PK1: CAR-T Cell Kinetics (VCN) Over Time";
-    title2 "PBCAR20A-01 Phase 1/2a — All Treated Subjects";
+    title2 "BV-CAR20-P1 Phase 1/2a — All Treated Subjects";
 run;
 
 /* 4. Spaghetti Plot - Individual Trajectories */
@@ -71,7 +71,7 @@ proc sgplot data=sdtm.cart_kinetics;
     yaxis label="Vector Copy Number (VCN)" type=log;
     
     title1 "Figure F-PK2: Individual CAR-T Expansion Profiles";
-    title2 "PBCAR20A-01 Phase 1/2a — All Treated Subjects";
+    title2 "BV-CAR20-P1 Phase 1/2a — All Treated Subjects";
     footnote1 "Red line = LOESS smooth of population trend.";
 run;
 

@@ -1,11 +1,11 @@
 # Study Data Reviewer Guide (SDRG)
-**Study**: PBCAR20A-01  
+**Study**: BV-CAR20-P1  
 **Date**: 2026-02-05
 
 ---
 
 ## 1. Introduction
-This Study Data Reviewer's Guide (SDRG) provides documentation to support the regulatory review of the SDTM tabulation datasets for Study PBCAR20A-01.
+This Study Data Reviewer's Guide (SDRG) provides documentation to support the regulatory review of the SDTM tabulation datasets for Study BV-CAR20-P1.
 
 ## 2. Protocol Design & Data Flow
 The SDTM datasets represent the direct tabulation of source data from electronic Case Report Forms (eCRF) and external laboratory vendors.

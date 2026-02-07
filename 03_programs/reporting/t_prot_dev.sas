@@ -1,6 +1,6 @@
 /******************************************************************************
  * Program:      t_prot_dev.sas
- * Protocol:     PBCAR20A-01
+ * Protocol:     BV-CAR20-P1
  * Purpose:      Table 1.2: Summary/Listing of Major Protocol Deviations
  * Author:       Clinical Programming Lead
  * Date:         2026-02-05
@@ -41,21 +41,21 @@
             length STUDYID $20 DOMAIN $2 USUBJID $40 DVSEQ 8 
                    DVTERM $200 DVCAT $50 DVSCAT $50 DVDTC $20 DVSTDTC $20;
             
-            STUDYID = "PBCAR20A-01";
+            STUDYID = "BV-CAR20-P1";
             DOMAIN = "DV";
             
             /* Mock protocol deviations - typical Phase 1 scenarios */
-            USUBJID = "PBCAR20A-01-001-0003"; DVSEQ = 1;
+            USUBJID = "BV-CAR20-P1-001-0003"; DVSEQ = 1;
             DVTERM = "Missed Day 14 assessment visit";
             DVCAT = "ASSESSMENT"; DVSCAT = "SCHEDULE";
             DVDTC = "2026-01-22"; output;
             
-            USUBJID = "PBCAR20A-01-001-0005"; DVSEQ = 1;
+            USUBJID = "BV-CAR20-P1-001-0005"; DVSEQ = 1;
             DVTERM = "Prohibited concomitant medication administered";
             DVCAT = "MEDICATION"; DVSCAT = "CONCOMITANT";
             DVDTC = "2026-01-18"; output;
             
-            USUBJID = "PBCAR20A-01-001-0007"; DVSEQ = 1;
+            USUBJID = "BV-CAR20-P1-001-0007"; DVSEQ = 1;
             DVTERM = "Laboratory sample not collected per protocol";
             DVCAT = "LABORATORY"; DVSCAT = "SAMPLE";
             DVDTC = "2026-01-25"; output;

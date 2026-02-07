@@ -1,4 +1,4 @@
-# Protocol Synopsis: PBCAR20A-01
+# Protocol Synopsis: BV-CAR20-P1
 
 **Protocol Title**: A Phase 1/2a Open-label, Dose-escalation Study to Evaluate the Safety and Clinical Activity of PBCAR20A in Subjects with r/r NHL or r/r CLL/SLL.
 

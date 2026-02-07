@@ -1,6 +1,6 @@
 /******************************************************************************
  * Program:      f_km_os.sas
- * Protocol:     PBCAR20A-01
+ * Protocol:     BV-CAR20-P1
  * Purpose:      Kaplan-Meier Survival Curve for Overall Survival (OS)
  * Author:       Clinical Programming Lead
  * Date:         2026-02-05
@@ -81,7 +81,7 @@ proc lifetest data=os_data method=KM
     time OS_MONTHS * OS_CNSR(1);
     strata ARMCD / order=internal;
     title1 "Figure F-EFF2: Kaplan-Meier Curve for Overall Survival";
-    title2 "PBCAR20A-01 Phase 1 — Safety Population";
+    title2 "BV-CAR20-P1 Phase 1 — Safety Population";
     footnote1 "OS defined as time from Day 0 to death from any cause.";
     footnote2 "Subjects alive at data cut censored at last known alive date.";
     footnote3 "Tick marks indicate censored observations.";

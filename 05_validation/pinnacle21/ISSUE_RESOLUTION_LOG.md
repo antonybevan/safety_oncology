@@ -1,5 +1,5 @@
 # Pinnacle 21 Validation Issue Resolution Log
-**Study**: PBCAR20A-01  
+**Study**: BV-CAR20-P1  
 **Software**: Pinnacle 21 Community v4.0  
 **Date**: 2026-02-05
 
@@ -25,7 +25,7 @@ All SDTM and ADaM datasets have been validated against CDISC SDTMIG v3.4 and ADa
 | **ADSL** | AD0047 | Required variable missing (e.g., RFSTDTC) | `RFSTDTC` is present in SDTM.DM; ADSL focuses on analysis-ready flags (`TRTSDT`). |
 
 ## 4. Conclusion
-The PBCAR20A-01 dataset package is conformant to regulatory standards. All remaining warnings are clinical/technical exceptions inherent to the study design (Oncology CAR-T) and do not impact data integrity.
+The BV-CAR20-P1 dataset package is conformant to regulatory standards. All remaining warnings are clinical/technical exceptions inherent to the study design (Oncology CAR-T) and do not impact data integrity.
 
 ---
 **Certified by**: Quality Control Lead  

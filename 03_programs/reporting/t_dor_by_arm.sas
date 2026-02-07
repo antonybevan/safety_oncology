@@ -1,6 +1,6 @@
 /******************************************************************************
  * Program:      t_dor_by_arm.sas
- * Protocol:     PBCAR20A-01 (Full Phase 2a per Original Protocol)
+ * Protocol:     BV-CAR20-P1 (Full Phase 2a per Original Protocol)
  * Purpose:      Duration of Response by Phase 2a Arm
  * Author:       Clinical Programming Lead
  * Date:         2026-02-05

@@ -1,6 +1,6 @@
 /******************************************************************************
  * Program:      f_cytokines.sas
- * Protocol:     PBCAR20A-01 (Full Phase 2a per Original Protocol)
+ * Protocol:     BV-CAR20-P1 (Full Phase 2a per Original Protocol)
  * Purpose:      Cytokine Analysis Figures (IL-6, IFN-g, CRP)
  * Author:       Clinical Programming Lead
  * Date:         2026-02-05
@@ -41,7 +41,7 @@ proc sgplot data=sdtm.cytokines;
     refline 100 / axis=y lineattrs=(pattern=dash color=red) label="CRS Threshold";
     
     title1 "Figure F-BIO1: IL-6 Levels Over Time";
-    title2 "PBCAR20A-01 Phase 1/2a — All Treated Subjects";
+    title2 "BV-CAR20-P1 Phase 1/2a — All Treated Subjects";
     footnote1 "Horizontal dashed line = typical threshold for severe CRS.";
 run;
 
@@ -54,7 +54,7 @@ proc sgplot data=sdtm.cytokines;
     yaxis label="IFN-gamma (pg/mL)" type=log;
     
     title1 "Figure F-BIO2: IFN-gamma Levels Over Time";
-    title2 "PBCAR20A-01 Phase 1/2a — All Treated Subjects";
+    title2 "BV-CAR20-P1 Phase 1/2a — All Treated Subjects";
 run;
 
 /* CRP Profile */
@@ -67,7 +67,7 @@ proc sgplot data=sdtm.cytokines;
     refline 50 / axis=y lineattrs=(pattern=dash color=orange) label="Elevated";
     
     title1 "Figure F-BIO3: CRP Levels Over Time";
-    title2 "PBCAR20A-01 Phase 1/2a — All Treated Subjects";
+    title2 "BV-CAR20-P1 Phase 1/2a — All Treated Subjects";
 run;
 
 ods graphics off;

@@ -1,6 +1,6 @@
 /******************************************************************************
  * Program:      t_sae_cart.sas
- * Protocol:     PBCAR20A-01
+ * Protocol:     BV-CAR20-P1
  * Purpose:      Table 3.7: Summary of PBCAR20A-related SAEs by Max Toxicity Grade
  * Author:       Clinical Programming Lead
  * Date:         2026-02-05

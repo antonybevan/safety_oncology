@@ -1,6 +1,6 @@
 /******************************************************************************
  * Program:      f_swimmer.sas
- * Protocol:     PBCAR20A-01
+ * Protocol:     BV-CAR20-P1
  * Purpose:      Figure F-SW: Swimmer Plot for Progression-Free Survival
  * Author:       Clinical Programming Lead
  * Date:         2026-02-05
@@ -112,7 +112,7 @@ proc sgplot data=swimmer_plot;
     
     /* Titles */
     title1 "Figure F-SW: Swimmer Plot — Duration of Response";
-    title2 "PBCAR20A-01 Phase 1 — Safety Population";
+    title2 "BV-CAR20-P1 Phase 1 — Safety Population";
     footnote1 "Each bar represents one subject. Bar length = duration on study.";
     footnote2 "X = Death; P = Progression; > = Ongoing at data cut.";
     footnote3 "Vertical dashed lines indicate Week 4 (DLT window) and Week 12.";

@@ -1,12 +1,12 @@
 # QC Evidence & Independent Programming Log
-**Study**: PBCAR20A-01  
+**Study**: BV-CAR20-P1  
 **Objective**: Demonstration of Level 3 QC (Double Programming) for Critical Endpoints  
 **Date**: 2026-02-05
 
 ---
 
 ## 1. Quality Control Strategy
-Following the PhUSE and FDA Good Programming Practices, study PBCAR20A-01 utilized a tiered QC approach:
+Following the PhUSE and FDA Good Programming Practices, study BV-CAR20-P1 utilized a tiered QC approach:
 - **Level 1**: Manual review of outputs against specs.
 - **Level 2**: Formal program and log review (Zero Warning Standard).
 - **Level 3**: Independent (Double) Programming for critical safety and efficacy metrics.
@@ -30,7 +30,7 @@ The independent programs (`QC_ADSL.sas`, `QC_T_AE.sas`) were written using the s
 - **Log Warnings**: 0
 
 ## 4. Final Attestation
-I certify that the clinical datasets and statistical outputs for Study PBCAR20A-01 have undergone rigorous independent verification. The data integrity is sufficient for a primary regulatory submission.
+I certify that the clinical datasets and statistical outputs for Study BV-CAR20-P1 have undergone rigorous independent verification. The data integrity is sufficient for a primary regulatory submission.
 
 ---
 **Signed**: Statistical Programming Manager  

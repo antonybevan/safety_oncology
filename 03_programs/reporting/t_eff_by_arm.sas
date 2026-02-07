@@ -1,6 +1,6 @@
 /******************************************************************************
  * Program:      t_eff_by_arm.sas
- * Protocol:     PBCAR20A-01 (Full Phase 2a per Original Protocol)
+ * Protocol:     BV-CAR20-P1 (Full Phase 2a per Original Protocol)
  * Purpose:      Primary Efficacy by Phase 2a Arm (per Protocol Section 2.1.2)
  * Author:       Clinical Programming Lead
  * Date:         2026-02-05
@@ -126,7 +126,7 @@ proc sgplot data=forest_data;
     yaxis label=" " discreteorder=data reverse;
     
     title1 "Figure F-EFF3: Forest Plot of ORR by Phase 2a Arm";
-    title2 "PBCAR20A-01 Phase 2a Expansion — Response Evaluable Population";
+    title2 "BV-CAR20-P1 Phase 2a Expansion — Response Evaluable Population";
     footnote1 "Vertical dashed line represents 50% response rate.";
     footnote2 "Diamonds indicate point estimates; horizontal lines indicate 95% CI.";
 run;

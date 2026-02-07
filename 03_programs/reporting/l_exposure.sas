@@ -1,6 +1,6 @@
 /******************************************************************************
  * Program:      l_exposure.sas
- * Protocol:     PBCAR20A-01
+ * Protocol:     BV-CAR20-P1
  * Purpose:      Listing L-TA1: Planned and Actual Treatment Administered
  * Author:       Clinical Programming Lead
  * Date:         2026-02-05
@@ -95,7 +95,7 @@ proc print data=exposure_list noobs label split='*';
           ROUTE = "Route"
           COMPLIANCE = "Compliance*Status";
     title1 "Listing L-TA1: Planned and Actual Treatment Administered";
-    title2 "PBCAR20A-01 Phase 1 — Safety Population";
+    title2 "BV-CAR20-P1 Phase 1 — Safety Population";
     footnote1 "Source: SDTM EX Domain";
     footnote2 "Lymphodepletion: Fludarabine 30 mg/m2/day + Cyclophosphamide 500 mg/m2/day (Days -5 to -3)";
     footnote3 "CAR-T: BV-CAR20 administered on Day 0";
