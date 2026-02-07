@@ -70,7 +70,7 @@ run;
 
 /* 4. Create Publication-Quality KM Figure */
 ods graphics on / reset=all imagename="f_km_pfs" imagefmt=png width=8in height=6in;
-ods listing gpath="&OUTPUT_PATH";
+ods listing gpath="&OUT_FIGURES";
 
 proc lifetest data=pfs_data method=KM 
     plots=survival(atrisk=0 to 12 by 3 outside(0.15) cb=hw test);

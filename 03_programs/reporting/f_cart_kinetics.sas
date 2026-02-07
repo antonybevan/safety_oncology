@@ -24,7 +24,7 @@
    ============================================================================ */
 
 /* 1. Summary statistics by timepoint */
-proc means data=cart_kinetics n mean std median min max;
+proc means data=sdtm.cart_kinetics n mean std median min max;
     class VISIT;
     var VCN CARTT_CELLS;
     output out=kinetics_summary
@@ -40,7 +40,7 @@ proc sql;
     select USUBJID,
            max(VCN) as PEAK_VCN,
            max(CARTT_CELLS) as PEAK_CELLS
-    from cart_kinetics
+    from sdtm.cart_kinetics
     group by USUBJID;
 quit;
 
@@ -51,9 +51,9 @@ run;
 
 /* 3. Generate Kinetics Figure */
 ods graphics on / reset=all imagename="f_cart_kinetics" imagefmt=png width=10in height=6in;
-ods listing gpath="&OUTPUT_PATH";
+ods listing gpath="&OUT_FIGURES";
 
-proc sgpanel data=cart_kinetics;
+proc sgpanel data=sdtm.cart_kinetics;
     panelby VISIT / columns=7 novarname;
     histogram VCN / scale=count;
     title1 "Figure F-PK1: CAR-T Cell Kinetics (VCN) Over Time";
@@ -63,7 +63,7 @@ run;
 /* 4. Spaghetti Plot - Individual Trajectories */
 ods graphics on / imagename="f_cart_spaghetti" imagefmt=png width=10in height=6in;
 
-proc sgplot data=cart_kinetics;
+proc sgplot data=sdtm.cart_kinetics;
     series x=ADY y=VCN / group=USUBJID lineattrs=(thickness=1) transparency=0.5;
     loess x=ADY y=VCN / lineattrs=(thickness=3 color=red);
     
@@ -84,7 +84,7 @@ proc sql;
            count(distinct USUBJID) as N_Assessed,
            count(distinct case when VCN > 0 then USUBJID end) as N_Detectable,
            calculated N_Detectable / calculated N_Assessed * 100 as Persist_Rate format=5.1
-    from cart_kinetics
+    from sdtm.cart_kinetics
     group by VISIT, ADY
     order by ADY;
 quit;

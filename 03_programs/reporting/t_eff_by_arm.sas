@@ -31,8 +31,8 @@ proc sql;
            b.RSCAT as CRITERIA,
            case when b.RSORRES in ('CR', 'CRi') then 1 else 0 end as CR_FLAG,
            case when b.RSORRES in ('CR', 'CRi', 'PR') then 1 else 0 end as ORR_FLAG
-    from dm_phase2a_full a
-    inner join rs_phase2a_full b on a.USUBJID = b.USUBJID;
+    from sdtm.dm_phase2a_full a
+    inner join sdtm.rs_phase2a_full b on a.USUBJID = b.USUBJID;
 quit;
 
 /* 2. Arm A: CR Rate (CLL/SLL) */
@@ -115,7 +115,7 @@ run;
 
 /* 7. Create Forest Plot */
 ods graphics on / reset=all imagename="f_forest_orr" imagefmt=png width=10in height=6in;
-ods listing gpath="&OUTPUT_PATH";
+ods listing gpath="&OUT_FIGURES";
 
 proc sgplot data=forest_data;
     scatter y=Subgroup x=ORR / markerattrs=(symbol=diamondfilled size=12);

@@ -37,8 +37,9 @@ data mrd_data;
     
     call streaminit(20260205);
     
-    set adam.adsl_expanded(keep=USUBJID DISEASE COHORT EFFFL);
-    where EFFFL = 'Y';
+    set sdtm.dm_phase2a_full(keep=USUBJID DISEASETYPE COHORT ITTFL);
+    rename DISEASETYPE=DISEASE;
+    where ITTFL = 'Y';
     
     STUDYID = "PBCAR20A-01";
     
@@ -114,7 +115,7 @@ run;
 
 /* 4. MRD Rate Over Time - Line Plot */
 ods graphics on / reset=all imagename="f_mrd_time" imagefmt=png width=8in height=6in;
-ods listing gpath="&OUTPUT_PATH";
+ods listing gpath="&OUT_FIGURES";
 
 proc sgplot data=mrd_summary;
     series x=TIMEPOINT y=MRD_Neg_Rate / group=DISEASE 
@@ -137,7 +138,7 @@ proc sql;
     create table mrd_response as
     select a.USUBJID, a.DISEASE, a.MRDRESULT, a.TIMEPOINT, b.AVALC as BOR
     from mrd_data a
-    inner join adam.adrs_expanded b on a.USUBJID = b.USUBJID and b.PARAMCD = 'BOR'
+    inner join sdtm.rs_phase2a_full b on a.USUBJID = b.USUBJID and b.PARAMCD = 'BOR'
     where a.TIMEPOINT = 'Week 12';
 quit;
 

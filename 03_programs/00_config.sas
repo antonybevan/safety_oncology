@@ -71,6 +71,7 @@
     %let OUT_LISTINGS = &OUT_PATH/listings;
     %let OUT_FIGURES  = &OUT_PATH/figures;
     %let OUT_META     = &OUT_PATH/metadata;
+    %let OUTPUT_PATH  = &OUT_PATH;
 
     /* Assign Libraries */
     libname raw  "&LEGACY_PATH" access=readonly;

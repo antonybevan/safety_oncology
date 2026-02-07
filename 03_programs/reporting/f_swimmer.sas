@@ -86,7 +86,7 @@ run;
 
 /* 2. Create Swimmer Plot using SGPLOT */
 ods graphics on / reset=all imagename="f_swimmer" imagefmt=png width=10in height=8in;
-ods listing gpath="&OUTPUT_PATH";
+ods listing gpath="&OUT_FIGURES";
 
 proc sgplot data=swimmer_plot;
     /* Horizontal bars for duration */

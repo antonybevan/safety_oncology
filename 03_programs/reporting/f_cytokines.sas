@@ -23,7 +23,7 @@
    ============================================================================ */
 
 /* 1. Summary statistics by timepoint */
-proc means data=cytokines n mean std median min max;
+proc means data=sdtm.cytokines n mean std median min max;
     class VISIT;
     var IL6 IFNG CRP;
     title "Cytokine Summary by Timepoint";
@@ -31,10 +31,10 @@ run;
 
 /* 2. Generate Cytokine Profile Figures */
 ods graphics on / reset=all imagename="f_cytokines_il6" imagefmt=png width=8in height=6in;
-ods listing gpath="&OUTPUT_PATH";
+ods listing gpath="&OUT_FIGURES";
 
 /* IL-6 Profile */
-proc sgplot data=cytokines;
+proc sgplot data=sdtm.cytokines;
     vbox IL6 / category=VISIT;
     xaxis label="Timepoint" discreteorder=data;
     yaxis label="IL-6 (pg/mL)" type=log;
@@ -48,7 +48,7 @@ run;
 /* IFN-gamma Profile */
 ods graphics on / imagename="f_cytokines_ifng" imagefmt=png width=8in height=6in;
 
-proc sgplot data=cytokines;
+proc sgplot data=sdtm.cytokines;
     vbox IFNG / category=VISIT;
     xaxis label="Timepoint" discreteorder=data;
     yaxis label="IFN-gamma (pg/mL)" type=log;
@@ -60,7 +60,7 @@ run;
 /* CRP Profile */
 ods graphics on / imagename="f_cytokines_crp" imagefmt=png width=8in height=6in;
 
-proc sgplot data=cytokines;
+proc sgplot data=sdtm.cytokines;
     vbox CRP / category=VISIT;
     xaxis label="Timepoint" discreteorder=data;
     yaxis label="CRP (mg/L)";
@@ -79,7 +79,7 @@ proc sql;
            max(IL6) as PEAK_IL6,
            max(IFNG) as PEAK_IFNG,
            max(CRP) as PEAK_CRP
-    from cytokines
+    from sdtm.cytokines
     group by USUBJID;
 quit;
 

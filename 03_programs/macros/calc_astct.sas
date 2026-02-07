@@ -10,9 +10,9 @@
     length _tmp $50;
     _tmp = upcase(&source_grade);
     
-    if index(_tmp, 'GRADE 1') then &out_grade = 1;
-    else if index(_tmp, 'GRADE 2') then &out_grade = 2;
-    else if index(_tmp, 'GRADE 3') then &out_grade = 3;
-    else if index(_tmp, 'GRADE 4') then &out_grade = 4;
+    if index(_tmp, 'GRADE 4') or _tmp = '4' then &out_grade = 4;
+    else if index(_tmp, 'GRADE 3') or _tmp = '3' then &out_grade = 3;
+    else if index(_tmp, 'GRADE 2') or _tmp = '2' then &out_grade = 2;
+    else if index(_tmp, 'GRADE 1') or _tmp = '1' then &out_grade = 1;
     else &out_grade = .;
 %mend calc_astct;
