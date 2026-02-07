@@ -1,4 +1,4 @@
-/* GIT_RECOVERY.sas: Download Full Repo as ZIP for SAS OnDemand */
+/* GIT_PULL.sas: Download Full Repo as ZIP for SAS OnDemand */
 OPTIONS NONOTES NOSTIMER NOSOURCE NOSYNTAXCHECK;
 
 %let repo = https://github.com/antonybevan/safety_oncology/archive/refs/heads/main.zip;
