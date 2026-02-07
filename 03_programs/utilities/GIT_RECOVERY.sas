@@ -1,169 +1,70 @@
 /******************************************************************************
  * Program:      GIT_RECOVERY.sas
  * Protocol:     BV-CAR20-P1
- * Purpose:      Synchronization and Environment Recovery for SAS OnDemand
+ * Purpose:      Environment Recovery Instructions for SAS OnDemand
  * Author:       Clinical Programming Lead
  * Date:         2026-02-07
  * SAS Version:  9.4+ / SAS OnDemand compatible
  *
- * Description:  This utility performs a full environment recovery by:
- *               1. Removing existing local repository contents.
- *               2. Re-cloning the repository from the source.
- *
- * Note:         This process will overwrite local uncommitted changes.
- *               Ensure GIT_PUSH.sas is called before execution if data
- *               preservation is required.
+ * IMPORTANT:    PROC GIT and shell escapes are NOT available in SAS ODA.
+ *               This program provides manual instructions instead.
  ******************************************************************************/
 
-OPTIONS NONOTES NOSTIMER NOSOURCE NOSYNTAXCHECK;
+/*=============================================================================
+  ENVIRONMENT DETECTION & INSTRUCTIONS
+=============================================================================*/
+
+%put NOTE: ======================================================================;
+%put NOTE: ENVIRONMENT RECOVERY UTILITY - MANUAL INSTRUCTIONS;
+%put NOTE: ======================================================================;
+%put NOTE: ;
+%put NOTE: SAS OnDemand for Academics DOES NOT support PROC GIT or shell commands.;
+%put NOTE: Please follow the steps below to synchronize your environment.;
+%put NOTE: ;
+%put NOTE: ======================================================================;
+%put NOTE: STEP 1: DOWNLOAD THE LATEST REPOSITORY;
+%put NOTE: ======================================================================;
+%put NOTE:   1. Open a web browser and navigate to:;
+%put NOTE:      https://github.com/antonybevan/safety_oncology;
+%put NOTE:   2. Click the green "< > Code" button.;
+%put NOTE:   3. Select "Download ZIP".;
+%put NOTE:   4. Save the file to your local computer.;
+%put NOTE: ;
+%put NOTE: ======================================================================;
+%put NOTE: STEP 2: UPLOAD TO SAS ONDEMAND;
+%put NOTE: ======================================================================;
+%put NOTE:   1. In SAS OnDemand Studio, open the "Files (Home)" tab.;
+%put NOTE:   2. Delete or rename any existing 'clinical_safety' or;
+%put NOTE:      'safety_oncology' folder to avoid conflicts.;
+%put NOTE:   3. Right-click inside the Files pane and select "Upload".;
+%put NOTE:   4. Upload the ZIP file.;
+%put NOTE:   5. Right-click the uploaded ZIP file and select "Extract All".;
+%put NOTE: ;
+%put NOTE: ======================================================================;
+%put NOTE: STEP 3: CONFIGURE & RUN;
+%put NOTE: ======================================================================;
+%put NOTE:   1. Open 00_config.sas from the extracted folder.;
+%put NOTE:   2. Run it (F3 or click Run) to set up library paths.;
+%put NOTE:   3. Proceed with the main pipeline (00_main.sas).;
+%put NOTE: ;
+%put NOTE: ======================================================================;
+%put NOTE: RECOVERY INSTRUCTIONS COMPLETE;
+%put NOTE: ======================================================================;
 
 /*=============================================================================
-  USER CONFIGURATION
+  OPTIONAL: QUICK DIRECTORY CLEANUP MACRO
+  Uses SAS I/O functions, which ARE available in ODA.
 =============================================================================*/
-%let repo_url   = https://github.com/antonybevan/safety_oncology.git;
-%let home_dir   = /home/u63849890;
-%let target_dir = &home_dir/clinical_safety;
-
-/*=============================================================================
-  MACRO: DELETE_FILE
-  Deletes a single file using SAS I/O functions
-=============================================================================*/
-%macro delete_file(filepath);
+%macro oda_delete_folder(path);
+    /* This macro attempts to delete a folder using SAS functions. */
+    /* It will only work on EMPTY directories. Delete files first. */
     data _null_;
-        rc = filename("del", "&filepath");
+        rc = filename("del", "&path");
         rc = fdelete("del");
-        if rc ne 0 then put "NOTE: (Delete File) Failed for &filepath";
+        if rc = 0 then put "NOTE: Successfully deleted folder: &path";
+        else put "WARNING: Could not delete folder (may contain files): &path";
         rc = filename("del");
     run;
 %mend;
 
-/*=============================================================================
-  MACRO: DELETE_EMPTY_FOLDER
-  Deletes an empty folder (must be called after contents are removed)
-=============================================================================*/
-%macro delete_empty_folder(folderpath);
-    data _null_;
-        rc = filename("rdir", "&folderpath");
-        rc = fdelete("rdir");
-        if rc ne 0 then put "NOTE: (Delete Folder) Waiting for contents: &folderpath";
-        rc = filename("rdir");
-    run;
-%mend;
-
-/*=============================================================================
-  MACRO: TRAVERSAL
-  Recursive depth-first traversal to delete directory tree
-=============================================================================*/
-%macro traversal(dir);
-    data _null_;
-        length name $256 path $1024;
-        rc = filename("d", "&dir");
-        did = dopen("d");
-        
-        if did > 0 then do;
-            num = dnum(did);
-            do i = 1 to num;
-                name = dread(did, i);
-                path = catx("/", "&dir", name);
-                
-                /* Check if directory by trying to open it */
-                rc2 = filename("t", path);
-                did2 = dopen("t");
-                
-                if did2 > 0 then do;
-                    /* It is a directory: Close it, Recurse into it */
-                    rc3 = dclose(did2);
-                    call execute('%traversal(' || strip(path) || ')'); 
-                end;
-                else do;
-                     /* It is a file: Delete it immediately */
-                     call execute('%delete_file(' || strip(path) || ')');
-                end;
-                rc2 = filename("t");
-            end;
-            rc = dclose(did);
-        end;
-        rc = filename("d");
-        
-        /* Queue the deletion of the directory itself (runs after contents) */
-        call execute('%delete_empty_folder(' || strip("&dir") || ')');
-    run;
-%mend;
-
-/*=============================================================================
-  MACRO: DO_CLONE
-  Re-clone the repository after cleanup
-=============================================================================*/
-%macro do_clone;
-    data _null_;
-        put "NOTE: ==================================================";
-        put "NOTE: Cleanup complete. Attempting fresh CLONE...";
-        put "NOTE: ==================================================";
-    run;
-    
-    proc git;
-        clone url="&repo_url" out="&target_dir";
-    run;
-    
-    data _null_;
-        rc = filename("chk", "&target_dir/.git");
-        exists = fileexist("&target_dir/.git");
-        
-        if exists then do;
-            put "NOTE: ==================================================";
-            put "NOTE: ✅ SUCCESS! Repository reset in-place.";
-            put "NOTE: You can continue working in: &target_dir";
-            put "NOTE: ==================================================";
-        end;
-        else do;
-            put "ERR" "OR: Clone failed. Check network/permissions.";
-        end;
-    run;
-%mend;
-
-/*=============================================================================
-  MAIN EXECUTION
-=============================================================================*/
-data _null_;
-    put "NOTE: --------------------------------------------------";
-    put "NOTE: ENVIRONMENT RECOVERY - FULL SYNCHRONIZATION";
-    put "NOTE: Target: &target_dir";
-    put "NOTE: --------------------------------------------------";
-    put "NOTE: ";
-    put "NOTE: WARNING: Uncommitted local changes will be lost.";
-    put "NOTE: ";
-run;
-
-/* Step 1: Attempt a simple pull first */
-data _null_;
-    rc = gitfn_pull("&target_dir");
-    
-    if rc = 0 then do;
-        put "NOTE: Synchronization successful - no recovery required.";
-        call symputx('NEED_RESCUE', '0');
-    end;
-    else if rc = 1 then do;
-        put "NOTE: Environment is currently up to date.";
-        call symputx('NEED_RESCUE', '0');
-    end;
-    else do;
-        put "NOTE: Conflict Detected (RC=" rc ").";
-        put "NOTE: Initiating full environment recovery...";
-        call symputx('NEED_RESCUE', '1');
-    end;
-run;
-
-/* Step 2: If recovery needed, execute recursive delete and re-clone */
-%macro execute_rescue;
-    %if &NEED_RESCUE = 1 %then %do;
-        %traversal(&target_dir);
-        %do_clone;
-    %end;
-%mend;
-%execute_rescue;
-
-OPTIONS NOTES STIMER SOURCE SYNTAXCHECK;
-
-%put NOTE: --------------------------------------------------;
-%put NOTE: RECOVERY PROCESS COMPLETE;
-%put NOTE: --------------------------------------------------;
+/* Example: %oda_delete_folder(/home/u63849890/clinical_safety); */
