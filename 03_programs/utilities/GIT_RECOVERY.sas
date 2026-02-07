@@ -1,13 +1,14 @@
 /******************************************************************************
  * Program:      GIT_RECOVERY.sas
  * Protocol:     BV-CAR20-P1
- * Purpose:      Full Environment Reset for SAS OnDemand (No PROC GIT Required)
+ * Purpose:      Synchronization and Environment Recovery
  * Author:       Clinical Programming Lead
  * Date:         2026-02-07
- * SAS Version:  9.4+ / SAS OnDemand compatible
+ * SAS Version:  9.4+
  *
- * Description:  Performs a clean re-download of all repository files.
- *               Uses filename URL to bypass the PROC GIT limitation.
+ * Description:  This utility performs a full environment recovery by:
+ *               1. Removing existing local repository contents.
+ *               2. Re-cloning the repository from the source.
  ******************************************************************************/
 
 OPTIONS NONOTES NOSTIMER NOSOURCE NOSYNTAXCHECK;
@@ -15,129 +16,119 @@ OPTIONS NONOTES NOSTIMER NOSOURCE NOSYNTAXCHECK;
 /*=============================================================================
   USER CONFIGURATION
 =============================================================================*/
-%let github_user = antonybevan;
-%let repo_name   = safety_oncology;
-%let branch      = main;
-%let home_dir    = /home/u63849890;
-%let target_dir  = &home_dir/safety_oncology;
-
-%let raw_base = https://raw.githubusercontent.com/&github_user/&repo_name/&branch;
-
-/*=============================================================================
-  MACRO: CREATE_DIR
-=============================================================================*/
-%macro create_dir(path);
-    options dlcreatedir;
-    libname _tmp_ "&path";
-    libname _tmp_ clear;
-%mend;
-
-/*=============================================================================
-  MACRO: DOWNLOAD_FILE
-=============================================================================*/
-%macro download_file(remote_path, local_path);
-    filename src URL "&raw_base/&remote_path";
-    filename dest "&local_path";
-    
-    data _null_;
-        length line $32767;
-        infile src lrecl=32767 truncover end=eof;
-        file dest lrecl=32767;
-        input line $char32767.;
-        put line $char32767.;
-    run;
-    
-    %if &syserr = 0 %then %put NOTE: Synced: &remote_path;
-    %else %put WARNING: Failed: &remote_path;
-    
-    filename src clear;
-    filename dest clear;
-%mend;
+%let repo_url   = https://github.com/antonybevan/safety_oncology.git;
+%let home_dir   = /home/u63849890;
+%let target_dir = &home_dir/clinical_safety;
 
 /*=============================================================================
   MACRO: DELETE_FILE
+  Deletes a single file using SAS I/O functions
 =============================================================================*/
 %macro delete_file(filepath);
     data _null_;
-        rc = filename("del", "&filepath");
-        rc = fdelete("del");
-        rc = filename("del");
+        length fref $8;
+        rc = filename(fref, "&filepath");
+        if rc = 0 then do;
+            rc = fdelete(fref);
+            rc = filename(fref);
+        end;
     run;
 %mend;
 
 /*=============================================================================
-  MAIN EXECUTION: FULL REPOSITORY SYNC
+  MACRO: DELETE_EMPTY_FOLDER
+  Deletes an empty folder
 =============================================================================*/
-%put NOTE: ======================================================================;
-%put NOTE: FULL ENVIRONMENT RECOVERY - GITHUB DIRECT SYNC;
-%put NOTE: Repository: &github_user/&repo_name;
-%put NOTE: Target: &target_dir;
-%put NOTE: ======================================================================;
-%put NOTE: This will overwrite all local files with the latest from GitHub.;
-%put NOTE: ======================================================================;
+%macro delete_empty_folder(folderpath);
+    data _null_;
+        length fref $8;
+        rc = filename(fref, "&folderpath");
+        if rc = 0 then do;
+            rc = fdelete(fref);
+            rc = filename(fref);
+        end;
+    run;
+%mend;
 
-/* Create full directory structure */
-%create_dir(&target_dir);
-%create_dir(&target_dir/01_documentation);
-%create_dir(&target_dir/02_datasets);
-%create_dir(&target_dir/02_datasets/legacy);
-%create_dir(&target_dir/02_datasets/tabulations);
-%create_dir(&target_dir/02_datasets/analysis);
-%create_dir(&target_dir/03_programs);
-%create_dir(&target_dir/03_programs/tabulations);
-%create_dir(&target_dir/03_programs/analysis);
-%create_dir(&target_dir/03_programs/reporting);
-%create_dir(&target_dir/03_programs/utilities);
-%create_dir(&target_dir/03_programs/macros);
-%create_dir(&target_dir/04_outputs);
-%create_dir(&target_dir/04_outputs/tables);
-%create_dir(&target_dir/04_outputs/figures);
-%create_dir(&target_dir/04_outputs/listings);
+/*=============================================================================
+  MACRO: TRAVERSAL
+  Recursive depth-first traversal to delete directory tree
+=============================================================================*/
+%macro traversal(dir);
+    data _null_;
+        length name $256 path $1024;
+        rc = filename("d", "&dir");
+        did = dopen("d");
+        
+        if did > 0 then do;
+            num = dnum(did);
+            do i = 1 to num;
+                name = dread(did, i);
+                path = catx("/", "&dir", name);
+                
+                /* Check if directory */
+                rc2 = filename("t", path);
+                did2 = dopen("t");
+                
+                if did2 > 0 then do;
+                    /* It is a directory: Close it, Recurse into it */
+                    rc3 = dclose(did2);
+                    call execute('%traversal(' || strip(path) || ')'); 
+                end;
+                else do;
+                     /* It is a file: Delete it */
+                     call execute('%delete_file(' || strip(path) || ')');
+                end;
+                rc2 = filename("t");
+            end;
+            rc = dclose(did);
+        end;
+        rc = filename("d");
+        
+        /* Delete the directory itself */
+        call execute('%delete_empty_folder(' || strip("&dir") || ')');
+    run;
+%mend;
 
-/* Download Core Config */
-%download_file(03_programs/00_config.sas, &target_dir/03_programs/00_config.sas);
-%download_file(03_programs/00_main.sas, &target_dir/03_programs/00_main.sas);
-%download_file(03_programs/00_phase2a_full_driver.sas, &target_dir/03_programs/00_phase2a_full_driver.sas);
+/*=============================================================================
+  MACRO: DO_CLONE
+  Re-clone the repository
+=============================================================================*/
+%macro do_clone;
+    data _null_;
+        put "NOTE: Attempting fresh CLONE...";
+    run;
+    
+    proc git;
+        clone url="&repo_url" out="&target_dir";
+    run; 
+    quit; /* Explicit QUIT to prevent active procedure block issues */
+%mend;
 
-/* Download SDTM Programs */
-%download_file(03_programs/tabulations/dm.sas, &target_dir/03_programs/tabulations/dm.sas);
-%download_file(03_programs/tabulations/ae.sas, &target_dir/03_programs/tabulations/ae.sas);
-%download_file(03_programs/tabulations/suppae.sas, &target_dir/03_programs/tabulations/suppae.sas);
-%download_file(03_programs/tabulations/ex.sas, &target_dir/03_programs/tabulations/ex.sas);
-%download_file(03_programs/tabulations/lb.sas, &target_dir/03_programs/tabulations/lb.sas);
-%download_file(03_programs/tabulations/rs.sas, &target_dir/03_programs/tabulations/rs.sas);
-%download_file(03_programs/tabulations/ts.sas, &target_dir/03_programs/tabulations/ts.sas);
-%download_file(03_programs/tabulations/ta.sas, &target_dir/03_programs/tabulations/ta.sas);
-%download_file(03_programs/tabulations/te.sas, &target_dir/03_programs/tabulations/te.sas);
-%download_file(03_programs/tabulations/su.sas, &target_dir/03_programs/tabulations/su.sas);
-%download_file(03_programs/tabulations/cp.sas, &target_dir/03_programs/tabulations/cp.sas);
-%download_file(03_programs/tabulations/is.sas, &target_dir/03_programs/tabulations/is.sas);
+/*=============================================================================
+  MAIN EXECUTION
+=============================================================================*/
+%macro main;
+    /* Step 1: Check inputs */
+    %if %length(&target_dir) = 0 %then %return;
 
-/* Download ADaM Programs */
-%download_file(03_programs/analysis/adsl.sas, &target_dir/03_programs/analysis/adsl.sas);
-%download_file(03_programs/analysis/adae.sas, &target_dir/03_programs/analysis/adae.sas);
-%download_file(03_programs/analysis/adlb.sas, &target_dir/03_programs/analysis/adlb.sas);
-%download_file(03_programs/analysis/adrs.sas, &target_dir/03_programs/analysis/adrs.sas);
-%download_file(03_programs/analysis/adex.sas, &target_dir/03_programs/analysis/adex.sas);
-%download_file(03_programs/analysis/adtte.sas, &target_dir/03_programs/analysis/adtte.sas);
-%download_file(03_programs/analysis/gen_metadata.sas, &target_dir/03_programs/analysis/gen_metadata.sas);
+    /* Step 2: Clean existing directory if it exists */
+    %if %sysfunc(fileexist(&target_dir)) %then %do;
+        %traversal(&target_dir);
+    %end;
 
-/* Download Reporting Programs */
-%download_file(03_programs/reporting/t_dm.sas, &target_dir/03_programs/reporting/t_dm.sas);
-%download_file(03_programs/reporting/t_eff.sas, &target_dir/03_programs/reporting/t_eff.sas);
-%download_file(03_programs/reporting/t_ae_summ.sas, &target_dir/03_programs/reporting/t_ae_summ.sas);
-%download_file(03_programs/reporting/t_ae_aesi.sas, &target_dir/03_programs/reporting/t_ae_aesi.sas);
-%download_file(03_programs/reporting/t_lb_grad.sas, &target_dir/03_programs/reporting/t_lb_grad.sas);
+    /* Step 3: Clone fresh */
+    %do_clone;
+    
+    /* Step 4: Verify */
+    data _null_;
+        if fileexist("&target_dir/.git") then 
+            put "NOTE: RECOVERY COMPLETE.";
+        else 
+            put "ERROR: Recovery failed.";
+    run;
+%mend;
 
-/* Download Utilities */
-%download_file(03_programs/utilities/generate_synthetic_data.sas, &target_dir/03_programs/utilities/generate_synthetic_data.sas);
-%download_file(03_programs/utilities/GIT_PULL.sas, &target_dir/03_programs/utilities/GIT_PULL.sas);
-%download_file(03_programs/utilities/GIT_PUSH.sas, &target_dir/03_programs/utilities/GIT_PUSH.sas);
-
-%put NOTE: ======================================================================;
-%put NOTE: RECOVERY COMPLETE - All files synced to: &target_dir;
-%put NOTE: ======================================================================;
-%put NOTE: Next Step: Run 00_config.sas to initialize the environment.;
-%put NOTE: ======================================================================;
+%main;
 
 OPTIONS NOTES STIMER SOURCE SYNTAXCHECK;
