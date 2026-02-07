@@ -35,7 +35,13 @@ data ex_pre;
     PARAM = EXTRT;
     PARAMCD = substr(EXTRT, 1, 8); /* Simple truncation for code */
     
-    keep USUBJID PARAM PARAMCD AVAL AVALU ASTDT AENDT EXSEQ;
+    /* MNC Traceability Variables (CDISC ADaM IG v1.3) */
+    length SRCDOM $8 SRCVAR $20;
+    SRCDOM = "EX";
+    SRCVAR = "EXDOSE";
+    SRCSEQ = EXSEQ;
+    
+    keep USUBJID PARAM PARAMCD AVAL AVALU ASTDT AENDT SRCDOM SRCVAR SRCSEQ;
 run;
 
 /* 2. Join ADSL */
@@ -70,6 +76,9 @@ data adex;
         ADY   = "Analysis Relative Day"
         TRTA  = "Actual Treatment"
         TRTAN = "Actual Treatment (N)"
+        SRCDOM = "Source Domain"
+        SRCVAR = "Source Variable"
+        SRCSEQ = "Source Sequence Number"
     ;
 run;
 

@@ -35,7 +35,13 @@ data lb_pre;
     PARAM   = LBTEST;
     AVISIT  = VISIT;
     
-    keep USUBJID PARAMCD PARAM ADT AVISIT AVAL LBORNRLO LBORNRHI;
+    /* MNC Traceability Variables (CDISC ADaM IG v1.3) */
+    length SRCDOM $8 SRCVAR $20;
+    SRCDOM = "LB";
+    SRCVAR = "LBORRES";
+    SRCSEQ = LBSEQ;
+    
+    keep USUBJID PARAMCD PARAM ADT AVISIT AVAL LBORNRLO LBORNRHI SRCDOM SRCVAR SRCSEQ;
 run;
 
 /* 2. Join ADSL for Treatment Start Date */
@@ -153,6 +159,9 @@ data adlb;
         ATOXDSCH = "Analysis Toxicity Description High"
         TRTA     = "Actual Treatment"
         TRTAN    = "Actual Treatment (N)"
+        SRCDOM   = "Source Domain"
+        SRCVAR   = "Source Variable"
+        SRCSEQ   = "Source Sequence Number"
     ;
 run;
 

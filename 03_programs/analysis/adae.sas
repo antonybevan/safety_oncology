@@ -63,6 +63,12 @@ data adae;
     /* Actual Treatment */
     TRTA = TRT01A;
     TRTAN = TRT01AN;
+    
+    /* MNC Traceability Variables (CDISC ADaM IG v1.3) */
+    length SRCDOM $8 SRCVAR $20;
+    SRCDOM = "AE";
+    SRCVAR = "AEDECOD";
+    SRCSEQ = AESEQ;
 
     /* Treatment Emergent Flag (SAP §8.2.1: On/After first PBCAR20A dose) */
     if not missing(ASTDT) and not missing(CARTDT) then do;
