@@ -118,15 +118,15 @@ data adsl;
     end;
 
     /* DLT Evaluable Population Flag (Per Protocol Section 6.2.3) */
-    /* DLTEVALFL = Y if MBOINFL = Y AND (DLT or completed 28-day window) */
-    length DLTEVALFL $1;
+    /* DLTEVLFL = Y if MBOINFL = Y AND (DLT or completed 28-day window) */
+    length DLTEVLFL $1;
     if MBOINFL = 'Y' then do;
         TRTDUR = TRTEDT - TRTSDT + 1;
         /* Evaluability: 28-day window completion or early DLT (Manual adjudication expected) */
-        if TRTDUR >= 28 then DLTEVALFL = 'Y';
-        else DLTEVALFL = 'N';
+        if TRTDUR >= 28 then DLTEVLFL = 'Y';
+        else DLTEVLFL = 'N';
     end;
-    else DLTEVALFL = 'N';
+    else DLTEVLFL = 'N';
 
     /* Age Grouping */
     length AGEGR1 $10;
@@ -147,7 +147,7 @@ data adsl;
         SAFFL    = "Safety Population Flag"
         EFFFL    = "Efficacy Population Flag"
         MBOINFL  = "mBOIN Dose-Escalation Set Flag"
-        DLTEVALFL = "DLT Evaluable Population Flag"
+        DLTEVLFL = "DLT Evaluability Flag"
         TRT01P   = "Planned Treatment for Period 01"
         TRT01PN  = "Planned Treatment for Period 01 (N)"
         TRT01A   = "Actual Treatment for Period 01"

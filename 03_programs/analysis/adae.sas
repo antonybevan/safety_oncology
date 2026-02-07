@@ -34,15 +34,15 @@ data adae;
     /* Join ADSL variables */
     length TRT01A $200;
     if _n_ = 1 then do;
-        if 0 then set adam.adsl(keep=USUBJID TRTSDT CARTDT TRT01A TRT01AN ARM ARMCD);
+        if 0 then set adam.adsl(keep=USUBJID TRTSDT CARTDT LDSTDT TRT01A TRT01AN ARM ARMCD);
         declare hash a(dataset:'adam.adsl');
         a.defineKey('USUBJID');
-        a.defineData('TRTSDT', 'CARTDT', 'TRT01A', 'TRT01AN', 'ARM', 'ARMCD');
+        a.defineData('TRTSDT', 'CARTDT', 'LDSTDT', 'TRT01A', 'TRT01AN', 'ARM', 'ARMCD');
         a.defineDone();
     end;
     
     if a.find() ne 0 then do;
-        TRTSDT = .; CARTDT = .; TRT01A = ""; TRT01AN = .;
+        TRTSDT = .; CARTDT = .; LDSTDT = .; TRT01A = ""; TRT01AN = .;
     end;
 
     /* Join SUPPAE Grades */
@@ -69,6 +69,10 @@ data adae;
     SRCDOM = "AE";
     SRCVAR = "AEDECOD";
     SRCSEQ = AESEQ;
+    
+    /* Map AESOC and AEREL from SDTM AE */
+    AESOC = strip(AESOC);
+    AEREL = strip(AEREL);
 
     /* Treatment Emergent Flag (SAP §8.2.1: On/After first PBCAR20A dose) */
     if not missing(ASTDT) and not missing(CARTDT) then do;
@@ -237,6 +241,8 @@ data adae;
         DLTWINFL = "DLT Window Flag (Day 0-28)"
         AEDUR    = "Event Duration (Days)"
         INFFL    = "Infection Flag"
+        AESOC    = "Primary System Organ Class"
+        AEREL    = "Analysis Causality"
     ;
 run;
 

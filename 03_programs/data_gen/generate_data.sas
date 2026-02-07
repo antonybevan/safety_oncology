@@ -143,8 +143,8 @@ run;
    ============================================================================ */
 data raw_ae;
    retain STUDYID USUBJID ARM SEX RACE DISEASE RFSTDTC TRTSDT LDSTDT SAFFL ITTFL EFFFL dose_level i subid AGE dt 
-          AEDECOD AETERM AETOXGR AESTDTC AEENDTC AESER AESID day0;
-   length AEDECOD AETERM AETOXGR $100 AESTDTC AEENDTC $10 AESER $1;
+          AEDECOD AETERM AETOXGR AESOC AEREL AESTDTC AEENDTC AESER AESID day0;
+   length AEDECOD AETERM AETOXGR AESOC $100 AEREL $40 AESTDTC AEENDTC $10 AESER $1;
    set raw_dm(where=(SAFFL='Y'));
    
    call streaminit(&SEED + 1000);
@@ -158,6 +158,8 @@ data raw_ae;
    AEENDTC = put(day0 + 14 + round(rand('uniform')*10), yymmdd10.);
    AESER   = "N";
    AESID   = 1;
+   AESOC   = "General disorders and administration site conditions";
+   AEREL   = "NOT RELATED";
    output;
 
    /* CRS - Dose-dependent rate (DL1: 60%, DL2: 80%, DL3: 94%) */
@@ -190,6 +192,8 @@ data raw_ae;
       AEENDTC = put(day0 + _onset + round(rand('gamma', 7, 1)), yymmdd10.);
       AESER = ifc(AETOXGR in ('GRADE 3', 'GRADE 4'), 'Y', 'N');
       AESID = 2;
+      AESOC = "Immune system disorders";
+      AEREL = "RELATED";
       output;
    end;
 
@@ -217,6 +221,8 @@ data raw_ae;
       AEENDTC = put(day0 + _onset + round(rand('gamma', 12, 1)), yymmdd10.);
       AESER = ifc(AETOXGR in ('GRADE 3', 'GRADE 4'), 'Y', 'N');
       AESID = 3;
+      AESOC = "Nervous system disorders";
+      AEREL = "RELATED";
       output;
    end;
    

@@ -21,9 +21,9 @@ data raw_ae;
     /* Aligned with generate_data.sas: raw_dm (17 vars) + AE specific (8 vars) */
     length STUDYID $20 USUBJID $40 ARM $200 SEX $1 RACE $100 DISEASE $5 RFSTDTC TRTSDT LDSTDT $10
            SAFFL ITTFL EFFFL $1
-           AEDECOD AETERM AETOXGR $100 AESTDTC AEENDTC $10 AESER $1 AESID 8 day0 8;
+           AEDECOD AETERM AETOXGR AESOC AEREL $100 AESTDTC AEENDTC $10 AESER $1 AESID 8 day0 8;
     input STUDYID $ USUBJID $ ARM $ SEX $ RACE $ DISEASE $ RFSTDTC $ TRTSDT $ LDSTDT $ SAFFL $ ITTFL $ EFFFL $ 
-          dose_level i subid AGE dt AEDECOD $ AETERM $ AETOXGR $ AESTDTC $ AEENDTC $ AESER $ AESID day0;
+          dose_level i subid AGE dt AEDECOD $ AETERM $ AETOXGR $ AESOC $ AEREL $ AESTDTC $ AEENDTC $ AESER $ AESID day0;
 run;
 
 data ae;
@@ -87,7 +87,7 @@ data ae;
     end;
     
     keep STUDYID DOMAIN USUBJID AETERM AEDECOD AESTDTC AEENDTC 
-         AESTDY AEENDY AETOXGR AESER AESEV AESID;
+         AESTDY AEENDY AETOXGR AESER AESEV AESID AESOC AEREL LDSTDT;
 run;
 
 /* Assign sequence numbers */
