@@ -66,7 +66,7 @@
     %end;
 
     /* Define Output Sub-sections */
-    %global OUT_TABLES OUT_LISTINGS OUT_FIGURES OUT_META;
+    %global OUT_TABLES OUT_LISTINGS OUT_FIGURES OUT_META OUTPUT_PATH;
     %let OUT_TABLES   = &OUT_PATH/tables;
     %let OUT_LISTINGS = &OUT_PATH/listings;
     %let OUT_FIGURES  = &OUT_PATH/figures;
