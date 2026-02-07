@@ -53,9 +53,8 @@ proc sql;
            max(case when ae.USUBJID is not null then 1 else 0 end) as any_teae,
            max(case when ae.AETOXGRN >= 3 then 1 else 0 end) as any_g34,
            max(case when ae.AESER = 'Y' then 1 else 0 end) as any_ser,
-           max(case when index(upcase(ae.AEDECOD), 'CYTOKINE RELEASE') > 0 then 1 else 0 end) as any_crs,
-           max(case when index(upcase(ae.AEDECOD), 'NEUROTOXICITY') > 0 or 
-                         index(upcase(ae.AEDECOD), 'IMMUNE EFFECTOR') > 0 then 1 else 0 end) as any_icans
+           max(case when ae.AESICAT = 'CRS' then 1 else 0 end) as any_crs,
+           max(case when ae.AESICAT = 'ICANS' then 1 else 0 end) as any_icans
     from adam.adsl a
     left join ae_data ae on a.USUBJID = ae.USUBJID
     where a.SAFFL = 'Y'

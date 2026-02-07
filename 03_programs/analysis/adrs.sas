@@ -183,7 +183,7 @@ run;
 /* 2. Export to XPT */
 libname xpt xport "&ADAM_PATH/adrs.xpt";
 data xpt.adrs;
-    set adrs;
+    set adrs_combined;
 run;
 libname xpt clear;
 
