@@ -29,7 +29,7 @@ run;
 
 /* 2. Setup ADAE */
 data adae;
-    set sdtm.ae;
+    set sdtm.ae(drop=LDSTDT);
     
     /* Join ADSL variables */
     length TRT01A $200;

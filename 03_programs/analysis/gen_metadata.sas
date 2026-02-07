@@ -48,7 +48,7 @@ data define_metadata;
     else if Variable in ('TRTSDT', 'TRTEDT', 'CARTDT', 'LDSTDT') then do;
         Method = "Derived from first/last exposure in SDTM.EX";
     end;
-    else if Variable = 'DLTEVALFL' then do;
+    else if Variable = 'DLTEVLFL' then do;
         Method = "Y if SAFFL='Y' and (Treatment Duration >= 28 days or DLT reported)";
     end;
     else if Variable = 'COHORT' then do;

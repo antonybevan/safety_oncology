@@ -22,7 +22,7 @@ data raw_ex;
            SAFFL ITTFL EFFFL $1
            EXTRT $100 EXDOSE 8 EXDOSU $20 EXSTDTC EXENDTC $10 day0 d 8;
     input STUDYID $ USUBJID $ ARM $ SEX $ RACE $ DISEASE $ RFSTDTC $ TRTSDT $ LDSTDT $ SAFFL $ ITTFL $ EFFFL $ 
-          dose_level i subid AGE dt EXTRT $ EXDOSE EXDOSU $ EXSTDTC $ EXENDTC $ day0 d;
+          dose_level i subid AGE dt EXTRT $ EXDOSE EXDOSU $ EXSTDTC $ EXENDTC $ EXLOT $ day0 d;
 run;
 
 data ex;

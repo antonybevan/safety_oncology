@@ -22,7 +22,7 @@ data raw_rs;
            SAFFL ITTFL EFFFL $1
            RSTESTCD $8 RSTEST $100 RSORRES RSSTRESC $20 RSDTC $10 VISIT $20 day0 r 8;
     input STUDYID $ USUBJID $ ARM $ SEX $ RACE $ DISEASE $ RFSTDTC $ TRTSDT $ LDSTDT $ SAFFL $ ITTFL $ EFFFL $ 
-          dose_level i subid AGE dt RSTESTCD $ RSTEST $ RSORRES $ RSSTRESC $ RSDTC $ VISIT $ day0 r;
+          dose_level i subid AGE dt RSTESTCD $ RSTEST $ RSORRES $ RSSTRESC $ RSDTC $ VISIT $ day0;
 run;
 
 data rs;
