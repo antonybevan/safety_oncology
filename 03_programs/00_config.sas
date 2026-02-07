@@ -18,24 +18,36 @@
     /* 1a. Detect if running in SAS OnDemand (Linux) */
     %if %sysfunc(find(&SYSSCP, LIN)) > 0 %then %do;
         %let IS_CLOUD = 1;
-        %if %symexist(_SASPROGRAMFILE) %then %do;
-            %let this_path = %sysfunc(prxchange(s/(.*)[\/\\].*$/$1/, 1, &_SASPROGRAMFILE));
-            %let prog_pos = %sysfunc(index(&this_path, 03_programs));
-            %if &prog_pos > 0 %then 
-                %let PROJ_ROOT = %substr(&this_path, 1, %eval(&prog_pos - 2));
-            %else %let PROJ_ROOT = &this_path;
+        /* Direct path for SAS OnDemand */
+        %if %sysfunc(fileexist(/home/u63849890/clinical_safety/03_programs/00_config.sas)) %then %do;
+            %let PROJ_ROOT = /home/u63849890/clinical_safety;
+        %end;
+        %else %if %symexist(_SASPROGRAMFILE) %then %do;
+            data _null_;
+                length dir $500;
+                dir = "&_SASPROGRAMFILE";
+                pos = max(findc(dir, '/', 'b'), findc(dir, '\', 'b'));
+                if pos > 0 then dir = substr(dir, 1, pos-1);
+                prog_pos = index(dir, '03_programs');
+                if prog_pos > 0 then dir = substr(dir, 1, prog_pos-2);
+                call symputx('PROJ_ROOT', strip(dir), 'G');
+            run;
         %end;
         %else %let PROJ_ROOT = %sysget(HOME);
     %end;
-    /* 1b. Local Windows Environment - Auto-detect via current file location */
+    /* 1b. Local Windows Environment */
     %else %do;
         %let IS_CLOUD = 0;
         %if %symexist(_SASPROGRAMFILE) %then %do;
-            %let this_path = %sysfunc(prxchange(s/(.*)[\/\\].*$/$1/, 1, &_SASPROGRAMFILE));
-            %let prog_pos = %sysfunc(index(&this_path, 03_programs));
-            %if &prog_pos > 0 %then 
-                %let PROJ_ROOT = %substr(&this_path, 1, %eval(&prog_pos - 2));
-            %else %let PROJ_ROOT = &this_path;
+            data _null_;
+                length dir $500;
+                dir = "&_SASPROGRAMFILE";
+                pos = max(findc(dir, '/', 'b'), findc(dir, '\', 'b'));
+                if pos > 0 then dir = substr(dir, 1, pos-1);
+                prog_pos = index(dir, '03_programs');
+                if prog_pos > 0 then dir = substr(dir, 1, prog_pos-2);
+                call symputx('PROJ_ROOT', strip(dir), 'G');
+            run;
         %end;
         %else %do;
             /* Fallback for local Windows if _SASPROGRAMFILE is not populated */
