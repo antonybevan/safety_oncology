@@ -1,13 +1,13 @@
 /******************************************************************************
- * Program:      GIT_RECOVERY.sas
+ * Program:      GIT_PULL.sas
  * Protocol:     BV-CAR20-P1
- * Purpose:      Full Environment Reset for SAS OnDemand (No PROC GIT Required)
+ * Purpose:      Direct GitHub Pull for SAS OnDemand (No PROC GIT Required)
  * Author:       Clinical Programming Lead
  * Date:         2026-02-07
  * SAS Version:  9.4+ / SAS OnDemand compatible
  *
- * Description:  Performs a clean re-download of all repository files.
- *               Uses filename URL to bypass the PROC GIT limitation.
+ * Description:  Uses filename URL to download files directly from GitHub.
+ *               This bypasses the PROC GIT limitation in SAS ODA.
  ******************************************************************************/
 
 OPTIONS NONOTES NOSTIMER NOSOURCE NOSYNTAXCHECK;
@@ -21,10 +21,12 @@ OPTIONS NONOTES NOSTIMER NOSOURCE NOSYNTAXCHECK;
 %let home_dir    = /home/u63849890;
 %let target_dir  = &home_dir/safety_oncology;
 
+/* Base URL for raw GitHub content */
 %let raw_base = https://raw.githubusercontent.com/&github_user/&repo_name/&branch;
 
 /*=============================================================================
   MACRO: CREATE_DIR
+  Creates a directory if it doesn't exist (ODA compatible)
 =============================================================================*/
 %macro create_dir(path);
     options dlcreatedir;
@@ -34,70 +36,58 @@ OPTIONS NONOTES NOSTIMER NOSOURCE NOSYNTAXCHECK;
 
 /*=============================================================================
   MACRO: DOWNLOAD_FILE
+  Downloads a single file from GitHub raw content
 =============================================================================*/
 %macro download_file(remote_path, local_path);
-    filename src URL "&raw_base/&remote_path";
+    %local url;
+    %let url = &raw_base/&remote_path;
+    
+    filename src URL "&url";
     filename dest "&local_path";
     
     data _null_;
         length line $32767;
-        infile src lrecl=32767 truncover end=eof;
+        infile src lrecl=32767 truncover;
         file dest lrecl=32767;
         input line $char32767.;
         put line $char32767.;
     run;
     
-    %if &syserr = 0 %then %put NOTE: Synced: &remote_path;
-    %else %put WARNING: Failed: &remote_path;
+    %if &syserr = 0 %then %do;
+        %put NOTE: Downloaded: &remote_path;
+    %end;
+    %else %do;
+        %put WARNING: Failed to download: &remote_path;
+    %end;
     
     filename src clear;
     filename dest clear;
 %mend;
 
 /*=============================================================================
-  MACRO: DELETE_FILE
-=============================================================================*/
-%macro delete_file(filepath);
-    data _null_;
-        rc = filename("del", "&filepath");
-        rc = fdelete("del");
-        rc = filename("del");
-    run;
-%mend;
-
-/*=============================================================================
-  MAIN EXECUTION: FULL REPOSITORY SYNC
+  MAIN EXECUTION: PULL CORE FILES
 =============================================================================*/
 %put NOTE: ======================================================================;
-%put NOTE: FULL ENVIRONMENT RECOVERY - GITHUB DIRECT SYNC;
+%put NOTE: GITHUB DIRECT PULL - SAS ONDEMAND COMPATIBLE;
 %put NOTE: Repository: &github_user/&repo_name;
 %put NOTE: Target: &target_dir;
 %put NOTE: ======================================================================;
-%put NOTE: This will overwrite all local files with the latest from GitHub.;
-%put NOTE: ======================================================================;
 
-/* Create full directory structure */
+/* Create directory structure */
 %create_dir(&target_dir);
-%create_dir(&target_dir/01_documentation);
-%create_dir(&target_dir/02_datasets);
-%create_dir(&target_dir/02_datasets/legacy);
-%create_dir(&target_dir/02_datasets/tabulations);
-%create_dir(&target_dir/02_datasets/analysis);
 %create_dir(&target_dir/03_programs);
 %create_dir(&target_dir/03_programs/tabulations);
 %create_dir(&target_dir/03_programs/analysis);
 %create_dir(&target_dir/03_programs/reporting);
 %create_dir(&target_dir/03_programs/utilities);
-%create_dir(&target_dir/03_programs/macros);
-%create_dir(&target_dir/04_outputs);
-%create_dir(&target_dir/04_outputs/tables);
-%create_dir(&target_dir/04_outputs/figures);
-%create_dir(&target_dir/04_outputs/listings);
+%create_dir(&target_dir/02_datasets);
+%create_dir(&target_dir/02_datasets/legacy);
+%create_dir(&target_dir/02_datasets/tabulations);
+%create_dir(&target_dir/02_datasets/analysis);
 
-/* Download Core Config */
+/* Download Configuration */
 %download_file(03_programs/00_config.sas, &target_dir/03_programs/00_config.sas);
 %download_file(03_programs/00_main.sas, &target_dir/03_programs/00_main.sas);
-%download_file(03_programs/00_phase2a_full_driver.sas, &target_dir/03_programs/00_phase2a_full_driver.sas);
 
 /* Download SDTM Programs */
 %download_file(03_programs/tabulations/dm.sas, &target_dir/03_programs/tabulations/dm.sas);
@@ -111,7 +101,6 @@ OPTIONS NONOTES NOSTIMER NOSOURCE NOSYNTAXCHECK;
 %download_file(03_programs/tabulations/te.sas, &target_dir/03_programs/tabulations/te.sas);
 %download_file(03_programs/tabulations/su.sas, &target_dir/03_programs/tabulations/su.sas);
 %download_file(03_programs/tabulations/cp.sas, &target_dir/03_programs/tabulations/cp.sas);
-%download_file(03_programs/tabulations/is.sas, &target_dir/03_programs/tabulations/is.sas);
 
 /* Download ADaM Programs */
 %download_file(03_programs/analysis/adsl.sas, &target_dir/03_programs/analysis/adsl.sas);
@@ -120,24 +109,14 @@ OPTIONS NONOTES NOSTIMER NOSOURCE NOSYNTAXCHECK;
 %download_file(03_programs/analysis/adrs.sas, &target_dir/03_programs/analysis/adrs.sas);
 %download_file(03_programs/analysis/adex.sas, &target_dir/03_programs/analysis/adex.sas);
 %download_file(03_programs/analysis/adtte.sas, &target_dir/03_programs/analysis/adtte.sas);
-%download_file(03_programs/analysis/gen_metadata.sas, &target_dir/03_programs/analysis/gen_metadata.sas);
 
-/* Download Reporting Programs */
-%download_file(03_programs/reporting/t_dm.sas, &target_dir/03_programs/reporting/t_dm.sas);
-%download_file(03_programs/reporting/t_eff.sas, &target_dir/03_programs/reporting/t_eff.sas);
-%download_file(03_programs/reporting/t_ae_summ.sas, &target_dir/03_programs/reporting/t_ae_summ.sas);
-%download_file(03_programs/reporting/t_ae_aesi.sas, &target_dir/03_programs/reporting/t_ae_aesi.sas);
-%download_file(03_programs/reporting/t_lb_grad.sas, &target_dir/03_programs/reporting/t_lb_grad.sas);
-
-/* Download Utilities */
+/* Download Data Generator */
 %download_file(03_programs/utilities/generate_synthetic_data.sas, &target_dir/03_programs/utilities/generate_synthetic_data.sas);
-%download_file(03_programs/utilities/GIT_PULL.sas, &target_dir/03_programs/utilities/GIT_PULL.sas);
-%download_file(03_programs/utilities/GIT_PUSH.sas, &target_dir/03_programs/utilities/GIT_PUSH.sas);
 
 %put NOTE: ======================================================================;
-%put NOTE: RECOVERY COMPLETE - All files synced to: &target_dir;
+%put NOTE: PULL COMPLETE - Files synced to: &target_dir;
 %put NOTE: ======================================================================;
-%put NOTE: Next Step: Run 00_config.sas to initialize the environment.;
+%put NOTE: Next Step: Run 00_config.sas to initialize environment.;
 %put NOTE: ======================================================================;
 
 OPTIONS NOTES STIMER SOURCE SYNTAXCHECK;
