@@ -58,8 +58,7 @@
        ========================================================================= */
     %put NOTE: --- Phase 2a Secondary Efficacy ---;
     %include "&path/reporting/t_dor_by_arm.sas";
-    %include "&path/reporting/t_dor.sas";
-    %include "&path/reporting/t_eff_subgroup.sas";
+    /* Note: t_dor.sas and t_eff_subgroup.sas are optional extensions */
     
     /* =========================================================================
        SECTION 5: EXPLORATORY BIOMARKERS
@@ -87,11 +86,11 @@
         select 'Phase 1 Subjects' as Category length=50, 
                count(distinct case when PHASE='1' then USUBJID end) as N from sdtm.dm_phase2a_full
         union all
-        select 'Phase 2a Arm A (CLL/SLL)', count(distinct case when COHORT='Arm A: CLL/SLL Ibrutinib' then USUBJID end) from dm_phase2a_full
+        select 'Phase 2a Arm A (CLL/SLL)', count(distinct case when COHORT='Arm A: CLL/SLL Ibrutinib' then USUBJID end) from sdtm.dm_phase2a_full
         union all
-        select 'Phase 2a Arm B (DLBCL)', count(distinct case when COHORT='Arm B: DLBCL post-R-CHOP' then USUBJID end) from dm_phase2a_full
+        select 'Phase 2a Arm B (DLBCL)', count(distinct case when COHORT='Arm B: DLBCL post-R-CHOP' then USUBJID end) from sdtm.dm_phase2a_full
         union all
-        select 'Phase 2a Arm C (High-grade NHL)', count(distinct case when COHORT='Arm C: High-grade NHL post-CAR-T' then USUBJID end) from dm_phase2a_full
+        select 'Phase 2a Arm C (High-grade NHL)', count(distinct case when COHORT='Arm C: High-grade NHL post-CAR-T' then USUBJID end) from sdtm.dm_phase2a_full
         union all
         select 'TOTAL SUBJECTS', count(distinct USUBJID) from sdtm.dm_phase2a_full;
     quit;
