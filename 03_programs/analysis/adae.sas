@@ -64,12 +64,19 @@ data adae;
     TRTA = TRT01A;
     TRTAN = TRT01AN;
 
-    /* Treatment Emergent Flag (Regimen-based: On/After LD Start) */
-    if not missing(ASTDT) and not missing(TRTSDT) then do;
-        if ASTDT >= TRTSDT then TRTEMFL = "Y";
+    /* Treatment Emergent Flag (SAP §8.2.1: On/After first PBCAR20A dose) */
+    if not missing(ASTDT) and not missing(CARTDT) then do;
+        if ASTDT >= CARTDT then TRTEMFL = "Y";
         else TRTEMFL = "N";
     end;
     else TRTEMFL = "N";
+
+    /* Lymphodepletion AE Flag (SAP §8.2.1: After LD start but before CAR-T) */
+    if not missing(ASTDT) and not missing(LDSTDT) then do;
+        if LDSTDT <= ASTDT < CARTDT then LDAEFL = "Y";
+        else LDAEFL = "N";
+    end;
+    else LDAEFL = "N";
 
     /* Post CAR-T Flag (Specific to Infusion) */
     if not missing(ASTDT) and not missing(CARTDT) then do;

@@ -50,14 +50,32 @@ proc sql;
     group by ARMCD;
 quit;
 
-/* 5. Production Reporting Logic */
+/* 5. Calculate Clopper-Pearson Exact 95% CI (SAP §7.1.1) */
+proc freq data=orr_data noprint;
+    by ARMCD;
+    tables ORRFL / binomial(level='1' cl=exact);
+    output out=orr_ci(drop=Table _TABLE_  Warning) binomial;
+run;
+
+/* Merge CI back to summary */
+proc sql;
+    create table orr_final as
+    select a.*, 
+           b.XLCL_BIN as LCL, 
+           b.XUCL_BIN as UCL,
+           put(XLCL_BIN*100, 5.1) || ", " || put(XUCL_BIN*100, 5.1) as CI_RANGE
+    from orr_summary a
+    left join orr_ci b on a.ARMCD = b.ARMCD;
+quit;
+
+/* 6. Production Reporting Logic */
 title1 "BV-CAR20-P1: CAR-T Efficacy Summary";
 title2 "Table 2.1: Summary of Objective Response Rate by Initial Treatment";
 title3 "Response Evaluable (RE) Population";
 
 footnote1 "Note: BOR is assessed via Lugano 2016 for NHL and iwCLL 2018 for CLL/SLL cohorts.";
 footnote2 "ORR (Objective Response Rate) = CR + PR.";
-footnote3 "Dose Level 2 was skipped per SRC recommendation (SAP Section 1.1).";
+footnote3 "95% CI calculated using Clopper-Pearson Exact binomial method (SAP §7.1.1).";
 
 proc report data=bor_counts nowd headskip split='|' style(report)={outputwidth=100%};
     column ("Best Overall Response" AVALC) ARMCD, (COUNT);
@@ -70,14 +88,15 @@ proc report data=bor_counts nowd headskip split='|' style(report)={outputwidth=1
     endcomp;
 run;
 
-/* Summary Table for ORR */
+/* Summary Table for ORR with CI */
 title2 "Summary of Objective Response Rate (ORR)";
-proc report data=orr_summary nowd headskip split='|';
-    column ARMCD orr_count n_subj orr_pct;
+proc report data=orr_final nowd headskip split='|';
+    column ARMCD n_subj orr_count orr_pct CI_RANGE;
     define ARMCD / "Dose Level" width=20;
-    define orr_count / "ORR (n)" center display;
-    define n_subj / "Number Evaluated (N)" center display;
+    define n_subj / "N" center;
+    define orr_count / "ORR (n)" center;
     define orr_pct / computed "ORR (%)" format=6.1 center;
+    define CI_RANGE / "95% CI (%)" center width=25;
     
     compute orr_pct;
         if n_subj > 0 then orr_pct = (orr_count / n_subj) * 100;

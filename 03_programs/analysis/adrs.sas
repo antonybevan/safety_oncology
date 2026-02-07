@@ -102,37 +102,72 @@ data adrs_pfs;
         p.defineDone();
     end;
     
-    length PD_DTC $10;
-    if p.find() = 0 then PD_DTC = RSDTC;
-    else PD_DTC = "";
+    /* 1. Find PD date and Death date */
+    if _n_ = 1 then do;
+        /* PD Assessments */
+        declare hash p(dataset:'sdtm.rs(where=(upcase(RSSTRESC) in ("PD", "PMD")))');
+        p.defineKey('USUBJID');
+        p.defineData('RSDTC');
+        p.defineDone();
+        
+        /* Death Events from AE */
+        declare hash d(dataset:'sdtm.ae(where=(AETOXGR="5"))');
+        d.defineKey('USUBJID');
+        d.defineData('AESTDTC');
+        d.defineDone();
+        
+        /* Last Assessment Date (LSTASTDT) from RS */
+        proc sort data=sdtm.rs out=rs_last; by USUBJID RSDTC; run;
+        declare hash l(dataset:'rs_last');
+        l.defineKey('USUBJID');
+        l.defineData('RSDTC');
+        l.defineDone();
+    end;
     
-    format PD_DT date9.;
+    length PD_DTC DT_DTC LST_DTC $10;
+    if p.find() = 0 then PD_DTC = RSDTC; else PD_DTC = "";
+    if d.find() = 0 then DT_DTC = AESTDTC; else DT_DTC = "";
+    if l.find() = 0 then LST_DTC = RSDTC; else LST_DTC = "";
+
+    format PD_DT DT_DT LST_DT date9.;
     if not missing(PD_DTC) then PD_DT = input(PD_DTC, yymmdd10.);
-    
-    /* Censoring Logic (SAP Table 6) */
-    /* 1. If PD found -> Event (CNSR=0) */
-    if not missing(PD_DT) then do;
-        ADT = PD_DT;
+    if not missing(DT_DTC) then DT_DT = input(DT_DTC, yymmdd10.);
+    if not missing(LST_DTC) then LST_DT = input(LST_DTC, yymmdd10.);
+
+    /* PFS Derivation Logic (SAP Table 6 / FDA Guidance) */
+    /* Priority 1: Event (Progression or Death) */
+    if not missing(PD_DT) or not missing(DT_DT) then do;
+        if not missing(PD_DT) and not missing(DT_DT) then ADT = min(PD_DT, DT_DT);
+        else if not missing(PD_DT) then ADT = PD_DT;
+        else ADT = DT_DT;
         CNSR = 0;
     end;
-    /* 2. Otherwise -> Censored at last exposure/contact (Simplified) */
+    /* Priority 2: Censored at Last Assessment */
     else do;
-        ADT = TRTEDT;
+        ADT = LST_DT;
+        if missing(ADT) then ADT = TRTSDT; /* Fallback to Day 0 if no assessment */
         CNSR = 1;
     end;
-    
-    if not missing(ADT) and not missing(TRTSDT) then do;
-        AVAL = ADT - TRTSDT + 1;
+
+    /* Missed Visit Handling (Simplified): If gap > 90d between LST_DT and PD_DT/DT_DT, censor at LST_DT */
+    if CNSR = 0 and not missing(LST_DT) then do;
+        if ADT - LST_DT > 90 then do; /* >2 scheduled visits missed */
+            ADT = LST_DT;
+            CNSR = 1;
+        end;
     end;
-    
+
+    if not missing(ADT) and not missing(TRTSDT) then 
+        AVAL = ADT - TRTSDT + 1;
+
     format ADT date9.;
     label CNSR = "Censor Flag (0=Event, 1=Censored)";
     
     /* Essential traceability */
-    SRCDOM = "RS/ADSL";
-    SRCVAR = "RSDTC/TRTEDT";
+    SRCDOM = "RS/AE/ADSL";
+    SRCVAR = "RSDTC/AESTDTC";
     
-    drop PD_DTC PD_DT TRTSDT CARTDT;
+    drop PD_DTC DT_DTC LST_DTC PD_DT DT_DT LST_DT TRTSDT CARTDT ITTFL SAFFL EFFFL EVALCRIT TRTEDT;
 run;
 
 /* 3. Combine and Finalize */
