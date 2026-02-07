@@ -1,5 +1,5 @@
 /******************************************************************************
- * Program:      suppae.sas
+PBCAR20A-01 (Phase 1/2a Allogeneic CAR-T) (75 sources)
  * Protocol:     BV-CAR20-P1
  * Purpose:      Create SDTM Supplemental AE (SUPPAE) domain for ASTCT grading
  * Author:       Clinical Programming Lead
@@ -20,9 +20,9 @@ data raw_ae;
     /* Aligned with AE specs */
     length STUDYID $20 USUBJID $40 ARM $100 SEX $1 RACE $40 DISEASE $5 RFSTDTC TRTSDT LDSTDT SAFFL ITTFL EFFFL $100
            dose_level i subid AGE dt 8
-           AEDECOD AETERM AETOXGR $100 AESTDTC AEENDTC $10 AESER $1 AESID 8 day0 8;
+           AEDECOD AETERM AETOXGR AESOC AEREL $100 AESTDTC AEENDTC $10 AESER $1 AESID 8 day0 8;
     input STUDYID $ USUBJID $ ARM $ SEX $ RACE $ DISEASE $ RFSTDTC $ TRTSDT $ LDSTDT $ SAFFL $ ITTFL $ EFFFL $ 
-          dose_level i subid AGE dt AEDECOD $ AETERM $ AETOXGR $ AESTDTC $ AEENDTC $ AESER $ AESID day0;
+          dose_level i subid AGE dt AEDECOD $ AETERM $ AETOXGR $ AESOC $ AEREL $ AESTDTC $ AEENDTC $ AESER $ AESID day0;
 run;
 
 /* First, ensure we have the actual SDTM AE domain to get the real AESEQ */
