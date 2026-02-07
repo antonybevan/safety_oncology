@@ -96,11 +96,11 @@
     run;
 
     %put NOTE: --------------------------------------------------;
-    %put NOTE: ✅ CLINICAL AUDIT COMPLETE: NO CRITICAL DISCREPANCIES;
+    %put NOTE: CLINICAL AUDIT COMPLETE: NO CRITICAL DISCREPANCIES;
     %put NOTE: --------------------------------------------------;
 %mend;
 %include_all;
 
 %put NOTE: --------------------------------------------------;
-%put NOTE: ✅ FULL PIPELINE EXECUTION COMPLETE;
+%put NOTE: FULL PIPELINE EXECUTION COMPLETE;
 %put NOTE: --------------------------------------------------;

@@ -100,7 +100,7 @@
     run;
     
     %put NOTE: ==================================================;
-    %put NOTE: ✅ FULL PHASE 1/2A IMPLEMENTATION COMPLETE;
+    %put NOTE: FULL PHASE 1/2A IMPLEMENTATION COMPLETE;
     %put NOTE: ==================================================;
     %put NOTE:;
     %put NOTE: Phase 1 (SAP-Compliant):;

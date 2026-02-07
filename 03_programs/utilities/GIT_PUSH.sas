@@ -110,7 +110,7 @@ OPTIONS NONOTES NOSTIMER NOSOURCE NOSYNTAXCHECK;
 %macro git_commit_push;
     %if &PULL_STATUS = CONFLICT %then %do;
         %put ERR%str(OR): Cannot push due to unresolved conflicts.;
-        %put ERR%str(OR): Run GIT_RESCUE.sas first to reset local state.;
+        %put ERR%str(OR): Run GIT_RECOVERY.sas first to reset local state.;
         %return;
     %end;
     

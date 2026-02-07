@@ -1,17 +1,17 @@
 /******************************************************************************
  * Program:      generate_data.sas
  * Protocol:     BV-CAR20-P1
- * Purpose:      SAS-Native Synthetic Data Generator with Clinical Realism
+ * Purpose:      Clinical Trial Synthetic Data Generation
  * Author:       Clinical Programming Lead
  * Date:         2026-02-07
  * SAS Version:  9.4
  *
- * Realism Features:
- *   - Variable enrollment per dose level (mBOIN-guided)
- *   - Screening failures (~15%)
- *   - Calibrated demographics (age/sex/race by disease)
- *   - CRS/ICANS rates aligned with ZUMA-1 benchmarks
- *   - Dose-escalation logic with DLT probability
+ * Characteristics:
+ *   - mBOIN-guided dose-escalation enrollment
+ *   - Screening failure modeling (~15%)
+ *   - Demographics calibrated for Hematology indications
+ *   - Toxicity profiles (CRS/ICANS) aligned with ZUMA-1 benchmarks
+ *   - Integrated DLT evaluability and windowing logic
  ******************************************************************************/
 
 %macro load_config;

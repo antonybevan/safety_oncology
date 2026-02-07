@@ -1,13 +1,13 @@
 /******************************************************************************
  * Program:      generate_phase2a_full.sas
- * Protocol:     PBCAR20A-01 (Full Phase 2a per Original Protocol)
- * Purpose:      Generate Complete Phase 2a Synthetic Data per Protocol V5.0
+ * Protocol:     PBCAR20A-01
+ * Purpose:      Synthetic Data Generation for Phase 2a Expansion Arms
  * Author:       Clinical Programming Lead
  * Date:         2026-02-05
  * SAS Version:  9.4
  *
- * Note:         Full implementation of ORIGINAL protocol before SAP descoped.
- *               Includes all 3 expansion arms (A, B, C) per Protocol Section 3.1.2
+ * Scope:        Implementation of the expansion phase per Protocol Section 3.1.2.
+ *               Includes Arms A (CLL/SLL), B (DLBCL), and C (NHL).
  ******************************************************************************/
 
 %macro load_config;
@@ -18,15 +18,13 @@
 %load_config;
 
 /* ============================================================================
-   FULL PHASE 2A DATA GENERATION PER ORIGINAL PROTOCOL V5.0
+   SYNTHETIC DATA GENERATION: PHASE 2A EXPANSION
    
-   Arm Structure (Protocol Section 3.1.2):
-   - Phase 1: 15 subjects (dose escalation)
-   - Arm A: 15 subjects (r/r CLL/SLL on Ibrutinib, del17p/TP53)
-   - Arm B: 15 subjects (r/r DLBCL post-R-CHOP with PR)
-   - Arm C: 10 subjects (r/r High-grade NHL post-CAR-T)
-   
-   Total: ~55 subjects
+   Expansion Arm Structure (Protocol Section 3.1.2):
+   - Phase 1: Dose Escalation (N=15)
+   - Arm A: CLL/SLL on Ibrutinib (N=15)
+   - Arm B: DLBCL post-R-CHOP with PR (N=15)
+   - Arm C: High-grade NHL post-CAR-T (N=10)
    ============================================================================ */
 
 %let SEED = 20260205;

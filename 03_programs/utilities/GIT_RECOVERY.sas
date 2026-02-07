@@ -1,18 +1,18 @@
 /******************************************************************************
- * Program:      GIT_RESCUE.sas
+ * Program:      GIT_RECOVERY.sas
  * Protocol:     BV-CAR20-P1
- * Purpose:      Force-sync SAS OnDemand repository (Nuclear Reset)
+ * Purpose:      Synchronization and Environment Recovery for SAS OnDemand
  * Author:       Clinical Programming Lead
- * Date:         2026-02-05
+ * Date:         2026-02-07
  * SAS Version:  9.4+ / SAS OnDemand compatible
  *
- * Description:  When Git conflicts arise that cannot be resolved normally,
- *               this program performs a "nuclear" reset:
- *               1. Deletes ALL local files recursively (Pure SAS - no shell)
- *               2. Re-clones the repository from GitHub
+ * Description:  This utility performs a full environment recovery by:
+ *               1. Removing existing local repository contents.
+ *               2. Re-cloning the repository from the source.
  *
- * WARNING:      This will DESTROY all local uncommitted changes!
- *               Use GIT_PUSH.sas first if you have work to save.
+ * Note:         This process will overwrite local uncommitted changes.
+ *               Ensure GIT_PUSH.sas is called before execution if data
+ *               preservation is required.
  ******************************************************************************/
 
 OPTIONS NONOTES NOSTIMER NOSOURCE NOSYNTAXCHECK;
@@ -125,12 +125,12 @@ OPTIONS NONOTES NOSTIMER NOSOURCE NOSYNTAXCHECK;
   MAIN EXECUTION
 =============================================================================*/
 data _null_;
-    put "NOTE: ==================================================";
-    put "NOTE: ⚠️  GIT RESCUE - NUCLEAR RESET";
+    put "NOTE: --------------------------------------------------";
+    put "NOTE: ENVIRONMENT RECOVERY - FULL SYNCHRONIZATION";
     put "NOTE: Target: &target_dir";
-    put "NOTE: ==================================================";
+    put "NOTE: --------------------------------------------------";
     put "NOTE: ";
-    put "NOTE: WARNING: All local changes will be DESTROYED!";
+    put "NOTE: WARNING: Uncommitted local changes will be lost.";
     put "NOTE: ";
 run;
 
@@ -139,21 +139,21 @@ data _null_;
     rc = gitfn_pull("&target_dir");
     
     if rc = 0 then do;
-        put "NOTE: ✅ Pull successful - no rescue needed!";
+        put "NOTE: Synchronization successful - no recovery required.";
         call symputx('NEED_RESCUE', '0');
     end;
     else if rc = 1 then do;
-        put "NOTE: ✓ Already up to date.";
+        put "NOTE: Environment is currently up to date.";
         call symputx('NEED_RESCUE', '0');
     end;
     else do;
-        put "NOTE: ⚠️ Conflict Detected (RC=" rc ").";
-        put "NOTE: Initiating NUCLEAR CLEANUP...";
+        put "NOTE: Conflict Detected (RC=" rc ").";
+        put "NOTE: Initiating full environment recovery...";
         call symputx('NEED_RESCUE', '1');
     end;
 run;
 
-/* Step 2: If rescue needed, execute recursive delete and re-clone */
+/* Step 2: If recovery needed, execute recursive delete and re-clone */
 %macro execute_rescue;
     %if &NEED_RESCUE = 1 %then %do;
         %traversal(&target_dir);
@@ -164,6 +164,6 @@ run;
 
 OPTIONS NOTES STIMER SOURCE SYNTAXCHECK;
 
-%put NOTE: ==================================================;
-%put NOTE: GIT RESCUE SCRIPT COMPLETE;
-%put NOTE: ==================================================;
+%put NOTE: --------------------------------------------------;
+%put NOTE: RECOVERY PROCESS COMPLETE;
+%put NOTE: --------------------------------------------------;
