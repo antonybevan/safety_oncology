@@ -1,37 +1,36 @@
-# SAS OnDemand Setup Guide (Streamlined)
+# SAS OnDemand: Clinical Environment Configuration
 
-If you just want to run the programs, get your XPTs, and be done—use **Option 1**.
+This guide details the procedures for deploying and executing the BV-CAR20-P1 clinical pipeline within the SAS OnDemand for Academics (ODA) environment.
 
-## Option 1: Simple & Fast (Flat Upload)
+## Method 1: Rapid Deployment (Unified Directory)
 
-1.  **Create a Folder**: In the SAS OnDemand "Files" pane, right-click "Home" and create ONE folder named `safety_oncology`.
-2.  **Upload EVERYTHING**: Drag and drop all your files directly into that folder:
-    *   `00_config.sas`
-    *   All CSV data files (e.g., `raw_ae.csv`, `raw_dm.csv`, etc.)
-    *   All SAS domain scripts (e.g., `ae.sas`, `dm.sas`, etc.)
-3.  **Run**:
-    *   Open `00_config.sas` and **Run** (F3). It will see that everything is in one spot and configure itself.
-    *   Open `ae.sas` (or any other) and **Run**.
-4.  **Download**: Your `.xpt` files will appear in the same `safety_oncology` folder. Right-click and **Download**.
+For rapid verification of clinical logic and TFL generation, use the following procedure:
+
+1.  **Directory Initialization**: In the SAS OnDemand "Files" pane, initialize a new directory named `safety_oncology`.
+2.  **Asset Upload**: Upload all configuration (`00_config.sas`), source data (CSV format), and clinical programs (SAS format) to the root of the `safety_oncology` directory.
+3.  **Initialization**:
+    *   Open and execute `00_config.sas` to establish environment variables and library references.
+    *   Execute the desired clinical programs (e.g., `ae.sas`) to process data.
+4.  **Asset Retrieval**: Generated datasets and TFL outputs will be located within the `safety_oncology` directory. Use the "Download" utility to retrieve primary artifacts.
 
 ---
 
-## Option 2: Professional Structure (eCTD)
+## Method 2: Regulatory Structure (eCTD Standards)
 
-If you cannot use `git clone`, follow these steps:
+To simulate a formal regulatory submission environment using the repository's native hierarchy:
 
-1.  **Create Project Folder**: In the SAS OnDemand "Files" pane, right-click "Home" and create a new folder named `safety_oncology`.
-2.  **Upload Structure**: Under `safety_oncology`, manually create the following folders:
+1.  **Root Initialization**: Initialize a root directory named `safety_oncology`.
+2.  **Hierarchy Construction**: Construct the following subdirectory architecture:
     *   `02_datasets`
-        *   `legacy`
-        *   `tabulations`
+        *   `legacy` (Source Data)
+        *   `tabulations` (SDTM)
     *   `03_programs`
-        *   `tabulations`
-3.  **Upload Files**:
-    *   Upload `03_programs/00_config.sas` to the `03_programs` folder.
-    *   Upload the SAS programs (e.g., `ae.sas`) to `03_programs/tabulations`.
-    *   Upload your input data (CSV/XLS) to `02_datasets/legacy`.
-4.  **Run Config**: Open `00_config.sas` and run it. Check the log for the "✅ Configuration complete" message.
+        *   `tabulations` (Mapping Scripts)
+3.  **Asset Mapping**:
+    *   Deploy `03_programs/00_config.sas` to the `03_programs` path.
+    *   Deploy clinical mapping programs to `03_programs/tabulations`.
+    *   Deploy source data (CSV/XLS) to `02_datasets/legacy`.
+4.  **Environment Validation**: Execute `00_config.sas` and verify the SAS Log for the "Configuration complete" confirmation message.
 
 ## Option 3: Advanced Git Workflow (Clone & Push)
 
@@ -68,17 +67,17 @@ git push origin main
 
 ---
 
-## Troubleshooting SAS OnDemand
+## Troubleshooting & Environment Support
 
-### ERROR: Library RAW or SDTM does not exist
-This means SAS cannot find your folders.
-- **Flat Upload (Option 1)**: Ensure `00_config.sas`, all CSVs, and all SAS scripts are in the **same folder** (e.g., `safety_oncology`).
-- **Structured Upload (Option 2)**: Ensure your folder structure exactly matches the eCTD hierarchy (02_datasets/legacy, etc.).
-- **Verify Path**: Run `00_config.sas` and look at the LOG. It will tell you the `PROJ_ROOT` it is using. If that path is wrong, update the `MANUAL_ROOT` line in `00_config.sas`.
+### Directory Resolution Errors
+Failure to resolve `RAW` or `SDTM` libraries indicates a pathing discrepancy.
+- **Rapid Deployment**: Ensure all assets reside in a singular directory alongside `00_config.sas`.
+- **Structured Deployment**: Verify the directory tree strictly adheres to the mandated hierarchy (`02_datasets/legacy/`, etc.).
+- **Manual Overrides**: Execute `00_config.sas` and inspect the Log for the `PROJ_ROOT` resolution. If required, utilize the `MANUAL_ROOT` macro variable for hard-pathing.
 
-### ERROR: Shell escape is not valid
-- **Reason**: SAS OnDemand disables the `X` command for security. 
-- **Fix**: The latest code has removed all `X` commands. You must manually create folders using the SAS Studio interface if you are using the Professional Structure.
+### System Permissions (Shell Escape)
+- **Status**: The `X` command and shell escapes are restricted within the ODA environment.
+- **Resolution**: The current codebase utilizes SAS native functions for file/directory management. Ensure all required system folders are created manually via the SAS Studio interface prior to execution.
 
 ---
 
