@@ -65,7 +65,7 @@
     %include "&path/reporting/l_sae.sas";
     %include "&path/reporting/l_deaths.sas";
 
-    /* 6. Final Integrity Cross-Check (Million Dollar Audit) */
+    /* 6. End-to-End Pipeline Integrity Audit */
     title "BV-CAR20-P1: End-to-End Pipeline Integrity Audit";
     proc sql;
        create table integrity_audit as

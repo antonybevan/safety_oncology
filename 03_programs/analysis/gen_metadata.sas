@@ -89,7 +89,7 @@ data define_metadata;
 run;
 
 /* 3. Output to HTML for Reviewer Guide Support */
-title "PBCAR20A-01: Enhanced ADaM Metadata (Million Dollar Submission Package)";
+title "PBCAR20A-01: Enhanced ADaM Metadata (Regulatory-Grade Submission Package)";
 ods html body="&OUT_META/adam_metadata_enhanced.html";
 proc report data=define_metadata nowd headskip split='|' style(report)={outputwidth=100%};
     column Dataset Variable Label DataType Role Origin Method;
