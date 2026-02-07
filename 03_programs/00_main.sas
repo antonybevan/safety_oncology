@@ -7,8 +7,21 @@
 /* 1. Detect Path for SAS Studio / Cloud Environment */
 %macro include_all;
     %local path;
-    %if %symexist(_SASPROGRAMFILE) %then %do;
-        %let path = %sysfunc(prxchange(s/(.*)[\/\\].*$/$1/, 1, &_SASPROGRAMFILE));
+    
+    /* Detect environment and set path accordingly */
+    %if %sysfunc(fileexist(/home/u63849890/clinical_safety/03_programs/00_config.sas)) %then %do;
+        /* SAS OnDemand */
+        %let path = /home/u63849890/clinical_safety/03_programs;
+    %end;
+    %else %if %symexist(_SASPROGRAMFILE) %then %do;
+        /* Local SAS - extract directory from program path */
+        data _null_;
+            length dir $500;
+            dir = "&_SASPROGRAMFILE";
+            pos = max(findc(dir, '/', 'b'), findc(dir, '\', 'b'));
+            if pos > 0 then dir = substr(dir, 1, pos-1);
+            call symputx('path', strip(dir), 'L');
+        run;
     %end;
     %else %let path = .;
 
