@@ -1,28 +1,16 @@
 /******************************************************************************
  * Program:      GIT_RESCUE.sas
- * Purpose:      Force-sync local repository with remote
+ * Purpose:      Force-sync SAS OnDemand with GitHub (Public Repo)
  ******************************************************************************/
 
-%macro load_config;
-   %if %symexist(CONFIG_LOADED) %then %if &CONFIG_LOADED=1 %then %return;
-   %if %sysfunc(fileexist(00_config.sas)) %then %include "00_config.sas";
-   %else %if %sysfunc(fileexist(03_programs/00_config.sas)) %then %include "03_programs/00_config.sas";
-   %else %if %sysfunc(fileexist(../00_config.sas)) %then %include "../00_config.sas";
-   %else %if %sysfunc(fileexist(../03_programs/00_config.sas)) %then %include "../03_programs/00_config.sas";
-   %else %if %sysfunc(fileexist(../../00_config.sas)) %then %include "../../00_config.sas";
-   %else %if %sysfunc(fileexist(../../03_programs/00_config.sas)) %then %include "../../03_programs/00_config.sas";
-   %else %if %sysfunc(fileexist(../../../00_config.sas)) %then %include "../../../00_config.sas";
-   %else %if %sysfunc(fileexist(../../../03_programs/00_config.sas)) %then %include "../../../03_programs/00_config.sas";
-   %else %do;
-      %put ERROR: Unable to locate 00_config.sas from current working directory.;
-      %abort cancel;
-   %end;
-%mend;
-%load_config;
+%let repo_url = https://github.com/antonybevan/safety_oncology.git;
+%let home_dir = /home/u63849890;
+%let safe_path = &home_dir/clinical_safety;
 
-%if not %symexist(GIT_REPO_PATH) or %superq(GIT_REPO_PATH)= %then %let GIT_REPO_PATH = &PROJ_ROOT;
-%if not %symexist(GIT_REMOTE_URL) or %superq(GIT_REMOTE_URL)= %then %let GIT_REMOTE_URL = %sysget(GIT_REMOTE_URL);
-
+/* 
+   ROBUST CLEANUP MACRO 
+   Uses Linux 'rm -rf' via SYSTEM call to ensure non-empty dirs are gone.
+*/
 %macro force_clean(dir);
    data _null_;
       fname = "tempfile";
@@ -37,31 +25,34 @@
 
 data _null_;
    put "NOTE: --------------------------------------------------";
-   put "NOTE: Starting GIT RESCUE operation...";
-   put "NOTE: Repo Path: &GIT_REPO_PATH";
-
-   rc = gitfn_pull("&GIT_REPO_PATH");
+   put "NOTE: Starting GIT RESCUE Operation...";
+   
+   /* 1. Attempt PULL first */
+   rc = gitfn_pull("&safe_path");
    put "NOTE: gitfn_pull returned RC=" rc;
-
-   if rc = 0 then put "NOTE: Pull completed.";
-   else if rc = 1 then put "NOTE: Repository already up to date.";
-   else do;
-       put "NOTE: Pull failed. Initiating fresh-clone protocol...";
-
-       call execute('%force_clean(&GIT_REPO_PATH)');
-
-       %if %length(%superq(GIT_REMOTE_URL)) > 0 %then %do;
-           put "NOTE: Cloning from &GIT_REMOTE_URL...";
-           rc_clone = gitfn_clone("&GIT_REMOTE_URL", "&GIT_REPO_PATH");
-
-           if rc_clone = 0 then put "NOTE: Fresh clone completed.";
-           else put "ERROR: Clone failed. RC=" rc_clone;
-       %end;
-       %else %do;
-           put "ERROR: Missing remote URL. Set GIT_REMOTE_URL macro var or environment variable before rescue clone.";
-       %end;
+   
+   if rc = 0 then put "NOTE: ✅ SUCCESS! Project updated from GitHub.";
+   else if rc = 1 then put "NOTE: Repository is already up to date.";
+   
+   /* 
+      Catch-all for failures:
+      RC = 22 (Conflict)
+      RC = -1 (Generic Failure / Repo missing)
+      RC = 128 (Not a repo)
+   */
+   else do; 
+       put "NOTE: Pull failed (Conflict or Missing). Initiating FRESH CLONE Protocol...";
+       
+       /* Nuke it from orbit */
+       call execute('%force_clean(&safe_path)');
+       
+       /* Clone fresh */
+       put "NOTE: Cloning from &repo_url...";
+       rc_clone = gitfn_clone("&repo_url", "&safe_path");
+       
+       if rc_clone = 0 then put "NOTE: ✅ SUCCESS! Project reset and re-cloned.";
+       else put "ERR" "OR: Clone failed. RC=" rc_clone;
    end;
-
+   
    put "NOTE: --------------------------------------------------";
 run;
-
