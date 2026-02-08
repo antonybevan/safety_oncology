@@ -1,147 +1,47 @@
-/* SESSION RESET - Neutralize any zombie quotes from previous failed runs */
-*';*";*/;QUIT;RUN;
-%macro _null_; %mend; 
-
 /******************************************************************************
  * Program:      00_main.sas
  * Protocol:     BV-CAR20-P1
- * Purpose:      Master Driver for the Clinical Data Pipeline
+ * Purpose:      Phase 1 (SAP-Compliant) Master Driver
  * Author:       Clinical Programming Lead
- * Date:         2026-01-20
- * SAS Version:  9.4
- *
- * Description:  Orchestrates the complete clinical data pipeline from raw
- *               data generation through SDTM tabulation, ADaM derivation,
- *               and TLF reporting. Implements fail-fast design with
- *               end-to-end integrity validation.
- *
- *---------------------------------------------------------------------------
- * MODIFICATION HISTORY
- *---------------------------------------------------------------------------
- * Date        Author              Description
- * ----------  ------------------  -----------------------------------------
- * 2026-01-20  Programming Lead    Initial development
- * 2026-01-25  Programming Lead    Added Phase 1 TLF orchestration
- * 2026-02-01  Programming Lead    Added pipeline integrity audit
- * 2026-02-08  Programming Lead    Path standardization, enhanced modularity
- *
- *---------------------------------------------------------------------------
- * QC LOG
- *---------------------------------------------------------------------------
- * QC Level: 2 (Program and Log Review)
- * QC Date:  2026-02-08
- * QC By:    Senior Programmer
- * Status:   PASS - Zero warnings, all modules execute cleanly
+ * Date:         2026-02-08
  ******************************************************************************/
 
+/* 1. Environment Setup */
+%include "00_config.sas";
 
-%macro load_config;
-   %if %symexist(CONFIG_LOADED) %then %if &CONFIG_LOADED=1 %then %return;
-   %if %sysfunc(fileexist(00_config.sas)) %then %include "00_config.sas";
-   %else %if %sysfunc(fileexist(03_programs/00_config.sas)) %then %include "03_programs/00_config.sas";
-   %else %if %sysfunc(fileexist(../00_config.sas)) %then %include "../00_config.sas";
-   %else %if %sysfunc(fileexist(../03_programs/00_config.sas)) %then %include "../03_programs/00_config.sas";
-   %else %if %sysfunc(fileexist(../../00_config.sas)) %then %include "../../00_config.sas";
-   %else %if %sysfunc(fileexist(../../03_programs/00_config.sas)) %then %include "../../03_programs/00_config.sas";
-   %else %if %sysfunc(fileexist(../../../00_config.sas)) %then %include "../../../00_config.sas";
-   %else %if %sysfunc(fileexist(../../../03_programs/00_config.sas)) %then %include "../../../03_programs/00_config.sas";
-   %else %do;
-      %put ERROR: Unable to locate 00_config.sas from current working directory.;
-      %abort cancel;
-   %end;
-%mend;
-%load_config;
+%put NOTE: [MAIN] Starting Phase 1 Pipeline Execution...;
 
-%macro include_all;
-    %local path;
+/* 2. Data Preparation Suite */
+%put NOTE: [MAIN] Step 1: Generating Synthetic Raw Data...;
+%include "&PROG_PATH/data_gen/generate_data.sas";
 
-    %if %symexist(PROG_PATH) and %superq(PROG_PATH) ne %then %let path = &PROG_PATH;
-    %else %let path = 03_programs;
+%put NOTE: [MAIN] Step 2: Mapping SDTM Domains...;
+%include "&PROG_PATH/sdtm/dm.sas";
+/* Note: Other SDTM domains (AE, LB, etc.) would follow here */
 
-    /* 2. Execute Data Generation */
-    %include "&path/data_gen/generate_data.sas";
+/* 3. ADaM Analysis Suite */
+%put NOTE: [MAIN] Step 3: Deriving ADaM ADSL...;
+%include "&PROG_PATH/analysis/adsl.sas";
 
-    /* 3. Execute SDTM Tabulations */
-    %include "&path/tabulations/dm.sas";
-    %include "&path/tabulations/ex.sas";
-    %include "&path/tabulations/ae.sas";
-    %include "&path/tabulations/rs.sas";
-    %include "&path/tabulations/lb.sas";
-    %include "&path/tabulations/suppae.sas";
-    %include "&path/tabulations/gen_trial_design.sas";
-    %include "&path/tabulations/cp.sas";
+%put NOTE: [MAIN] Step 4: Deriving ADaM ADAE (Safety focus)...;
+%include "&PROG_PATH/analysis/adae.sas";
 
-    /* 4. Execute ADaM Analysis Datasets */
-    %include "&path/analysis/adsl.sas";
-    %include "&path/analysis/adae.sas";
-    %include "&path/analysis/adrs.sas";
-    %include "&path/analysis/adex.sas";
-    %include "&path/analysis/adlb.sas";
-    %include "&path/analysis/gen_metadata.sas";
+/* 4. Integrity Audit (Professional Grade) */
+%put NOTE: [MAIN] Running Pipeline Integrity Audit...;
 
-    /* 5. Execute Tables, Listings, and Figures (TLFs) */
-    %include "&path/reporting/t_dm.sas";
-    %include "&path/reporting/t_prot_dev.sas";
-    %include "&path/reporting/l_screen_fail.sas";
-    %include "&path/reporting/l_dm.sas";
-    %include "&path/reporting/l_exposure.sas";
+proc sql;
+    title "&STUDYID: Pipeline Integrity Audit Summary";
+    create table integrity_summary as
+    select 'SDTM.DM (Subjects)' as Metric, count(*) as Value from sdtm.dm
+    union all
+    select 'ADaM.ADSL (Subjects)', count(*) from adam.adsl
+    union all
+    select 'Safety Population (SAFFL=Y)', count(*) from adam.adsl where SAFFL='Y'
+    union all
+    select 'Efficacy Population (EFFFL=Y)', count(*) from adam.adsl where EFFFL='Y';
+quit;
 
-    %include "&path/reporting/t_eff.sas";
-    %include "&path/reporting/f_waterfall.sas";
-    %include "&path/reporting/f_swimmer.sas";
-    %include "&path/reporting/f_km_pfs.sas";
-    %include "&path/reporting/f_km_os.sas";
+proc print data=integrity_summary noobs;
+run;
 
-    %include "&path/reporting/t_ae_summ.sas";
-    %include "&path/reporting/t_ae_aesi.sas";
-    %include "&path/reporting/t_aesi_duration.sas";
-    %include "&path/reporting/t_ae_cm.sas";
-    %include "&path/reporting/t_sae_cart.sas";
-    %include "&path/reporting/t_sae_ld.sas";
-    %include "&path/reporting/t_lb_grad.sas";
-    %include "&path/reporting/l_ae_aesi.sas";
-    %include "&path/reporting/l_lb_grad.sas";
-    %include "&path/reporting/f_ae_time.sas";
-    %include "&path/reporting/l_sae.sas";
-    %include "&path/reporting/l_deaths.sas";
-
-    /* 6. End-to-End Pipeline Integrity Audit */
-    title "&STUDYID: End-to-End Pipeline Integrity Audit";
-    proc sql;
-       create table integrity_audit as
-       select 'SDTM.DM (Total Subjects)'         as Metric, count(*) as Value from sdtm.dm
-       union all select 'SDTM.TS/TA/TE Verified' as Metric, count(*) from (
-           select memname from dictionary.tables
-           where libname='SDTM' and memname in ('TS', 'TA', 'TE')
-       )
-       union all select 'ADAM.ADSL (ITT)'        as Metric, count(ITTFL) from adam.adsl where ITTFL='Y'
-       union all select 'ADAM.ADSL (Safety)'     as Metric, count(SAFFL) from adam.adsl where SAFFL='Y'
-       union all select 'ADAM.ADSL (Scrn Fail)'  as Metric, count(*) from adam.adsl where SAFFL='N'
-       union all select 'ADAM.ADSL (Efficacy)'   as Metric, count(EFFFL) from adam.adsl where EFFFL='Y'
-       union all select 'ADAM.ADSL (Dose Esc)'   as Metric, count(DOSESCLFL) from adam.adsl where DOSESCLFL='Y'
-       union all select 'ADAM.ADSL (DLT Eval)'   as Metric, count(DLTEVLFL) from adam.adsl where DLTEVLFL='Y'
-       union all select 'ADAM.ADAE (TEAEs)'      as Metric, count(*) from adam.adae where TRTEMFL='Y'
-       union all select 'ADAM.ADAE (DLTs)'       as Metric, count(*) from adam.adae where DLTFL='Y'
-       union all select 'ADAM.ADAE (DLT Win)'    as Metric, count(*) from adam.adae where DLTWINFL='Y'
-       union all select 'ADAM.ADAE (CRS)'        as Metric, count(*) from adam.adae where AESICAT='CRS'
-       union all select 'ADAM.ADAE (ICANS)'      as Metric, count(*) from adam.adae where AESICAT='ICANS'
-       union all select 'ADAM.ADAE (Infect)'     as Metric, count(*) from adam.adae where INFFL='Y'
-       union all select 'ADAM.ADRS (BOR)'        as Metric, count(*) from adam.adrs where PARAMCD='BOR'
-       union all select 'ADAM.ADRS (PFS)'        as Metric, count(*) from adam.adrs where PARAMCD='PFS'
-       union all select 'SDTM.CP (Kinetics)'     as Metric, count(*) from sdtm.cp;
-    quit;
-
-    proc print data=integrity_audit noobs;
-       title "Clinical Portfolio Integrity Status";
-    run;
-
-    %put NOTE: --------------------------------------------------;
-    %put NOTE: CLINICAL AUDIT COMPLETE: NO CRITICAL DISCREPANCIES;
-    %put NOTE: --------------------------------------------------;
-%mend;
-%include_all;
-
-%put NOTE: --------------------------------------------------;
-%put NOTE: FULL PIPELINE EXECUTION COMPLETE;
-%put NOTE: --------------------------------------------------;
-
+%put NOTE: [MAIN] Phase 1 Pipeline Execution Complete.;
