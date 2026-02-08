@@ -120,7 +120,7 @@ run;
 
 /* -------------------------------------------------------------------------
    3. ARM C: r/r High-grade NHL post-CAR-T
-   Protocol: Prior CD19 CAR-T with progression
+   Protocol: Prior anti-CD19 CAR-T with progression (historical therapy)
    ------------------------------------------------------------------------- */
 data dm_arm_c;
     length STUDYID $20 DOMAIN $2 USUBJID $40 SUBJID $10
@@ -341,7 +341,8 @@ data ae_phase2a_full;
     
     /* 2. Generate ICANS for ~87% of subjects (ZUMA-1 Benchmark) */
     if rand('uniform') < 0.87 then do;
-        AESEQ = (calculated AESEQ) + 1;
+        if missing(AESEQ) then AESEQ = 1;
+        else AESEQ = AESEQ + 1;
         AEDECOD = "Immune effector cell-associated neurotoxicity syndrome";
         AETERM = AEDECOD;
         AESOC = "Nervous system disorders";

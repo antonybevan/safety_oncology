@@ -11,9 +11,9 @@
 ## 2. Dose Levels
 | Cohort | Dose Level (Cells) | Calculation |
 |:---|:---|:---|
-| **DL1** | 30 x 10^6 | Flat Dose |
-| **DL2** | 240 x 10^6 | Flat Dose (Skipped per Amendment) |
-| **DL3** | 480 x 10^6 | Flat Dose |
+| **DL1** | 1 x 10^6 cells/kg | Weight-based Dose |
+| **DL2** | 3 x 10^6 cells/kg | Weight-based Dose (historically represented as ~240 x 10^6 flat equivalent; skipped per amendment) |
+| **DL3** | 480 x 10^6 cells | Flat Dose |
 
 ## 3. Analysis Populations
 - **Safety**: All subjects receiving any study treatment (incl. Lymphodepletion).

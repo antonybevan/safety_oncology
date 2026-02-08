@@ -5,7 +5,7 @@ This matrix identifies the technical implementation of specific Statistical Anal
 ## 1. Population & Parameter Mapping
 | SAP Requirement | Implementation Feature | compliance Status |
 |:---|:---|:---:|
-| **Population Flags** (§4) | ADSL: `SAFFL`, `ITTFL`, `EFFFL`, `DLTEVALFL` | ✅ |
+| **Population Flags** (§4) | ADSL: `SAFFL`, `ITTFL`, `EFFFL`, `DLTEVLFL` | ✅ |
 | **Treatment Mapping** (§5.3) | `TRT01P` / `TRT01A` (Dose Levels 1, 2, 3) | ✅ |
 | **Study Day 0** (§5.7) | Scale: -1, 0, 2 (Matching literal SAP §5.7) | ✅ |
 | **Baseline Definition** | Last non-missing result prior to treatment | ✅ |
@@ -31,3 +31,4 @@ This matrix identifies the technical implementation of specific Statistical Anal
 
 ## 4. Conclusion
 The pipeline architecture is 100% compliant with **SAP v5.0**. All technical nuances, including the Phase 2a exclusion and Study Day 0 anomaly, have been explicitly validated.
+

@@ -37,7 +37,7 @@ BV-CAR20-P1/
 │   ├── reporting/              # TFL programs (SAS/R)
 │   └── macros/                 # Reusable utilities
 │
-├── 04_output/
+├── 04_outputs/
 │   ├── tables/                 # Summary tables (RTF)
 │   ├── figures/                # Swimmer plots, KM curves
 │   └── listings/               # Subject-level listings
@@ -118,3 +118,4 @@ See `01_documentation/` folder for:
 **Portfolio Purpose:** Clinical programming excellence based on authentic Phase 1/2a CAR-T SAP  
 **Data:** 100% Synthetic (HIPAA/GDPR compliant)  
 **IP Notice:** Sponsor and product names anonymized; technical logic 100% authentic
+

@@ -1,6 +1,6 @@
 # Analysis Data Reviewer Guide (ADRG)
 **Study**: BV-CAR20-P1  
-**Product**: PBCAR20A (Allogeneic CD19 CAR-T)  
+**Product**: PBCAR20A (Allogeneic CD20 CAR-T)  
 **Date**: 2026-02-05
 
 ---
@@ -16,8 +16,8 @@ All analysis datasets use **CDISC Controlled Terminology (v2025-12-20)**. No cus
 BV-CAR20-P1 is a Phase 1/2a, open-label, dose-escalation study. The primary objective is to evaluate the safety and MTD of PBCAR20A in subjects with r/r NHL or r/r CLL/SLL.
 - **Design**: Standard 3+3 Dose Escalation.
 - **Dose Levels**: 
-  - DL1: 100 x 10^6 cells
-  - DL2: 240 x 10^6 cells (Skipped per SRC)
+  - DL1: 1 x 10^6 cells/kg
+  - DL2: 3 x 10^6 cells/kg (historically represented as ~240 x 10^6 flat equivalent; skipped per SRC)
   - DL3: 480 x 10^6 cells
 - **Regimen**: Lymphodepletion (Day -5 to -3) followed by CAR-T Infusion (Day 0).
 
@@ -31,7 +31,7 @@ BV-CAR20-P1 is a Phase 1/2a, open-label, dose-escalation study. The primary obje
 | **ITTFL** | Intent-To-Treat | All enrolled subjects who signed informed consent. |
 | **SAFFL** | Safety | Subjects receiving any study treatment (LD or CAR-T). |
 | **EFFFL** | Efficacy | Subset of SAFFL with at least one post-baseline response assessment. |
-| **DLTEVALFL** | DLT Evaluable | SAFFL subjects who completed 28-day window or experienced a DLT. |
+| **DLTEVLFL** | DLT Evaluable | SAFFL subjects who completed 28-day window or experienced a DLT. |
 
 ## 4. Analysis Dataset Descriptions
 

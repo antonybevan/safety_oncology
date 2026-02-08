@@ -20,7 +20,7 @@ data ts;
 
     /* Core Parameters */
     TSPARMCD="SSTDT";  TSPARM="Study Start Date"; TSVAL="2025-01-15"; TSVALCD=""; output;
-    TSPARMCD="TITLE";  TSPARM="Trial Title"; TSVAL="Clinical Safety of CD19 CAR-T (PBCAR20A)"; output;
+    TSPARMCD="TITLE";  TSPARM="Trial Title"; TSVAL="Clinical Safety of CD20 CAR-T (PBCAR20A)"; output;
     TSPARMCD="PHASE";  TSPARM="Trial Phase"; TSVAL="PHASE I/IIA"; TSVALCD="PHASE I/IIA"; output;
     TSPARMCD="TRT";    TSPARM="Investigational Therapy"; TSVAL="PBCAR20A"; TSVALCD=""; output;
     TSPARMCD="INDIC";  TSPARM="Trial Indication"; TSVAL="NH Lymphoma and CLL/SLL"; TSVALCD=""; output;
@@ -65,3 +65,4 @@ libname xpt xport "&SDTM_PATH/ta.xpt"; data xpt.ta; set ta; run; libname xpt cle
 %put NOTE: --------------------------------------------------;
 %put NOTE: ✅ TRIAL DESIGN DOMAINS (TS, TA, TE) GENERATED;
 %put NOTE: --------------------------------------------------;
+

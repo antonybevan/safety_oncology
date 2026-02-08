@@ -46,10 +46,10 @@ run;
 title "Table 1.3: Summary of Demographics and Baseline Characteristics";
 title2 "Safety Population";
 
-/* Handle the DL2 "Skipped" Logic per SAP §1.1 */
+/* Handle the DL2 "Skipped" note per SAP Section 1.1 when intermediate level is absent */
 %macro check_dl2;
     %if &N_DL2 = 0 %then %do;
-        %put NOTE: Dose Level 2 (240x10^6) was SKIPPED per Protocol V4 amendments.;
+        %put NOTE: Dose Level 2 (3x10^6 cells/kg; ~240x10^6 flat equivalent) was SKIPPED per Protocol V4 amendments.;
     %end;
 %mend;
 %check_dl2;
@@ -64,8 +64,10 @@ proc report data=t_dm_data nowd headskip split='|' style(report)={outputwidth=10
     
     compute after _page_;
         line @1 "--------------------------------------------------------------------------------";
-        line @1 "Note: Dose Level 2 (240x10^6) was skipped per SAP Section 1.1; treatment proceeded";
+        %if &N_DL2 = 0 %then %do;
+        line @1 "Note: Dose Level 2 (3x10^6 cells/kg; ~240x10^6 flat equivalent) was skipped per SAP Section 1.1;";
         line @1 "directly from Level 1 to Level 3 based on SRC recommendation.";
+        %end;
     endcomp;
 run;
 

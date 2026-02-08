@@ -82,8 +82,8 @@ data adae;
     else TRTEMFL = "N";
 
     /* Lymphodepletion AE Flag (SAP §8.2.1: After LD start but before CAR-T) */
-    if not missing(ASTDT) and not missing(LDSTDT) then do;
-        if LDSTDT <= ASTDT < CARTDT then LDAEFL = "Y";
+    if not missing(ASTDT) and not missing(LDSTDT) and not missing(CARTDT) then do;
+        if ASTDT >= LDSTDT and ASTDT < CARTDT then LDAEFL = "Y";
         else LDAEFL = "N";
     end;
     else LDAEFL = "N";
@@ -140,7 +140,7 @@ data adae;
     /* DLT Window Check: Day 0 to Day 28 from CAR-T infusion */
     if not missing(ASTDT) and not missing(CARTDT) then do;
         DLTWINDY = ASTDT - CARTDT;
-        if 0 <= DLTWINDY <= 28 then DLTWINFL = "Y";
+        if DLTWINDY >= 0 and DLTWINDY <= 28 then DLTWINFL = "Y";
         else DLTWINFL = "N";
     end;
     else DLTWINFL = "N";

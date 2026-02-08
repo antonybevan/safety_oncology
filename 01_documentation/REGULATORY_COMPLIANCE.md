@@ -53,7 +53,7 @@ BV-CAR20-P1/
 │   ├── tabulations/            # SDTM programs
 │   ├── analysis/               # ADaM programs
 │   └── reporting/              # TFL programs
-├── 04_output/                   # RTF/PNG results
+├── 04_outputs/                   # RTF/PNG results
 └── 05_validation/               # QC documentation
 ```
 
@@ -93,5 +93,6 @@ L1_ingestion/  L2_sdtm/  L3_adam/  L4_reporting/  L5_metadata/
 
 ---
 
-**Last Updated:** 2026-01-22  
+**Last Updated:** 2026-02-08  
 **Compliance Verified Against:** FDA SDTCG v4.4, CDISC SDTM/ADaM IG
+
