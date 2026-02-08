@@ -11,8 +11,8 @@
 ### 1. Data Standards Compliance
 | Requirement | Standard | Status | Notes |
 |:------------|:---------|:------:|:------|
-| SDTM datasets | IG 3.4 | ✅ | All domains implemented |
-| ADaM datasets | IG 1.3 | ✅ | ADSL, ADAE, ADRS, ADLB, ADTR |
+| SDTM datasets | IG 3.4 | ✅ Complete | TS (SSTDTC), EXCAT, and CP/GF shells for CAR-T |
+| ADaM datasets | IG 1.3 | ✅ Hardened | ADSL (MBOINFL), ADAE (ASTCT), TEAE_CELL |
 | Define-XML | v2.1 | ⏳ Shell | Requires P21 or SAS Clinical |
 | Controlled Terminology | CDISC CT 2025-12-20 | ✅ | Applied throughout |
 | XPT format | v5 transport | ✅ | All datasets exported |
@@ -26,7 +26,7 @@
 | BOR Derivation | ✅ | ADRS with AVALC ranking |
 | PFS/OS Parameters | ✅ | Time-to-event with censoring |
 | Cell Therapy Variables | ✅ | CARTDT, LDSTDT, CAR-T kinetics |
-| CRS/ICANS Grading | ✅ | ASTCT Consensus v2020 |
+| CRS/ICANS Grading | ✅ | ASTCT 2019; Traceable `ASTCTGR` in ADAE |
 
 ### 3. Pinnacle 21 Validation
 | Requirement | Tool | Status | Target |
@@ -52,7 +52,7 @@
 |:------------|:---------|:------:|
 | eCTD version | v3.2.2 (transitional) / v4.0 | ⏳ |
 | ESG transmission | FDA Electronic Submissions Gateway | ⏳ |
-| Module 5 structure | datasets/, programs/, misc/ | ✅ |
+| Module 5 structure | datasets/, programs/, misc/ | ✅ | Standardized `adrg.md`, `csdrg.md` |
 | File naming | Max 8 chars, lowercase | ✅ |
 | Path length | ≤150 characters | ✅ |
 
