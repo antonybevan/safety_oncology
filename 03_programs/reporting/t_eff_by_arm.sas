@@ -12,22 +12,8 @@
  * - Arm C (High-grade NHL): ORR per Lugano 2016
  ******************************************************************************/
 
-%macro load_config;
-   %if %symexist(CONFIG_LOADED) %then %if &CONFIG_LOADED=1 %then %return;
-   %if %sysfunc(fileexist(00_config.sas)) %then %include "00_config.sas";
-   %else %if %sysfunc(fileexist(03_programs/00_config.sas)) %then %include "03_programs/00_config.sas";
-   %else %if %sysfunc(fileexist(../00_config.sas)) %then %include "../00_config.sas";
-   %else %if %sysfunc(fileexist(../03_programs/00_config.sas)) %then %include "../03_programs/00_config.sas";
-   %else %if %sysfunc(fileexist(../../00_config.sas)) %then %include "../../00_config.sas";
-   %else %if %sysfunc(fileexist(../../03_programs/00_config.sas)) %then %include "../../03_programs/00_config.sas";
-   %else %if %sysfunc(fileexist(../../../00_config.sas)) %then %include "../../../00_config.sas";
-   %else %if %sysfunc(fileexist(../../../03_programs/00_config.sas)) %then %include "../../../03_programs/00_config.sas";
-   %else %do;
-      %put ERROR: Unable to locate 00_config.sas from current working directory.;
-      %abort cancel;
-   %end;
-%mend;
-%load_config;
+/* Environment assumed to be set by 00_main.sas -> 00_config.sas */
+
 
 /* ============================================================================
    PRIMARY EFFICACY BY PHASE 2A ARM

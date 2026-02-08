@@ -7,22 +7,8 @@
  * SAS Version:  9.4
  ******************************************************************************/
 
-%macro load_config;
-   %if %symexist(CONFIG_LOADED) %then %if &CONFIG_LOADED=1 %then %return;
-   %if %sysfunc(fileexist(00_config.sas)) %then %include "00_config.sas";
-   %else %if %sysfunc(fileexist(03_programs/00_config.sas)) %then %include "03_programs/00_config.sas";
-   %else %if %sysfunc(fileexist(../00_config.sas)) %then %include "../00_config.sas";
-   %else %if %sysfunc(fileexist(../03_programs/00_config.sas)) %then %include "../03_programs/00_config.sas";
-   %else %if %sysfunc(fileexist(../../00_config.sas)) %then %include "../../00_config.sas";
-   %else %if %sysfunc(fileexist(../../03_programs/00_config.sas)) %then %include "../../03_programs/00_config.sas";
-   %else %if %sysfunc(fileexist(../../../00_config.sas)) %then %include "../../../00_config.sas";
-   %else %if %sysfunc(fileexist(../../../03_programs/00_config.sas)) %then %include "../../../03_programs/00_config.sas";
-   %else %do;
-      %put ERROR: Unable to locate 00_config.sas from current working directory.;
-      %abort cancel;
-   %end;
-%mend;
-%load_config;
+/* Environment assumed to be set by 00_main.sas -> 00_config.sas */
+
 
 * Read raw AE data for supplemental mapping;
 data raw_ae;
