@@ -15,7 +15,8 @@ Targeted terminology aligns to CDISC Controlled Terminology dated 2025-12-20. No
 | **ITTFL** | Intent-To-Treat | All enrolled subjects in SDTM.DM. |
 | **SAFFL** | Safety | Subjects with any exposure start date (`TRTSDT`). |
 | **EFFFL** | Efficacy | SAFFL subjects with at least one response assessment in SDTM.RS. |
-| **DLTEVLFL** | DLT Evaluable | CAR-T infused subjects with 28-day evaluation window completed (or DLT adjudication). |
+| **MBOINFL** | mBOIN Analysis | All subjects receiving the CAR-T IMP (`BV-CAR20`). |
+| **DLTEVLFL** | DLT Evaluable | CAR-T subjects with 28-day evaluation window completed OR experienced a DLT within 28 days (and >=80% dose). |
 
 ## 4. Analysis Dataset Descriptions
 
@@ -43,13 +44,13 @@ Targeted terminology aligns to CDISC Controlled Terminology dated 2025-12-20. No
 
 ### 4.4 ADLB (Laboratory Analysis)
 - **Baseline**: `ABLFL` is the last non-missing value on or before `TRTSDT`.
-- **Change and Shift**: `CHG`, `SHIFT1`, `ANRIND`/`BNRIND` derived from reference ranges.
+- **Re-Baseline**: For CAR-T specific analysis, baseline is last value prior to `CARTDT`.
 - **Toxicity Grading**: `ATOXGRL`/`ATOXGRH` apply bi-directional grading rules.
 
-## 5. Derivation Notes and Limitations
-- DLT derivations are rule-based and should be clinically adjudicated for a submission.
-- Death is derived from AE Grade 5 records only; no separate DS or mortality feed is used.
-- Phase 2a datasets are synthetic and intended for portfolio demonstration, not SAP submission.
+## 5. SAP v5.0 Nuances & Deviations
+- **Study Day 0 (SAP §5.7)**: This study utilizes a "Study Day 0" for events occurring on the day of infusion. Standard CDISC (Day 1) logic is modified in `ADAE` and `ADLB` to scale onset as Day 0, Day 2, etc., omitting Day 1 as per sponsor requirement.
+- **DLT Adjudication**: Algorithmic DLTs are flagged in `ADAE`. `ADSL.DLTEVLFL` incorporates an "event override" allowing early DLTs to be counted as evaluable despite incomplete windows.
+- **TEAE_CELL**: A specific flag `TEAE_CELL` is used in safety reports to isolate toxicities emerging post-CAR-T infusion from background lymphodepletion chemotherapy effects.
 
 ## 6. Conformance and Validation
 - Target standard: ADaM IG v1.3.

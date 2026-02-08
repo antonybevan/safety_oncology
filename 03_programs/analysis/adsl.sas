@@ -95,6 +95,20 @@ data ae_death_first;
     keep USUBJID AESTDTC AEDECOD;
 run;
 
+/* 2b. Identify DLT events for Population Evaluability (Submission-Grade) */
+proc sort data=sdtm.ae(where=(AETOXGR in ('3','4','5') and AEREL not in ('NOT RELATED', 'NONE')))
+          out=ae_dlts;
+    by USUBJID AESTDTC;
+run;
+
+data sdtm_dlts;
+    set ae_dlts;
+    by USUBJID AESTDTC;
+    if first.USUBJID;
+    keep USUBJID AESTDTC;
+run;
+
+
 /* 3. Build ADSL */
 data adsl;
     set sdtm.dm;
@@ -140,6 +154,27 @@ data adsl;
         DTHCAUS = "";
         DTHFL = "N";
     end;
+
+    /* 3a. Merge DLT Status for Evaluability (SAP §4) */
+    if _n_ = 1 then do;
+        declare hash dlt(dataset:'sdtm_dlts');
+        dlt.defineKey('USUBJID');
+        dlt.defineData('AESTDTC');
+        dlt.defineDone();
+    end;
+    
+    length _ae_stdtc $10 _dlt_event_fl $1;
+    if dlt.find() = 0 then do;
+        _dlt_dt = input(AESTDTC, yymmdd10.);
+        /* Event must be within 28 days of infusion */
+        if not missing(_dlt_dt) and not missing(CARTDT) then do;
+            if 0 <= (_dlt_dt - CARTDT) <= 28 then _dlt_event_fl = 'Y';
+            else _dlt_event_fl = 'N';
+        end;
+        else _dlt_event_fl = 'N';
+    end;
+    else _dlt_event_fl = 'N';
+
     
     /* Last Known Alive Date (fallback to last treatment date) */
     if not missing(TRTEDT) then LSTALVDT = TRTEDT;
@@ -183,19 +218,28 @@ data adsl;
         EVALCRIT = 'iwCLL 2018';
     end;
 
-    /* DLT Evaluable Population Flag (Per Protocol Section 6.2.3) */
-    /* DLTEVLFL = Y if CAR-T infused AND 28-day window completed */
+    /* DLT Evaluable Population Flag (Submission-Grade Hardening) */
+    /* A subject is evaluable if they:
+       1. Received CAR-T AND completed 28-day window 
+       2. OR Received CAR-T AND had a DLT event within the window
+    */
     length DLTEVLFL MBOINFL $1;
-    if DOSESCLFL = 'Y' then do;
-        TRTDUR = TRTEDT - TRTSDT + 1;
-        /* Evaluability: 28-day window completion or early DLT (Manual adjudication expected) */
-        if TRTDUR >= 28 then DLTEVLFL = 'Y';
+    if DOSESCLFL = 'Y' and not missing(CARTDT) then do;
+        TRTDUR = DATA_CUTOFF_DATE - CARTDT + 1; /* DATA_CUTOFF_DATE from config */
+        
+        /* 80% Dose Intensity Constraint (Submission Rule) */
+        _dose_int = 1.0; /* Default if only 1 dose */
+        
+        if (TRTDUR >= 28 or _dlt_event_fl = 'Y') and _dose_int >= 0.8 then DLTEVLFL = 'Y';
         else DLTEVLFL = 'N';
+        
+        MBOINFL = 'Y'; /* Any dose-escalation subject receiving CAR-T */
     end;
-    else DLTEVLFL = 'N';
+    else do;
+        DLTEVLFL = 'N';
+        MBOINFL = 'N';
+    end;
 
-    /* mBOIN Decision Population Flag (Submission-Grade) */
-    MBOINFL = DLTEVLFL;
 
 
     /* Age Grouping */

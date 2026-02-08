@@ -128,6 +128,12 @@ data adae;
     end;
     else PSTCARFL = "N";
 
+    /* TEAE Cell Flag (Submission-Grade Separation of LD vs CELL) */
+    length TEAE_CELL $1;
+    if TRTEMFL = "Y" and PSTCARFL = "Y" then TEAE_CELL = "Y";
+    else TEAE_CELL = "N";
+
+
     /* Numeric Grading - Use Centralized Macro */
     %calc_astct(source_grade=AETOXGR, out_grade=AETOXGRN);
 
