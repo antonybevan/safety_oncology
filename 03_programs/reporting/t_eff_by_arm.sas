@@ -15,7 +15,17 @@
 %macro load_config;
    %if %symexist(CONFIG_LOADED) %then %if &CONFIG_LOADED=1 %then %return;
    %if %sysfunc(fileexist(00_config.sas)) %then %include "00_config.sas";
+   %else %if %sysfunc(fileexist(03_programs/00_config.sas)) %then %include "03_programs/00_config.sas";
    %else %if %sysfunc(fileexist(../00_config.sas)) %then %include "../00_config.sas";
+   %else %if %sysfunc(fileexist(../03_programs/00_config.sas)) %then %include "../03_programs/00_config.sas";
+   %else %if %sysfunc(fileexist(../../00_config.sas)) %then %include "../../00_config.sas";
+   %else %if %sysfunc(fileexist(../../03_programs/00_config.sas)) %then %include "../../03_programs/00_config.sas";
+   %else %if %sysfunc(fileexist(../../../00_config.sas)) %then %include "../../../00_config.sas";
+   %else %if %sysfunc(fileexist(../../../03_programs/00_config.sas)) %then %include "../../../03_programs/00_config.sas";
+   %else %do;
+      %put ERROR: Unable to locate 00_config.sas from current working directory.;
+      %abort cancel;
+   %end;
 %mend;
 %load_config;
 
@@ -126,7 +136,7 @@ proc sgplot data=forest_data;
     yaxis label=" " discreteorder=data reverse;
     
     title1 "Figure F-EFF3: Forest Plot of ORR by Phase 2a Arm";
-    title2 "BV-CAR20-P1 Phase 2a Expansion — Response Evaluable Population";
+    title2 "&STUDYID Phase 2a Expansion — Response Evaluable Population";
     footnote1 "Vertical dashed line represents 50% response rate.";
     footnote2 "Diamonds indicate point estimates; horizontal lines indicate 95% CI.";
 run;
@@ -136,3 +146,5 @@ ods graphics off;
 %put NOTE: ----------------------------------------------------;
 %put NOTE: ✅ PHASE 2A PRIMARY EFFICACY BY ARM COMPLETE;
 %put NOTE: ----------------------------------------------------;
+
+

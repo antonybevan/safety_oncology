@@ -9,14 +9,24 @@
 %macro load_config;
    %if %symexist(CONFIG_LOADED) %then %if &CONFIG_LOADED=1 %then %return;
    %if %sysfunc(fileexist(00_config.sas)) %then %include "00_config.sas";
+   %else %if %sysfunc(fileexist(03_programs/00_config.sas)) %then %include "03_programs/00_config.sas";
    %else %if %sysfunc(fileexist(../00_config.sas)) %then %include "../00_config.sas";
+   %else %if %sysfunc(fileexist(../03_programs/00_config.sas)) %then %include "../03_programs/00_config.sas";
+   %else %if %sysfunc(fileexist(../../00_config.sas)) %then %include "../../00_config.sas";
+   %else %if %sysfunc(fileexist(../../03_programs/00_config.sas)) %then %include "../../03_programs/00_config.sas";
+   %else %if %sysfunc(fileexist(../../../00_config.sas)) %then %include "../../../00_config.sas";
+   %else %if %sysfunc(fileexist(../../../03_programs/00_config.sas)) %then %include "../../../03_programs/00_config.sas";
+   %else %do;
+      %put ERROR: Unable to locate 00_config.sas from current working directory.;
+      %abort cancel;
+   %end;
 %mend;
 %load_config;
 
 /* 1. Trial Summary (TS) - Mandatory Parameters */
 data ts;
     length STUDYID $20 TSPARMCD $8 TSPARM $40 TSVAL $100 TSVALCD $40;
-    STUDYID = "BV-CAR20-P1";
+    STUDYID = "&STUDYID";
 
     /* Core Parameters */
     TSPARMCD="SSTDT";  TSPARM="Study Start Date"; TSVAL="2025-01-15"; TSVALCD=""; output;
@@ -29,7 +39,7 @@ run;
 /* 2. Trial Elements (TE) */
 data te;
     length STUDYID $20 ETCD $8 ELEMENT $40 TESTRL $100;
-    STUDYID = "BV-CAR20-P1";
+    STUDYID = "&STUDYID";
     
     ETCD="LD";     ELEMENT="Lymphodepletion"; TESTRL="Start of Fludarabine/Cyclophosphamide"; output;
     ETCD="CART";   ELEMENT="CAR-T Infusion";  TESTRL="Start of PBCAR20A Infusion"; output;
@@ -39,7 +49,7 @@ run;
 /* 3. Trial Arms (TA) */
 data ta;
     length STUDYID $20 ARMCD $8 ARM $40 TAETORD 8 ETCD $8;
-    STUDYID = "BV-CAR20-P1";
+    STUDYID = "&STUDYID";
 
     /* Dose Level 1 Arm */
     ARMCD="DL1"; ARM="Dose Level 1"; TAETORD=1; ETCD="LD"; output;
@@ -65,4 +75,5 @@ libname xpt xport "&SDTM_PATH/ta.xpt"; data xpt.ta; set ta; run; libname xpt cle
 %put NOTE: --------------------------------------------------;
 %put NOTE: ✅ TRIAL DESIGN DOMAINS (TS, TA, TE) GENERATED;
 %put NOTE: --------------------------------------------------;
+
 

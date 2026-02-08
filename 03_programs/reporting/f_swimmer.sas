@@ -17,7 +17,17 @@
 %macro load_config;
    %if %symexist(CONFIG_LOADED) %then %if &CONFIG_LOADED=1 %then %return;
    %if %sysfunc(fileexist(00_config.sas)) %then %include "00_config.sas";
+   %else %if %sysfunc(fileexist(03_programs/00_config.sas)) %then %include "03_programs/00_config.sas";
    %else %if %sysfunc(fileexist(../00_config.sas)) %then %include "../00_config.sas";
+   %else %if %sysfunc(fileexist(../03_programs/00_config.sas)) %then %include "../03_programs/00_config.sas";
+   %else %if %sysfunc(fileexist(../../00_config.sas)) %then %include "../../00_config.sas";
+   %else %if %sysfunc(fileexist(../../03_programs/00_config.sas)) %then %include "../../03_programs/00_config.sas";
+   %else %if %sysfunc(fileexist(../../../00_config.sas)) %then %include "../../../00_config.sas";
+   %else %if %sysfunc(fileexist(../../../03_programs/00_config.sas)) %then %include "../../../03_programs/00_config.sas";
+   %else %do;
+      %put ERROR: Unable to locate 00_config.sas from current working directory.;
+      %abort cancel;
+   %end;
 %mend;
 %load_config;
 
@@ -40,7 +50,8 @@ proc sql;
            a.TRTSDT,
            a.TRTEDT,
            a.CARTDT,
-           coalesce(a.TRTEDT, today()) - a.TRTSDT + 1 as DURATION,
+           input("&DATA_CUTOFF", yymmdd10.) as DATA_CUTOFF,
+           coalesce(a.TRTEDT, input("&DATA_CUTOFF", yymmdd10.)) - a.TRTSDT + 1 as DURATION,
            b.AVALC as BOR,
            case when b.AVALC in ('CR', 'CRi') then 1
                 when b.AVALC = 'PR' then 2
@@ -60,6 +71,11 @@ quit;
 /* Assign subject order for plot */
 data swimmer_plot;
     set swimmer_base;
+    if missing(DATA_CUTOFF) then DATA_CUTOFF = coalesce(TRTEDT, TRTSDT);
+    _end = coalesce(TRTEDT, DATA_CUTOFF);
+    if not missing(DATA_CUTOFF) and not missing(TRTEDT) then _end = min(TRTEDT, DATA_CUTOFF);
+    if not missing(TRTSDT) then DURATION = _end - TRTSDT + 1;
+    if DURATION <= 0 then DURATION = 1;
     Subject_Order = _N_;
     
     /* Convert duration to weeks for display */
@@ -82,6 +98,7 @@ data swimmer_plot;
         when('Progressed') Status_Symbol = 'P';
         otherwise Status_Symbol = '>';
     end;
+    drop _end;
 run;
 
 /* 2. Create Swimmer Plot using SGPLOT */
@@ -111,8 +128,8 @@ proc sgplot data=swimmer_plot;
     keylegend / title="Best Overall Response" position=bottom;
     
     /* Titles */
-    title1 "Figure F-SW: Swimmer Plot — Duration of Response";
-    title2 "BV-CAR20-P1 Phase 1 — Safety Population";
+    title1 "Figure F-SW: Swimmer Plot - Duration of Response";
+    title2 "&STUDYID Phase 1 - Safety Population";
     footnote1 "Each bar represents one subject. Bar length = duration on study.";
     footnote2 "X = Death; P = Progression; > = Ongoing at data cut.";
     footnote3 "Vertical dashed lines indicate Week 4 (DLT window) and Week 12.";
@@ -132,5 +149,7 @@ proc print data=swimmer_plot(obs=20) noobs label;
 run;
 
 %put NOTE: ----------------------------------------------------;
-%put NOTE: ✅ SWIMMER PLOT GENERATED: f_swimmer.png;
+%put NOTE: SWIMMER PLOT GENERATED: f_swimmer.png;
 %put NOTE: ----------------------------------------------------;
+
+

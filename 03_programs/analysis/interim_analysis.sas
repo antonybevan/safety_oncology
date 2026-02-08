@@ -15,7 +15,17 @@
 %macro load_config;
    %if %symexist(CONFIG_LOADED) %then %if &CONFIG_LOADED=1 %then %return;
    %if %sysfunc(fileexist(00_config.sas)) %then %include "00_config.sas";
+   %else %if %sysfunc(fileexist(03_programs/00_config.sas)) %then %include "03_programs/00_config.sas";
    %else %if %sysfunc(fileexist(../00_config.sas)) %then %include "../00_config.sas";
+   %else %if %sysfunc(fileexist(../03_programs/00_config.sas)) %then %include "../03_programs/00_config.sas";
+   %else %if %sysfunc(fileexist(../../00_config.sas)) %then %include "../../00_config.sas";
+   %else %if %sysfunc(fileexist(../../03_programs/00_config.sas)) %then %include "../../03_programs/00_config.sas";
+   %else %if %sysfunc(fileexist(../../../00_config.sas)) %then %include "../../../00_config.sas";
+   %else %if %sysfunc(fileexist(../../../03_programs/00_config.sas)) %then %include "../../../03_programs/00_config.sas";
+   %else %do;
+      %put ERROR: Unable to locate 00_config.sas from current working directory.;
+      %abort cancel;
+   %end;
 %mend;
 %load_config;
 
@@ -59,7 +69,7 @@ run;
 
 proc print data=alpha_spent noobs;
     title1 "Table IA-1: Alpha Spending Function (O'Brien-Fleming)";
-    title2 "BV-CAR20-P1 Interim Analysis";
+    title2 "&STUDYID Interim Analysis";
 run;
 
 /* -------------------------------------------------------------------------
@@ -185,9 +195,11 @@ quit;
 
 proc print data=dmc_summary noobs;
     title1 "Data Monitoring Committee Summary";
-    title2 "Interim Analysis — &IA_DATE";
+    title2 "Interim Analysis - &IA_DATE";
 run;
 
 %put NOTE: ----------------------------------------------------;
-%put NOTE: ✅ INTERIM ANALYSIS SHELL COMPLETE;
+%put NOTE: INTERIM ANALYSIS SHELL COMPLETE;
 %put NOTE: ----------------------------------------------------;
+
+

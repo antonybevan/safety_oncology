@@ -10,7 +10,17 @@
 %macro load_config;
    %if %symexist(CONFIG_LOADED) %then %if &CONFIG_LOADED=1 %then %return;
    %if %sysfunc(fileexist(00_config.sas)) %then %include "00_config.sas";
+   %else %if %sysfunc(fileexist(03_programs/00_config.sas)) %then %include "03_programs/00_config.sas";
    %else %if %sysfunc(fileexist(../00_config.sas)) %then %include "../00_config.sas";
+   %else %if %sysfunc(fileexist(../03_programs/00_config.sas)) %then %include "../03_programs/00_config.sas";
+   %else %if %sysfunc(fileexist(../../00_config.sas)) %then %include "../../00_config.sas";
+   %else %if %sysfunc(fileexist(../../03_programs/00_config.sas)) %then %include "../../03_programs/00_config.sas";
+   %else %if %sysfunc(fileexist(../../../00_config.sas)) %then %include "../../../00_config.sas";
+   %else %if %sysfunc(fileexist(../../../03_programs/00_config.sas)) %then %include "../../../03_programs/00_config.sas";
+   %else %do;
+      %put ERROR: Unable to locate 00_config.sas from current working directory.;
+      %abort cancel;
+   %end;
 %mend;
 %load_config;
 
@@ -43,7 +53,7 @@ proc sort data=all_deaths nodupkey;
 run;
 
 /* 2. Production Listing */
-title1 "BV-CAR20-P1: CAR-T Clinical Trial";
+title1 "&STUDYID: CAR-T Clinical Trial";
 title2 "Listing L-SAE2: All Deaths";
 title3 "Safety Population";
 
@@ -69,3 +79,5 @@ ods html close;
 %put NOTE: --------------------------------------------------;
 %put NOTE: ✅ LISTING L-SAE2 (All Deaths) GENERATED;
 %put NOTE: --------------------------------------------------;
+
+

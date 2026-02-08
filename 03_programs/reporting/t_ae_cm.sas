@@ -10,44 +10,60 @@
 %macro load_config;
    %if %symexist(CONFIG_LOADED) %then %if &CONFIG_LOADED=1 %then %return;
    %if %sysfunc(fileexist(00_config.sas)) %then %include "00_config.sas";
+   %else %if %sysfunc(fileexist(03_programs/00_config.sas)) %then %include "03_programs/00_config.sas";
    %else %if %sysfunc(fileexist(../00_config.sas)) %then %include "../00_config.sas";
+   %else %if %sysfunc(fileexist(../03_programs/00_config.sas)) %then %include "../03_programs/00_config.sas";
+   %else %if %sysfunc(fileexist(../../00_config.sas)) %then %include "../../00_config.sas";
+   %else %if %sysfunc(fileexist(../../03_programs/00_config.sas)) %then %include "../../03_programs/00_config.sas";
+   %else %if %sysfunc(fileexist(../../../00_config.sas)) %then %include "../../../00_config.sas";
+   %else %if %sysfunc(fileexist(../../../03_programs/00_config.sas)) %then %include "../../../03_programs/00_config.sas";
+   %else %do;
+      %put ERROR: Unable to locate 00_config.sas from current working directory.;
+      %abort cancel;
+   %end;
 %mend;
 %load_config;
 
-/* 1. Identify AESI Con-Meds (Simplified logic for simulation) */
-/* In practice, this joins ADAE with ADCM based on dates and indication */
-data aesi_cm;
-    set sdtm.ae(where=(index(upcase(AEDECOD), 'CYTOKINE') > 0 or index(upcase(AEDECOD), 'IMMUNE') > 0));
-    keep USUBJID AEDECOD AESEQ;
-run;
-
-/* Mock data for CM given for AESI */
-data t_ae_cm_data;
-    set adam.adsl(keep=USUBJID ARMCD SAFFL);
-    where SAFFL = 'Y';
-    length CMTRT $40 CMCAT $20;
-    
-    /* Simulate Tocilizumab and Dexamethasone for high dose cohorts */
-    if ARMCD = 'DL3' then do;
-        CMTRT = "TOCILIZUMAB"; CMCAT = "IL-6 RECEPTOR ANTAG"; output;
-        CMTRT = "DEXAMETHASONE"; CMCAT = "CORTICOSTEROID"; output;
-    end;
-    else if ARMCD = 'DL1' then do;
-        CMTRT = "ACETAMINOPHEN"; CMCAT = "ANTIPYRETIC"; output;
-    end;
-run;
+/* 1. Identify interventions associated with AESI from ADAE */
+proc sql;
+    create table t_ae_cm_data as
+    select a.USUBJID,
+           b.ARMCD,
+           upcase(strip(a.AECONTRT)) as CMTRT length=40,
+           case
+               when index(upcase(a.AECONTRT), 'TOCILIZUMAB') > 0 then 'IL-6 RECEPTOR ANTAG'
+               when index(upcase(a.AECONTRT), 'DEXAMETHASONE') > 0 then 'CORTICOSTEROID'
+               when index(upcase(a.AECONTRT), 'ACETAMINOPHEN') > 0 then 'ANTIPYRETIC'
+               else 'THERAPEUTIC INTERVENTION'
+           end as CMCAT length=30
+    from adam.adae a
+    inner join adam.adsl b
+        on a.USUBJID = b.USUBJID
+    where b.SAFFL = 'Y'
+      and a.TRTEMFL = 'Y'
+      and (a.AESIFL = 'Y' or a.INFFL = 'Y')
+      and not missing(a.AECONTRT);
+quit;
 
 /* 2. Production Table Formatting */
-title1 "BV-CAR20-P1: CAR-T Safety Analysis";
+title1 "&STUDYID: CAR-T Safety Analysis";
 title2 "Table 3.6: Summary of Concomitant Medications Given for AESI";
 title3 "Safety Population";
 
-proc report data=t_ae_cm_data nowd headskip split='|' style(report)={outputwidth=100%};
-    column CMCAT CMTRT ARMCD, (n);
+/* Summarize counts by medication and arm */
+proc sql;
+    create table t_ae_cm_summary as
+    select CMCAT, CMTRT, ARMCD, count(*) as N
+    from t_ae_cm_data
+    group by CMCAT, CMTRT, ARMCD;
+quit;
+
+proc report data=t_ae_cm_summary nowd headskip split='|' style(report)={outputwidth=100%};
+    column CMCAT CMTRT ARMCD, N;
     define CMCAT / group "Medication Class";
     define CMTRT / group "Preferred Name";
     define ARMCD / across "Dose Level";
-    define n / "n" center;
+    define N / analysis sum "n" center;
     
     compute after _page_;
         line @1 "--------------------------------------------------------------------------------";
@@ -59,3 +75,5 @@ run;
 ods html body="&OUT_TABLES/t_ae_cm.html";
 proc print data=t_ae_cm_data(obs=10); run;
 ods html close;
+
+

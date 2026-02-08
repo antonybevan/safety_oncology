@@ -1,1 +1,62 @@
-<!-- Placeholder for Define-XML v2.1 -->
+<?xml version="1.0" encoding="UTF-8"?>
+<ODM xmlns="http://www.cdisc.org/ns/odm/v1.3"
+     xmlns:def="http://www.cdisc.org/ns/def/v2.1"
+     xmlns:xlink="http://www.w3.org/1999/xlink"
+     FileType="Snapshot"
+     ODMVersion="1.3.2"
+     CreationDateTime="2026-02-08T00:00:00"
+     Originator="BV-CAR20-P1 Statistical Programming">
+  <Study OID="STUDY.BV-CAR20-P1">
+    <GlobalVariables>
+      <StudyName>BV-CAR20-P1</StudyName>
+      <StudyDescription>Safety and efficacy of PBCAR20A in relapsed/refractory NHL and CLL/SLL</StudyDescription>
+      <ProtocolName>BV-CAR20-P1</ProtocolName>
+    </GlobalVariables>
+
+    <MetaDataVersion OID="MDV.BV-CAR20-P1.001"
+                     Name="BV-CAR20-P1 SDTM/ADaM Metadata"
+                     Description="Interim Define-XML template generated from repository standards"
+                     DefineVersion="2.1"
+                     def:StandardName="CDISC SDTM/ADaM"
+                     def:StandardVersion="SDTMIG 3.4; ADaMIG 1.3">
+
+      <def:CommentDef OID="COM.STATUS">
+        <Description>
+          <TranslatedText xml:lang="en">This file is a valid Define-XML shell and must be completed with full ItemDef, ValueListDef, CodeList, Origin, and method metadata before submission.</TranslatedText>
+        </Description>
+      </def:CommentDef>
+
+      <ItemGroupDef OID="IG.DM" Name="DM" Repeating="No" IsReferenceData="No" SASDatasetName="DM" Domain="DM" Purpose="Tabulation" Class="SPECIAL PURPOSE" def:Structure="One record per subject" def:Class="SPECIAL PURPOSE" def:ArchiveLocationID="LF.DM"/>
+      <ItemGroupDef OID="IG.EX" Name="EX" Repeating="Yes" IsReferenceData="No" SASDatasetName="EX" Domain="EX" Purpose="Tabulation" Class="INTERVENTIONS" def:Structure="One record per exposure administration" def:Class="INTERVENTIONS" def:ArchiveLocationID="LF.EX"/>
+      <ItemGroupDef OID="IG.AE" Name="AE" Repeating="Yes" IsReferenceData="No" SASDatasetName="AE" Domain="AE" Purpose="Tabulation" Class="EVENTS" def:Structure="One record per adverse event" def:Class="EVENTS" def:ArchiveLocationID="LF.AE"/>
+      <ItemGroupDef OID="IG.RS" Name="RS" Repeating="Yes" IsReferenceData="No" SASDatasetName="RS" Domain="RS" Purpose="Tabulation" Class="FINDINGS" def:Structure="One record per response assessment" def:Class="FINDINGS" def:ArchiveLocationID="LF.RS"/>
+      <ItemGroupDef OID="IG.LB" Name="LB" Repeating="Yes" IsReferenceData="No" SASDatasetName="LB" Domain="LB" Purpose="Tabulation" Class="FINDINGS" def:Structure="One record per laboratory result" def:Class="FINDINGS" def:ArchiveLocationID="LF.LB"/>
+      <ItemGroupDef OID="IG.SUPPAE" Name="SUPPAE" Repeating="Yes" IsReferenceData="No" SASDatasetName="SUPPAE" Domain="SUPPAE" Purpose="Tabulation" Class="RELATES TO" def:Structure="One record per AE supplemental qualifier" def:Class="RELATES TO" def:ArchiveLocationID="LF.SUPPAE"/>
+      <ItemGroupDef OID="IG.TS" Name="TS" Repeating="Yes" IsReferenceData="No" SASDatasetName="TS" Domain="TS" Purpose="Tabulation" Class="TRIAL DESIGN" def:Structure="Trial summary parameters" def:Class="TRIAL DESIGN" def:ArchiveLocationID="LF.TS"/>
+      <ItemGroupDef OID="IG.TA" Name="TA" Repeating="Yes" IsReferenceData="No" SASDatasetName="TA" Domain="TA" Purpose="Tabulation" Class="TRIAL DESIGN" def:Structure="Trial arms" def:Class="TRIAL DESIGN" def:ArchiveLocationID="LF.TA"/>
+      <ItemGroupDef OID="IG.TE" Name="TE" Repeating="Yes" IsReferenceData="No" SASDatasetName="TE" Domain="TE" Purpose="Tabulation" Class="TRIAL DESIGN" def:Structure="Trial elements" def:Class="TRIAL DESIGN" def:ArchiveLocationID="LF.TE"/>
+
+      <ItemGroupDef OID="IG.ADSL" Name="ADSL" Repeating="No" IsReferenceData="No" SASDatasetName="ADSL" Domain="ADSL" Purpose="Analysis" Class="ADAM SUBJECT LEVEL ANALYSIS DATASET" def:Structure="One record per subject" def:Class="BASIC DATA STRUCTURE" def:ArchiveLocationID="LF.ADSL"/>
+      <ItemGroupDef OID="IG.ADAE" Name="ADAE" Repeating="Yes" IsReferenceData="No" SASDatasetName="ADAE" Domain="ADAE" Purpose="Analysis" Class="ADAM BDS" def:Structure="One record per adverse event analysis record" def:Class="BASIC DATA STRUCTURE" def:ArchiveLocationID="LF.ADAE"/>
+      <ItemGroupDef OID="IG.ADRS" Name="ADRS" Repeating="Yes" IsReferenceData="No" SASDatasetName="ADRS" Domain="ADRS" Purpose="Analysis" Class="ADAM BDS" def:Structure="One record per response analysis record" def:Class="BASIC DATA STRUCTURE" def:ArchiveLocationID="LF.ADRS"/>
+      <ItemGroupDef OID="IG.ADLB" Name="ADLB" Repeating="Yes" IsReferenceData="No" SASDatasetName="ADLB" Domain="ADLB" Purpose="Analysis" Class="ADAM BDS" def:Structure="One record per laboratory analysis record" def:Class="BASIC DATA STRUCTURE" def:ArchiveLocationID="LF.ADLB"/>
+      <ItemGroupDef OID="IG.ADEX" Name="ADEX" Repeating="Yes" IsReferenceData="No" SASDatasetName="ADEX" Domain="ADEX" Purpose="Analysis" Class="ADAM BDS" def:Structure="One record per exposure analysis record" def:Class="BASIC DATA STRUCTURE" def:ArchiveLocationID="LF.ADEX"/>
+
+      <def:leaf ID="LF.DM" xlink:href="../tabulations/dm.xpt"><def:title>dm.xpt</def:title></def:leaf>
+      <def:leaf ID="LF.EX" xlink:href="../tabulations/ex.xpt"><def:title>ex.xpt</def:title></def:leaf>
+      <def:leaf ID="LF.AE" xlink:href="../tabulations/ae.xpt"><def:title>ae.xpt</def:title></def:leaf>
+      <def:leaf ID="LF.RS" xlink:href="../tabulations/rs.xpt"><def:title>rs.xpt</def:title></def:leaf>
+      <def:leaf ID="LF.LB" xlink:href="../tabulations/lb.xpt"><def:title>lb.xpt</def:title></def:leaf>
+      <def:leaf ID="LF.SUPPAE" xlink:href="../tabulations/suppae.xpt"><def:title>suppae.xpt</def:title></def:leaf>
+      <def:leaf ID="LF.TS" xlink:href="../tabulations/ts.xpt"><def:title>ts.xpt</def:title></def:leaf>
+      <def:leaf ID="LF.TA" xlink:href="../tabulations/ta.xpt"><def:title>ta.xpt</def:title></def:leaf>
+      <def:leaf ID="LF.TE" xlink:href="../tabulations/te.xpt"><def:title>te.xpt</def:title></def:leaf>
+
+      <def:leaf ID="LF.ADSL" xlink:href="../analysis/adsl.xpt"><def:title>adsl.xpt</def:title></def:leaf>
+      <def:leaf ID="LF.ADAE" xlink:href="../analysis/adae.xpt"><def:title>adae.xpt</def:title></def:leaf>
+      <def:leaf ID="LF.ADRS" xlink:href="../analysis/adrs.xpt"><def:title>adrs.xpt</def:title></def:leaf>
+      <def:leaf ID="LF.ADLB" xlink:href="../analysis/adlb.xpt"><def:title>adlb.xpt</def:title></def:leaf>
+      <def:leaf ID="LF.ADEX" xlink:href="../analysis/adex.xpt"><def:title>adex.xpt</def:title></def:leaf>
+    </MetaDataVersion>
+  </Study>
+</ODM>

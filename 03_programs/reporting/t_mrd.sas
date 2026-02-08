@@ -6,7 +6,7 @@
  * Date:         2026-02-05
  * SAS Version:  9.4
  *
- * Input:        adam.adsl_expanded, sdtm.lb_expanded
+ * Input:        sdtm.mrd_phase2a_full, sdtm.rs_phase2a_full
  * Output:       Table 2.4: MRD Negativity Rate
  *
  * Note:         MRD is key exploratory endpoint for CAR-T in hematologic
@@ -16,7 +16,17 @@
 %macro load_config;
    %if %symexist(CONFIG_LOADED) %then %if &CONFIG_LOADED=1 %then %return;
    %if %sysfunc(fileexist(00_config.sas)) %then %include "00_config.sas";
+   %else %if %sysfunc(fileexist(03_programs/00_config.sas)) %then %include "03_programs/00_config.sas";
    %else %if %sysfunc(fileexist(../00_config.sas)) %then %include "../00_config.sas";
+   %else %if %sysfunc(fileexist(../03_programs/00_config.sas)) %then %include "../03_programs/00_config.sas";
+   %else %if %sysfunc(fileexist(../../00_config.sas)) %then %include "../../00_config.sas";
+   %else %if %sysfunc(fileexist(../../03_programs/00_config.sas)) %then %include "../../03_programs/00_config.sas";
+   %else %if %sysfunc(fileexist(../../../00_config.sas)) %then %include "../../../00_config.sas";
+   %else %if %sysfunc(fileexist(../../../03_programs/00_config.sas)) %then %include "../../../03_programs/00_config.sas";
+   %else %do;
+      %put ERROR: Unable to locate 00_config.sas from current working directory.;
+      %abort cancel;
+   %end;
 %mend;
 %load_config;
 
@@ -30,66 +40,17 @@
    MRD-negative: No detectable disease at specified sensitivity
    ============================================================================ */
 
-/* 1. Generate synthetic MRD data */
+/* 1. Fetch MRD data from persisted SDTM */
 data mrd_data;
-    length STUDYID $20 USUBJID $40 MRDTEST $30 MRDMETHOD $30 
-           MRDRESULT $20 MRDNEG 8 TIMEPOINT $20 DISEASE $10;
-    
-    call streaminit(20260205);
-    
-    set sdtm.dm_phase2a_full(keep=USUBJID DISEASETYPE COHORT ITTFL);
-    rename DISEASETYPE=DISEASE;
-    where ITTFL = 'Y';
-    
-    STUDYID = "BV-CAR20-P1";
-    
-    /* MRD rates vary by disease and response */
-    if DISEASE = 'NHL' then _mrd_neg_rate = 0.55;  /* 55% MRD-neg for NHL */
-    else _mrd_neg_rate = 0.45;  /* 45% MRD-neg for CLL */
-    
-    /* Week 4 assessment */
-    TIMEPOINT = "Week 4";
-    MRDTEST = "MRD Assessment";
-    MRDMETHOD = "Flow Cytometry (10^-4)";
-    
-    if rand('uniform') < _mrd_neg_rate * 0.8 then do;
-        MRDRESULT = "Negative";
-        MRDNEG = 1;
-    end;
-    else do;
-        MRDRESULT = "Positive";
-        MRDNEG = 0;
-    end;
-    output;
-    
-    /* Week 12 assessment - higher rates as more achieve deep remission */
-    TIMEPOINT = "Week 12";
-    if MRDRESULT = "Positive" and rand('uniform') < 0.3 then do;
-        MRDRESULT = "Negative";
-        MRDNEG = 1;
-    end;
-    else if MRDRESULT = "Negative" and rand('uniform') < 0.1 then do;
-        MRDRESULT = "Positive";  /* Relapse */
-        MRDNEG = 0;
-    end;
-    output;
-    
-    /* Week 24 assessment */
-    TIMEPOINT = "Week 24";
-    if MRDRESULT = "Positive" and rand('uniform') < 0.15 then do;
-        MRDRESULT = "Negative";
-        MRDNEG = 1;
-    end;
-    output;
-    
-    drop _mrd_neg_rate;
+    set sdtm.mrd_phase2a_full;
+    /* Map disease names if needed */
 run;
 
 /* 2. MRD Negativity Rate by Disease and Timepoint */
 proc freq data=mrd_data;
     tables DISEASE * TIMEPOINT * MRDRESULT / nocum nopercent;
     title1 "Table 2.4: MRD Status by Disease and Timepoint";
-    title2 "BV-CAR20-P1 Phase 1/2a — Efficacy Evaluable Population";
+    title2 "&STUDYID Phase 1/2a — Efficacy Evaluable Population";
 run;
 
 /* 3. Summary Table */
@@ -127,7 +88,7 @@ proc sgplot data=mrd_summary;
     keylegend / position=bottom title="Disease";
     
     title1 "Figure F-MRD1: MRD Negativity Rate Over Time";
-    title2 "BV-CAR20-P1 Phase 1/2a — Efficacy Evaluable Population";
+    title2 "&STUDYID Phase 1/2a — Efficacy Evaluable Population";
     footnote1 "MRD assessed by flow cytometry at 10^-4 sensitivity.";
 run;
 
@@ -138,7 +99,7 @@ proc sql;
     create table mrd_response as
     select a.USUBJID, a.DISEASE, a.MRDRESULT, a.TIMEPOINT, b.AVALC as BOR
     from mrd_data a
-    inner join sdtm.rs_phase2a_full b on a.USUBJID = b.USUBJID and b.PARAMCD = 'BOR'
+    inner join sdtm.rs_phase2a_full b on a.USUBJID = b.USUBJID and b.RSTESTCD = 'OVRLRESP'
     where a.TIMEPOINT = 'Week 12';
 quit;
 
@@ -150,3 +111,5 @@ run;
 %put NOTE: ----------------------------------------------------;
 %put NOTE: ✅ MRD ANALYSIS COMPLETE;
 %put NOTE: ----------------------------------------------------;
+
+

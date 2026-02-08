@@ -14,7 +14,17 @@
 %macro load_config;
    %if %symexist(CONFIG_LOADED) %then %if &CONFIG_LOADED=1 %then %return;
    %if %sysfunc(fileexist(00_config.sas)) %then %include "00_config.sas";
+   %else %if %sysfunc(fileexist(03_programs/00_config.sas)) %then %include "03_programs/00_config.sas";
    %else %if %sysfunc(fileexist(../00_config.sas)) %then %include "../00_config.sas";
+   %else %if %sysfunc(fileexist(../03_programs/00_config.sas)) %then %include "../03_programs/00_config.sas";
+   %else %if %sysfunc(fileexist(../../00_config.sas)) %then %include "../../00_config.sas";
+   %else %if %sysfunc(fileexist(../../03_programs/00_config.sas)) %then %include "../../03_programs/00_config.sas";
+   %else %if %sysfunc(fileexist(../../../00_config.sas)) %then %include "../../../00_config.sas";
+   %else %if %sysfunc(fileexist(../../../03_programs/00_config.sas)) %then %include "../../../03_programs/00_config.sas";
+   %else %do;
+      %put ERROR: Unable to locate 00_config.sas from current working directory.;
+      %abort cancel;
+   %end;
 %mend;
 %load_config;
 
@@ -77,35 +87,40 @@ proc sort data=lb_adsl;
     by USUBJID PARAMCD ADT;
 run;
 
-data lb_base_flags;
-    set lb_adsl;
-    by USUBJID PARAMCD ADT;
-    
-    retain TEMP_BASE_DT;
-    
-    if first.PARAMCD then TEMP_BASE_DT = .;
-    
-    if not missing(AVAL) and not missing(TRTSDT) then do;
-        if ADT <= TRTSDT then TEMP_BASE_DT = ADT;
-    end;
-    
-    /* Check if this record is the baseline */
-    if ADT = TEMP_BASE_DT then ABLFL = 'Y';
-    else ABLFL = '';
-    
-    drop TEMP_BASE_DT;
+/* Baseline = last non-missing value on/before TRTSDT */
+proc sort data=lb_adsl out=lb_base_candidates;
+    by USUBJID PARAMCD descending ADT;
+    where not missing(AVAL) and not missing(TRTSDT) and ADT <= TRTSDT;
 run;
 
-/* 4. Derive Change from Baseline & Shift */
-proc sort data=lb_base_flags out=baseline_vals(keep=USUBJID PARAMCD AVAL rename=(AVAL=BASE)) nodupkey;
-    by USUBJID PARAMCD;
-    where ABLFL = 'Y';
+data lb_base_records;
+    set lb_base_candidates;
+    by USUBJID PARAMCD descending ADT;
+    if first.PARAMCD;
+    BASEDT = ADT;
+    BASE = AVAL;
+    keep USUBJID PARAMCD BASEDT BASE;
 run;
 
 data adlb;
-    merge lb_base_flags(in=a) baseline_vals(in=b);
-    by USUBJID PARAMCD;
-    if a;
+    set lb_adsl;
+    by USUBJID PARAMCD ADT;
+    
+    /* Attach baseline date/value */
+    if _n_ = 1 then do;
+        declare hash v(dataset:'lb_base_records');
+        v.defineKey('USUBJID', 'PARAMCD');
+        v.defineData('BASEDT', 'BASE');
+        v.defineDone();
+    end;
+    
+    if v.find() ne 0 then do;
+        BASEDT = .;
+        BASE = .;
+    end;
+    
+    if ADT = BASEDT then ABLFL = 'Y';
+    else ABLFL = '';
     
     /* Change from Baseline */
     if not missing(AVAL) and not missing(BASE) then CHG = AVAL - BASE;
@@ -181,3 +196,4 @@ proc freq data=adlb;
     tables PARAMCD * SHIFT1 / list missing;
     title "Lab Toxicity Shifts (Baseline to Post-Baseline)";
 run;
+

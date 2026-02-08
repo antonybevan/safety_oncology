@@ -14,7 +14,17 @@
 %macro load_config;
    %if %symexist(CONFIG_LOADED) %then %if &CONFIG_LOADED=1 %then %return;
    %if %sysfunc(fileexist(00_config.sas)) %then %include "00_config.sas";
+   %else %if %sysfunc(fileexist(03_programs/00_config.sas)) %then %include "03_programs/00_config.sas";
    %else %if %sysfunc(fileexist(../00_config.sas)) %then %include "../00_config.sas";
+   %else %if %sysfunc(fileexist(../03_programs/00_config.sas)) %then %include "../03_programs/00_config.sas";
+   %else %if %sysfunc(fileexist(../../00_config.sas)) %then %include "../../00_config.sas";
+   %else %if %sysfunc(fileexist(../../03_programs/00_config.sas)) %then %include "../../03_programs/00_config.sas";
+   %else %if %sysfunc(fileexist(../../../00_config.sas)) %then %include "../../../00_config.sas";
+   %else %if %sysfunc(fileexist(../../../03_programs/00_config.sas)) %then %include "../../../03_programs/00_config.sas";
+   %else %do;
+      %put ERROR: Unable to locate 00_config.sas from current working directory.;
+      %abort cancel;
+   %end;
 %mend;
 %load_config;
 
@@ -86,7 +96,56 @@ data adrs;
     ;
 run;
 
-/* 2. Add PFS Parameter (SAP §7.1.2) */
+/* 2. Add PFS Parameter (SAP Section 7.1.2) */
+proc sort data=sdtm.rs(where=(upcase(RSSTRESC) in ("PD", "PMD"))) out=rs_pd_all;
+    by USUBJID RSDTC;
+run;
+
+data rs_pd_first;
+    set rs_pd_all;
+    by USUBJID RSDTC;
+    if first.USUBJID;
+    keep USUBJID RSDTC;
+run;
+
+proc sort data=sdtm.rs out=rs_last_eval_all;
+    by USUBJID RSDTC;
+run;
+
+data rs_last_eval;
+    set rs_last_eval_all;
+    by USUBJID RSDTC;
+    if last.USUBJID;
+    keep USUBJID RSDTC;
+run;
+
+/* De-duplicate death events for stable hash lookup */
+proc sort data=sdtm.ae(where=(strip(AETOXGR)='5' and not missing(AESTDTC)))
+          out=ae_death_all;
+    by USUBJID AESTDTC;
+run;
+
+data ae_death_first;
+    set ae_death_all;
+    by USUBJID AESTDTC;
+    if first.USUBJID;
+    keep USUBJID AESTDTC;
+run;
+
+/* First non-protocol anti-cancer therapy date from EX */
+proc sort data=sdtm.ex(
+    where=(not missing(EXTRT) and upcase(strip(EXTRT)) not in ("FLUDARABINE", "CYCLOPHOSPHAMIDE", "BV-CAR20"))
+) out=ex_nact_all;
+    by USUBJID EXSTDTC;
+run;
+
+data ex_nact_first;
+    set ex_nact_all;
+    by USUBJID EXSTDTC;
+    if first.USUBJID;
+    keep USUBJID EXSTDTC;
+run;
+
 data adrs_pfs;
     set adam.adsl(keep=USUBJID TRTSDT CARTDT ITTFL SAFFL EFFFL EVALCRIT TRTEDT);
     
@@ -94,62 +153,77 @@ data adrs_pfs;
     PARAM = "Progression-Free Survival (Days)";
     PARCAT1 = "TIME-TO-EVENT";
     
-    /* Find progression date from RS (Simplified check) */
+    /* 1. Initialize Lookups (PD, Death, Last Assessment, New Therapy) */
     if _n_ = 1 then do;
-        declare hash p(dataset:'sdtm.rs(where=(upcase(RSSTRESC) in ("PD", "PMD")))');
-        p.defineKey('USUBJID');
-        p.defineData('RSDTC');
-        p.defineDone();
-    end;
-    
-    /* 1. Find PD date and Death date */
-    if _n_ = 1 then do;
-        /* PD Assessments */
-        declare hash p(dataset:'sdtm.rs(where=(upcase(RSSTRESC) in ("PD", "PMD")))');
+        /* PD Assessments from RS */
+        declare hash p(dataset:'rs_pd_first');
         p.defineKey('USUBJID');
         p.defineData('RSDTC');
         p.defineDone();
         
         /* Death Events from AE */
-        declare hash d(dataset:'sdtm.ae(where=(AETOXGR="5"))');
+        declare hash d(dataset:'ae_death_first');
         d.defineKey('USUBJID');
         d.defineData('AESTDTC');
         d.defineDone();
         
-        /* Last Assessment Date (LSTASTDT) from RS */
-        proc sort data=sdtm.rs out=rs_last; by USUBJID RSDTC; run;
-        declare hash l(dataset:'rs_last');
+        /* Last Assessment Date from RS */
+        declare hash l(dataset:'rs_last_eval');
         l.defineKey('USUBJID');
         l.defineData('RSDTC');
         l.defineDone();
+
+        /* New anti-cancer therapy date from EX */
+        declare hash n(dataset:'ex_nact_first');
+        n.defineKey('USUBJID');
+        n.defineData('EXSTDTC');
+        n.defineDone();
     end;
-    
-    length PD_DTC DT_DTC LST_DTC $10;
+        
+    /* Hash lookups */
+    length PD_DTC DT_DTC LST_DTC NACT_DTC $10;
     if p.find() = 0 then PD_DTC = RSDTC; else PD_DTC = "";
     if d.find() = 0 then DT_DTC = AESTDTC; else DT_DTC = "";
     if l.find() = 0 then LST_DTC = RSDTC; else LST_DTC = "";
+    if n.find() = 0 then NACT_DTC = EXSTDTC; else NACT_DTC = "";
 
-    format PD_DT DT_DT LST_DT date9.;
+    format PD_DT DT_DT LST_DT NACT_DT EVNT_DT date9.;
     if not missing(PD_DTC) then PD_DT = input(PD_DTC, yymmdd10.);
     if not missing(DT_DTC) then DT_DT = input(DT_DTC, yymmdd10.);
     if not missing(LST_DTC) then LST_DT = input(LST_DTC, yymmdd10.);
+    if not missing(NACT_DTC) then NACT_DT = input(NACT_DTC, yymmdd10.);
+
+    if not missing(PD_DT) and not missing(DT_DT) then EVNT_DT = min(PD_DT, DT_DT);
+    else if not missing(PD_DT) then EVNT_DT = PD_DT;
+    else if not missing(DT_DT) then EVNT_DT = DT_DT;
+    else EVNT_DT = .;
+
+    if not missing(NACT_DT) and not missing(TRTSDT) and NACT_DT < TRTSDT then NACT_DT = .;
 
     /* PFS Derivation Logic (SAP Table 6 / FDA Guidance) */
-    /* Priority 1: Event (Progression or Death) */
-    if not missing(PD_DT) or not missing(DT_DT) then do;
-        if not missing(PD_DT) and not missing(DT_DT) then ADT = min(PD_DT, DT_DT);
-        else if not missing(PD_DT) then ADT = PD_DT;
-        else ADT = DT_DT;
-        CNSR = 0;
+    /* Priority 1: Censor at new anti-cancer therapy before event */
+    if not missing(NACT_DT) and (missing(EVNT_DT) or NACT_DT <= EVNT_DT) then do;
+        if not missing(LST_DT) then ADT = min(LST_DT, NACT_DT);
+        else ADT = NACT_DT;
+        if missing(ADT) then ADT = TRTSDT;
+        CNSR = 1;
+        EVNTDESC = "Censored at New Anti-Cancer Therapy";
     end;
-    /* Priority 2: Censored at Last Assessment */
+    /* Priority 2: Event (Progression or Death) */
+    else if not missing(EVNT_DT) then do;
+        ADT = EVNT_DT;
+        CNSR = 0;
+        EVNTDESC = "Event";
+    end;
+    /* Priority 3: Censored at Last Assessment */
     else do;
         ADT = LST_DT;
         if missing(ADT) then ADT = TRTSDT; /* Fallback to Day 0 if no assessment */
         CNSR = 1;
+        EVNTDESC = "Censored";
     end;
 
-    /* Missed Visit Handling (Simplified): If gap > 90d between LST_DT and PD_DT/DT_DT, censor at LST_DT */
+    /* Missed Visit Handling (Simplified): If gap > 90d between LST_DT and event date, censor at LST_DT */
     if CNSR = 0 and not missing(LST_DT) then do;
         if ADT - LST_DT > 90 then do; /* >2 scheduled visits missed */
             ADT = LST_DT;
@@ -164,10 +238,10 @@ data adrs_pfs;
     label CNSR = "Censor Flag (0=Event, 1=Censored)";
     
     /* Essential traceability */
-    SRCDOM = "RS/AE/ADSL";
-    SRCVAR = "RSDTC/AESTDTC";
+    SRCDOM = "RS/AE/EX/ADSL";
+    SRCVAR = "RSDTC/AESTDTC/EXSTDTC";
     
-    drop PD_DTC DT_DTC LST_DTC PD_DT DT_DT LST_DT TRTSDT CARTDT ITTFL SAFFL EFFFL EVALCRIT TRTEDT;
+    drop PD_DTC DT_DTC LST_DTC NACT_DTC PD_DT DT_DT LST_DT NACT_DT EVNT_DT EXSTDTC TRTSDT CARTDT ITTFL SAFFL EFFFL EVALCRIT TRTEDT;
 run;
 
 /* 3. Combine and Finalize */
@@ -191,3 +265,4 @@ proc freq data=adrs;
     tables AVALC * TRT01A / nopercent norow nocol;
     title "Response Frequency by Dose Level";
 run;
+

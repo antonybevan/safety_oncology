@@ -10,14 +10,24 @@
 %macro load_config;
    %if %symexist(CONFIG_LOADED) %then %if &CONFIG_LOADED=1 %then %return;
    %if %sysfunc(fileexist(00_config.sas)) %then %include "00_config.sas";
+   %else %if %sysfunc(fileexist(03_programs/00_config.sas)) %then %include "03_programs/00_config.sas";
    %else %if %sysfunc(fileexist(../00_config.sas)) %then %include "../00_config.sas";
+   %else %if %sysfunc(fileexist(../03_programs/00_config.sas)) %then %include "../03_programs/00_config.sas";
+   %else %if %sysfunc(fileexist(../../00_config.sas)) %then %include "../../00_config.sas";
+   %else %if %sysfunc(fileexist(../../03_programs/00_config.sas)) %then %include "../../03_programs/00_config.sas";
+   %else %if %sysfunc(fileexist(../../../00_config.sas)) %then %include "../../../00_config.sas";
+   %else %if %sysfunc(fileexist(../../../03_programs/00_config.sas)) %then %include "../../../03_programs/00_config.sas";
+   %else %do;
+      %put ERROR: Unable to locate 00_config.sas from current working directory.;
+      %abort cancel;
+   %end;
 %mend;
 %load_config;
 
 /* 1. Prepare Efficacy Data (Response Evaluable Population) */
 data t_eff_data;
     set adam.adrs;
-    where EFFFL = 'Y';
+    where EFFFL = 'Y' and PARAMCD = 'BOR';
 run;
 
 /* 2. Calculate Big N per subgroup */
@@ -51,6 +61,10 @@ proc sql;
 quit;
 
 /* 5. Calculate Clopper-Pearson Exact 95% CI (SAP §7.1.1) */
+proc sort data=orr_data;
+    by ARMCD;
+run;
+
 proc freq data=orr_data noprint;
     by ARMCD;
     tables ORRFL / binomial(level='1' cl=exact);
@@ -69,7 +83,7 @@ proc sql;
 quit;
 
 /* 6. Production Reporting Logic */
-title1 "BV-CAR20-P1: CAR-T Efficacy Summary";
+title1 "&STUDYID: CAR-T Efficacy Summary";
 title2 "Table 2.1: Summary of Objective Response Rate by Initial Treatment";
 title3 "Response Evaluable (RE) Population";
 
@@ -108,3 +122,5 @@ run;
 ods html body="&OUT_TABLES/t_eff.html";
 proc print data=orr_summary; run;
 ods html close;
+
+

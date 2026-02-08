@@ -12,7 +12,17 @@
 %macro load_config;
    %if %symexist(CONFIG_LOADED) %then %if &CONFIG_LOADED=1 %then %return;
    %if %sysfunc(fileexist(00_config.sas)) %then %include "00_config.sas";
+   %else %if %sysfunc(fileexist(03_programs/00_config.sas)) %then %include "03_programs/00_config.sas";
    %else %if %sysfunc(fileexist(../00_config.sas)) %then %include "../00_config.sas";
+   %else %if %sysfunc(fileexist(../03_programs/00_config.sas)) %then %include "../03_programs/00_config.sas";
+   %else %if %sysfunc(fileexist(../../00_config.sas)) %then %include "../../00_config.sas";
+   %else %if %sysfunc(fileexist(../../03_programs/00_config.sas)) %then %include "../../03_programs/00_config.sas";
+   %else %if %sysfunc(fileexist(../../../00_config.sas)) %then %include "../../../00_config.sas";
+   %else %if %sysfunc(fileexist(../../../03_programs/00_config.sas)) %then %include "../../../03_programs/00_config.sas";
+   %else %do;
+      %put ERROR: Unable to locate 00_config.sas from current working directory.;
+      %abort cancel;
+   %end;
 %mend;
 %load_config;
 
@@ -41,7 +51,7 @@ proc sgplot data=sdtm.cytokines;
     refline 100 / axis=y lineattrs=(pattern=dash color=red) label="CRS Threshold";
     
     title1 "Figure F-BIO1: IL-6 Levels Over Time";
-    title2 "BV-CAR20-P1 Phase 1/2a — All Treated Subjects";
+    title2 "&STUDYID Phase 1/2a — All Treated Subjects";
     footnote1 "Horizontal dashed line = typical threshold for severe CRS.";
 run;
 
@@ -54,7 +64,7 @@ proc sgplot data=sdtm.cytokines;
     yaxis label="IFN-gamma (pg/mL)" type=log;
     
     title1 "Figure F-BIO2: IFN-gamma Levels Over Time";
-    title2 "BV-CAR20-P1 Phase 1/2a — All Treated Subjects";
+    title2 "&STUDYID Phase 1/2a — All Treated Subjects";
 run;
 
 /* CRP Profile */
@@ -67,10 +77,15 @@ proc sgplot data=sdtm.cytokines;
     refline 50 / axis=y lineattrs=(pattern=dash color=orange) label="Elevated";
     
     title1 "Figure F-BIO3: CRP Levels Over Time";
-    title2 "BV-CAR20-P1 Phase 1/2a — All Treated Subjects";
+    title2 "&STUDYID Phase 1/2a — All Treated Subjects";
 run;
 
 ods graphics off;
+
+/* 1. Get Cytokine Data */
+data cytokine_all;
+    set sdtm.cytokines;
+run;
 
 /* 3. Peak Cytokine Analysis */
 proc sql;
@@ -94,3 +109,5 @@ run;
 %put NOTE: ----------------------------------------------------;
 %put NOTE: ✅ CYTOKINE FIGURES GENERATED;
 %put NOTE: ----------------------------------------------------;
+
+

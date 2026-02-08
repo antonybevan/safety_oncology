@@ -12,7 +12,17 @@
 %macro load_config;
    %if %symexist(CONFIG_LOADED) %then %if &CONFIG_LOADED=1 %then %return;
    %if %sysfunc(fileexist(00_config.sas)) %then %include "00_config.sas";
+   %else %if %sysfunc(fileexist(03_programs/00_config.sas)) %then %include "03_programs/00_config.sas";
    %else %if %sysfunc(fileexist(../00_config.sas)) %then %include "../00_config.sas";
+   %else %if %sysfunc(fileexist(../03_programs/00_config.sas)) %then %include "../03_programs/00_config.sas";
+   %else %if %sysfunc(fileexist(../../00_config.sas)) %then %include "../../00_config.sas";
+   %else %if %sysfunc(fileexist(../../03_programs/00_config.sas)) %then %include "../../03_programs/00_config.sas";
+   %else %if %sysfunc(fileexist(../../../00_config.sas)) %then %include "../../../00_config.sas";
+   %else %if %sysfunc(fileexist(../../../03_programs/00_config.sas)) %then %include "../../../03_programs/00_config.sas";
+   %else %do;
+      %put ERROR: Unable to locate 00_config.sas from current working directory.;
+      %abort cancel;
+   %end;
 %mend;
 %load_config;
 
@@ -23,8 +33,13 @@
    - Persistence at key timepoints
    ============================================================================ */
 
+/* 1. Get Kinetic Data */
+data kinetics_all;
+    set sdtm.cart_kinetics;
+run;
+
 /* 1. Summary statistics by timepoint */
-proc means data=sdtm.cart_kinetics n mean std median min max;
+proc means data=kinetics_all n mean std median min max;
     class VISIT;
     var VCN CARTT_CELLS;
     output out=kinetics_summary
@@ -57,7 +72,7 @@ proc sgpanel data=sdtm.cart_kinetics;
     panelby VISIT / columns=7 novarname;
     histogram VCN / scale=count;
     title1 "Figure F-PK1: CAR-T Cell Kinetics (VCN) Over Time";
-    title2 "BV-CAR20-P1 Phase 1/2a — All Treated Subjects";
+    title2 "&STUDYID Phase 1/2a — All Treated Subjects";
 run;
 
 /* 4. Spaghetti Plot - Individual Trajectories */
@@ -71,7 +86,7 @@ proc sgplot data=sdtm.cart_kinetics;
     yaxis label="Vector Copy Number (VCN)" type=log;
     
     title1 "Figure F-PK2: Individual CAR-T Expansion Profiles";
-    title2 "BV-CAR20-P1 Phase 1/2a — All Treated Subjects";
+    title2 "&STUDYID Phase 1/2a — All Treated Subjects";
     footnote1 "Red line = LOESS smooth of population trend.";
 run;
 
@@ -100,3 +115,5 @@ run;
 %put NOTE: ----------------------------------------------------;
 %put NOTE: ✅ CAR-T KINETICS FIGURES GENERATED;
 %put NOTE: ----------------------------------------------------;
+
+

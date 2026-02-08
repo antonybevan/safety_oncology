@@ -10,7 +10,17 @@
 %macro load_config;
    %if %symexist(CONFIG_LOADED) %then %if &CONFIG_LOADED=1 %then %return;
    %if %sysfunc(fileexist(00_config.sas)) %then %include "00_config.sas";
+   %else %if %sysfunc(fileexist(03_programs/00_config.sas)) %then %include "03_programs/00_config.sas";
    %else %if %sysfunc(fileexist(../00_config.sas)) %then %include "../00_config.sas";
+   %else %if %sysfunc(fileexist(../03_programs/00_config.sas)) %then %include "../03_programs/00_config.sas";
+   %else %if %sysfunc(fileexist(../../00_config.sas)) %then %include "../../00_config.sas";
+   %else %if %sysfunc(fileexist(../../03_programs/00_config.sas)) %then %include "../../03_programs/00_config.sas";
+   %else %if %sysfunc(fileexist(../../../00_config.sas)) %then %include "../../../00_config.sas";
+   %else %if %sysfunc(fileexist(../../../03_programs/00_config.sas)) %then %include "../../../03_programs/00_config.sas";
+   %else %do;
+      %put ERROR: Unable to locate 00_config.sas from current working directory.;
+      %abort cancel;
+   %end;
 %mend;
 %load_config;
 
@@ -48,7 +58,7 @@ proc sql;
 quit;
 
 /* 5. Reporting */
-title1 "BV-CAR20-P1: CAR-T Safety Analysis";
+title1 "&STUDYID: CAR-T Safety Analysis";
 title2 "Table 14.3.3: Summary of Grade 3 or 4 Laboratory Toxicities";
 title3 "Safety Population";
 
@@ -72,3 +82,5 @@ run;
 ods html body="&OUT_TABLES/t_lb_grad.html";
 proc print data=lb_subj_summ(obs=10); run;
 ods html close;
+
+

@@ -10,7 +10,17 @@
 %macro load_config;
    %if %symexist(CONFIG_LOADED) %then %if &CONFIG_LOADED=1 %then %return;
    %if %sysfunc(fileexist(00_config.sas)) %then %include "00_config.sas";
+   %else %if %sysfunc(fileexist(03_programs/00_config.sas)) %then %include "03_programs/00_config.sas";
    %else %if %sysfunc(fileexist(../00_config.sas)) %then %include "../00_config.sas";
+   %else %if %sysfunc(fileexist(../03_programs/00_config.sas)) %then %include "../03_programs/00_config.sas";
+   %else %if %sysfunc(fileexist(../../00_config.sas)) %then %include "../../00_config.sas";
+   %else %if %sysfunc(fileexist(../../03_programs/00_config.sas)) %then %include "../../03_programs/00_config.sas";
+   %else %if %sysfunc(fileexist(../../../00_config.sas)) %then %include "../../../00_config.sas";
+   %else %if %sysfunc(fileexist(../../../03_programs/00_config.sas)) %then %include "../../../03_programs/00_config.sas";
+   %else %do;
+      %put ERROR: Unable to locate 00_config.sas from current working directory.;
+      %abort cancel;
+   %end;
 %mend;
 %load_config;
 
@@ -28,21 +38,57 @@ proc sql noprint;
     select count(*) into :N_TOT from t_dm_data;
 quit;
 
-/* 3. Summary Statistics for Age */
-proc means data=t_dm_data n mean std median min max;
+%let N_DL1 = %trim(&N_DL1);
+%let N_DL2 = %trim(&N_DL2);
+%let N_DL3 = %trim(&N_DL3);
+
+/* 3. Age Summary */
+proc means data=t_dm_data n mean std median min max noprint;
     class ARMCD;
     var AGE;
-    output out=age_stats;
+    output out=age_stats n=N mean=Mean std=Std median=Median min=Min max=Max;
 run;
 
-/* 4. Categorical variables (Sex, Race) */
-proc freq data=t_dm_data noprint;
-    tables ARMCD * SEX / out=sex_freq;
-    tables ARMCD * RACE / out=race_freq;
-    tables ARMCD * AGEGR1 / out=agegr_freq;
+data age_long;
+    set age_stats;
+    where _TYPE_ > 0;
+    length Category $20 Level $40 ValueC $20;
+    Category = "Age (Years)";
+    Level = "N";      ValueC = strip(put(N, 6.));   output;
+    Level = "Mean";   ValueC = strip(put(Mean, 6.1)); output;
+    Level = "SD";     ValueC = strip(put(Std, 6.1));  output;
+    Level = "Median"; ValueC = strip(put(Median, 6.1)); output;
+    Level = "Min";    ValueC = strip(put(Min, 6.1)); output;
+    Level = "Max";    ValueC = strip(put(Max, 6.1)); output;
+    keep Category Level ARMCD ValueC;
 run;
 
-/* 5. Production Table Formatting (Mockup logic for Portfolio) */
+/* 4. Categorical Summaries */
+data cat_long;
+    set t_dm_data;
+    length Category $20 Level $40 ValueC $20;
+    Category = "Sex";       Level = coalescec(SEX, "");    ValueC = "1"; output;
+    Category = "Race";      Level = coalescec(RACE, "");   ValueC = "1"; output;
+    Category = "Age Group"; Level = coalescec(AGEGR1, ""); ValueC = "1"; output;
+    keep Category Level ARMCD ValueC;
+run;
+
+proc sql;
+    create table cat_counts as
+    select Category, Level, ARMCD, strip(put(count(*), 6.)) as ValueC length=20
+    from cat_long
+    group by Category, Level, ARMCD;
+quit;
+
+data summary_long;
+    set age_long cat_counts;
+run;
+
+proc sort data=summary_long;
+    by Category Level;
+run;
+
+/* 5. Production Table */
 title "Table 1.3: Summary of Demographics and Baseline Characteristics";
 title2 "Safety Population";
 
@@ -54,13 +100,12 @@ title2 "Safety Population";
 %mend;
 %check_dl2;
 
-proc report data=t_dm_data nowd headskip split='|' style(report)={outputwidth=100%};
-    column ("Characteristic" AGE SEX RACE) ARMCD, (n);
-    define AGE / "Age (Years)";
-    define AGEGR1 / "Age Group";
-    define SEX / "Gender";
-    define RACE / "Race";
+proc report data=summary_long nowd headskip split='|' style(report)={outputwidth=100%};
+    column Category Level ARMCD, ValueC;
+    define Category / group "Characteristic";
+    define Level / group "Category/Statistic";
     define ARMCD / across "Dose Level";
+    define ValueC / display "Value" center;
     
     compute after _page_;
         line @1 "--------------------------------------------------------------------------------";
@@ -73,5 +118,6 @@ run;
 
 /* Export results to a safe location */
 ods html body="&OUT_TABLES/t_dm.html";
-proc print data=t_dm_data(obs=10); run;
+proc print data=summary_long(obs=10); run;
 ods html close;
+

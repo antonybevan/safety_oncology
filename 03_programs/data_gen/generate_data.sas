@@ -17,12 +17,22 @@
 %macro load_config;
    %if %symexist(CONFIG_LOADED) %then %if &CONFIG_LOADED=1 %then %return;
    %if %sysfunc(fileexist(00_config.sas)) %then %include "00_config.sas";
+   %else %if %sysfunc(fileexist(03_programs/00_config.sas)) %then %include "03_programs/00_config.sas";
    %else %if %sysfunc(fileexist(../00_config.sas)) %then %include "../00_config.sas";
+   %else %if %sysfunc(fileexist(../03_programs/00_config.sas)) %then %include "../03_programs/00_config.sas";
+   %else %if %sysfunc(fileexist(../../00_config.sas)) %then %include "../../00_config.sas";
+   %else %if %sysfunc(fileexist(../../03_programs/00_config.sas)) %then %include "../../03_programs/00_config.sas";
+   %else %if %sysfunc(fileexist(../../../00_config.sas)) %then %include "../../../00_config.sas";
+   %else %if %sysfunc(fileexist(../../../03_programs/00_config.sas)) %then %include "../../../03_programs/00_config.sas";
+   %else %do;
+      %put ERROR: Unable to locate 00_config.sas from current working directory.;
+      %abort cancel;
+   %end;
 %mend;
 %load_config;
 
 /* Define Study Metadata */
-%let target_study = BV-CAR20-P1;
+%let target_study = &STUDYID;
 %let SEED = 20260207;
 
 /* ============================================================================
@@ -40,21 +50,6 @@ data raw_dm;
    /* SAP-aligned enrollment with DL2 skipped per amendment */
    /* DL1: 3 subjects, DL2: 0 subjects (skipped), DL3: 6 subjects */
    array n_per_dose[3] _temporary_ (3, 0, 6);
-   
-   do dose_level = 1 to 3;
-      do i = 1 to n_per_dose[dose_level];
-         subid = 100 + dose_level*100 + i;
-         USUBJID = catx('-', '101', subid);
-         
-         /* Protocol Defined Doses per SAP (DL2 retained as reserved code; skipped in enrollment) */
-         if dose_level = 1 then ARM = "DL1: 1x10^6 cells/kg";
-         else if dose_level = 2 then ARM = "DL2: 3x10^6 cells/kg";
-         else ARM = "DL3: 480x10^6 cells";
-         
-         /* Realistic Age Distribution (NHL/CLL population: median ~62) */
-         AGE = round(rand('normal', 62, 12));
-         if AGE < 35 then AGE = 35;
-         if AGE > 82 then AGE = 82;
          
          /* Sex Distribution (NHL: ~55% male) */
          if rand('uniform') < 0.55 then SEX = 'M'; else SEX = 'F';
@@ -104,12 +99,13 @@ run;
    ============================================================================ */
 data raw_ex;
    retain STUDYID USUBJID ARM SEX RACE DISEASE RFSTDTC TRTSDT LDSTDT SAFFL ITTFL EFFFL dose_level i subid AGE dt 
-          EXTRT EXDOSE EXDOSU EXSTDTC EXENDTC EXLOT day0 d;
-   length EXTRT $40 EXDOSU $20 EXSTDTC EXENDTC $10 EXLOT $15;
+          EXTRT EXDOSE EXDOSU EXSTDTC EXENDTC EXLOT EXADJ day0 d;
+   length EXTRT $40 EXDOSU $20 EXSTDTC EXENDTC $10 EXLOT $15 EXADJ $20;
    set raw_dm(where=(SAFFL='Y'));  /* Only treated subjects */
    
    day0 = input(TRTSDT, yymmdd10.);
    EXLOT = catx('-', 'LOT', put(dose_level, z2.), put(i, z3.));
+   EXADJ = "NONE";
 
    /* Lymphodepletion Days -5 to -3 (Flu/Cy) */
    do d = day0 - 5 to day0 - 3;
@@ -143,11 +139,11 @@ run;
    ============================================================================ */
 data raw_ae;
    retain STUDYID USUBJID ARM SEX RACE DISEASE RFSTDTC TRTSDT LDSTDT SAFFL ITTFL EFFFL dose_level i subid AGE dt 
-          AEDECOD AETERM AETOXGR AESOC AEREL AESTDTC AEENDTC AESER AESID day0;
-   length AEDECOD AETERM AETOXGR AESOC $100 AEREL $40 AESTDTC AEENDTC $10 AESER $1;
+          AEDECOD AETERM AETOXGR AESOC AEREL AESTDTC AEENDTC AESER AESID AEOUT AECONTRT day0;
+   length AEDECOD AETERM AETOXGR AESOC AEREL AEOUT AECONTRT $100 AESTDTC AEENDTC $10 AESER $1;
    set raw_dm(where=(SAFFL='Y'));
    
-   call streaminit(&SEED + 1000);
+   if _n_ = 1 then call streaminit(&SEED + 1000);
    day0 = input(TRTSDT, yymmdd10.);
    
    /* Common AEs - Everyone gets some fatigue/fever */
@@ -160,8 +156,10 @@ data raw_ae;
    AESID   = 1;
    AESOC   = "General disorders and administration site conditions";
    AEREL   = "NOT RELATED";
+   AEOUT   = "RECOVERED/RESOLVED";
+   AECONTRT = "";
    output;
-
+ 
    /* CRS - Dose-dependent rate (DL1: 60%, DL2: 80%, DL3: 94%) */
    _crs_prob = 0.50 + dose_level * 0.15;
    if rand('uniform') < _crs_prob then do;
@@ -194,9 +192,11 @@ data raw_ae;
       AESID = 2;
       AESOC = "Immune system disorders";
       AEREL = "RELATED";
+      AEOUT = "RECOVERED/RESOLVED";
+      AECONTRT = "PBCAR20A";
       output;
    end;
-
+ 
    /* ICANS - Higher rates at DL3 */
    _icans_prob = 0.30 + dose_level * 0.20;
    if rand('uniform') < _icans_prob then do;
@@ -223,6 +223,8 @@ data raw_ae;
       AESID = 3;
       AESOC = "Nervous system disorders";
       AEREL = "RELATED";
+      AEOUT = "RECOVERED/RESOLVED";
+      AECONTRT = "PBCAR20A";
       output;
    end;
    
@@ -238,7 +240,7 @@ data raw_lb;
    length LBTESTCD $8 LBTEST $40 LBORRES LBORNRLO LBORNRHI $20 VISIT $20 LBDTC $10;
    set raw_dm(where=(SAFFL='Y'));
    
-   call streaminit(&SEED + 2000);
+   if _n_ = 1 then call streaminit(&SEED + 2000);
    day0 = input(TRTSDT, yymmdd10.);
    
    do VISIT = 'Screening', 'Day 0', 'Day 7', 'Day 14', 'Day 28';
@@ -291,7 +293,7 @@ data raw_rs;
    length RSTESTCD $8 RSTEST $40 RSORRES RSSTRESC $20 RSDTC $10 VISIT $20;
    set raw_dm(where=(EFFFL='Y'));  /* Only efficacy-evaluable */
    
-   call streaminit(&SEED + 3000);
+   if _n_ = 1 then call streaminit(&SEED + 3000);
    day0 = input(TRTSDT, yymmdd10.);
    
    do VISIT = 'Day 28', 'Day 56', 'Day 84';
@@ -357,3 +359,4 @@ run;
 %put NOTE:   - Cytopenias at Day 7-14 nadir;
 %put NOTE:   - Dose-response: ORR ~45% (DL1) to ~75% (DL3);
 %put NOTE: ----------------------------------------------------;
+

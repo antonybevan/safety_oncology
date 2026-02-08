@@ -17,7 +17,17 @@
 %macro load_config;
    %if %symexist(CONFIG_LOADED) %then %if &CONFIG_LOADED=1 %then %return;
    %if %sysfunc(fileexist(00_config.sas)) %then %include "00_config.sas";
+   %else %if %sysfunc(fileexist(03_programs/00_config.sas)) %then %include "03_programs/00_config.sas";
    %else %if %sysfunc(fileexist(../00_config.sas)) %then %include "../00_config.sas";
+   %else %if %sysfunc(fileexist(../03_programs/00_config.sas)) %then %include "../03_programs/00_config.sas";
+   %else %if %sysfunc(fileexist(../../00_config.sas)) %then %include "../../00_config.sas";
+   %else %if %sysfunc(fileexist(../../03_programs/00_config.sas)) %then %include "../../03_programs/00_config.sas";
+   %else %if %sysfunc(fileexist(../../../00_config.sas)) %then %include "../../../00_config.sas";
+   %else %if %sysfunc(fileexist(../../../03_programs/00_config.sas)) %then %include "../../../03_programs/00_config.sas";
+   %else %do;
+      %put ERROR: Unable to locate 00_config.sas from current working directory.;
+      %abort cancel;
+   %end;
 %mend;
 %load_config;
 
@@ -36,30 +46,13 @@
         run;
     %end;
     %else %do;
-        /* Create mock DV domain structure for demonstration */
+        /* Keep dataset structure but do not fabricate deviation records */
         data dv_data;
             length STUDYID $20 DOMAIN $2 USUBJID $40 DVSEQ 8 
                    DVTERM $200 DVCAT $50 DVSCAT $50 DVDTC $20 DVSTDTC $20;
-            
-            STUDYID = "BV-CAR20-P1";
-            DOMAIN = "DV";
-            
-            /* Mock protocol deviations - typical Phase 1 scenarios */
-            USUBJID = "BV-CAR20-P1-001-0003"; DVSEQ = 1;
-            DVTERM = "Missed Day 14 assessment visit";
-            DVCAT = "ASSESSMENT"; DVSCAT = "SCHEDULE";
-            DVDTC = "2026-01-22"; output;
-            
-            USUBJID = "BV-CAR20-P1-001-0005"; DVSEQ = 1;
-            DVTERM = "Prohibited concomitant medication administered";
-            DVCAT = "MEDICATION"; DVSCAT = "CONCOMITANT";
-            DVDTC = "2026-01-18"; output;
-            
-            USUBJID = "BV-CAR20-P1-001-0007"; DVSEQ = 1;
-            DVTERM = "Laboratory sample not collected per protocol";
-            DVCAT = "LABORATORY"; DVSCAT = "SAMPLE";
-            DVDTC = "2026-01-25"; output;
+            stop;
         run;
+        %put WARNING: SDTM.DV not found. Protocol deviation outputs will be blank.;
     %end;
 %mend;
 %check_dv;
@@ -135,3 +128,4 @@ run;
 %put NOTE: ----------------------------------------------------;
 %put NOTE: ✅ PROTOCOL DEVIATIONS TABLE GENERATED;
 %put NOTE: ----------------------------------------------------;
+

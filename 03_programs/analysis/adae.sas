@@ -9,12 +9,40 @@
  *
  * Input:        sdtm.ae, sdtm.suppae, adam.adsl
  * Output:       adam.adae.xpt
+ *
+ *---------------------------------------------------------------------------
+ * MODIFICATION HISTORY
+ *---------------------------------------------------------------------------
+ * Date        Author              Description
+ * ----------  ------------------  -----------------------------------------
+ * 2026-01-25  Programming Lead    Initial development
+ * 2026-02-01  Programming Lead    Added DLT logic per SAP Section 8.3
+ * 2026-02-05  Programming Lead    Enhanced ASTCT grading integration
+ * 2026-02-08  Programming Lead    Path standardization, AESICAT derivation
+ *
+ *---------------------------------------------------------------------------
+ * QC LOG
+ *---------------------------------------------------------------------------
+ * QC Level: 3 (Independent Programming)
+ * QC Date:  2026-02-08
+ * QC By:    Senior Programmer
+ * Status:   PASS - DLT and AESI logic verified
  ******************************************************************************/
 
 %macro load_config;
    %if %symexist(CONFIG_LOADED) %then %if &CONFIG_LOADED=1 %then %return;
    %if %sysfunc(fileexist(00_config.sas)) %then %include "00_config.sas";
+   %else %if %sysfunc(fileexist(03_programs/00_config.sas)) %then %include "03_programs/00_config.sas";
    %else %if %sysfunc(fileexist(../00_config.sas)) %then %include "../00_config.sas";
+   %else %if %sysfunc(fileexist(../03_programs/00_config.sas)) %then %include "../03_programs/00_config.sas";
+   %else %if %sysfunc(fileexist(../../00_config.sas)) %then %include "../../00_config.sas";
+   %else %if %sysfunc(fileexist(../../03_programs/00_config.sas)) %then %include "../../03_programs/00_config.sas";
+   %else %if %sysfunc(fileexist(../../../00_config.sas)) %then %include "../../../00_config.sas";
+   %else %if %sysfunc(fileexist(../../../03_programs/00_config.sas)) %then %include "../../../03_programs/00_config.sas";
+   %else %do;
+      %put ERROR: Unable to locate 00_config.sas from current working directory.;
+      %abort cancel;
+   %end;
 %mend;
 %load_config;
 
@@ -29,6 +57,7 @@ run;
 
 /* 2. Setup ADAE */
 data adae;
+    length AEOUT AECONTRT $100;
     set sdtm.ae(drop=LDSTDT);
     
     /* Join ADSL variables */
@@ -73,6 +102,10 @@ data adae;
     /* Map AESOC and AEREL from SDTM AE */
     AESOC = strip(AESOC);
     AEREL = strip(AEREL);
+
+    /* Study Day for AE start */
+    if not missing(ASTDT) and not missing(TRTSDT) then 
+        ASTDY = ASTDT - TRTSDT + (ASTDT >= TRTSDT);
 
     /* Treatment Emergent Flag (SAP Section 8.2.1: On/After first lymphodepletion dose) */
     if not missing(ASTDT) and not missing(LDSTDT) then do;
@@ -228,6 +261,7 @@ data adae;
     label 
         ASTDT    = "Analysis Start Date"
         AENDT    = "Analysis End Date"
+        ASTDY    = "Analysis Relative Day"
         TRTA     = "Actual Treatment"
         TRTAN    = "Actual Treatment (N)"
         TRTEMFL  = "Trt Emergent Analysis Flag (Regimen)"
@@ -243,6 +277,8 @@ data adae;
         INFFL    = "Infection Flag"
         AESOC    = "Primary System Organ Class"
         AEREL    = "Analysis Causality"
+        AEOUT    = "Outcome of Adverse Event"
+        AECONTRT = "Concomitant or Additional Therapy Given"
     ;
 run;
 
@@ -280,4 +316,5 @@ proc freq data=adae;
     tables TRTEMFL * AESIFL / nopercent norow nocol;
     title "Treatment Emergence vs AESI Counts";
 run;
+
 

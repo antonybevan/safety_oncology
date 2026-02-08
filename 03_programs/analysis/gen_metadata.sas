@@ -9,7 +9,17 @@
 %macro load_config;
    %if %symexist(CONFIG_LOADED) %then %if &CONFIG_LOADED=1 %then %return;
    %if %sysfunc(fileexist(00_config.sas)) %then %include "00_config.sas";
+   %else %if %sysfunc(fileexist(03_programs/00_config.sas)) %then %include "03_programs/00_config.sas";
    %else %if %sysfunc(fileexist(../00_config.sas)) %then %include "../00_config.sas";
+   %else %if %sysfunc(fileexist(../03_programs/00_config.sas)) %then %include "../03_programs/00_config.sas";
+   %else %if %sysfunc(fileexist(../../00_config.sas)) %then %include "../../00_config.sas";
+   %else %if %sysfunc(fileexist(../../03_programs/00_config.sas)) %then %include "../../03_programs/00_config.sas";
+   %else %if %sysfunc(fileexist(../../../00_config.sas)) %then %include "../../../00_config.sas";
+   %else %if %sysfunc(fileexist(../../../03_programs/00_config.sas)) %then %include "../../../03_programs/00_config.sas";
+   %else %do;
+      %put ERROR: Unable to locate 00_config.sas from current working directory.;
+      %abort cancel;
+   %end;
 %mend;
 %load_config;
 
@@ -49,7 +59,7 @@ data define_metadata;
         Method = "Derived from first/last exposure in SDTM.EX";
     end;
     else if Variable = 'DLTEVLFL' then do;
-        Method = "Y if SAFFL='Y' and (Treatment Duration >= 28 days or DLT reported)";
+        Method = "Y if CAR-T infused and treatment duration >= 28 days";
     end;
     else if Variable = 'COHORT' then do;
         Method = "NHL if SDTM.DM.DISEASE='NHL'; CLL if DISEASE in ('CLL', 'SLL')";
@@ -89,7 +99,7 @@ data define_metadata;
 run;
 
 /* 3. Output to HTML for Reviewer Guide Support */
-title "BV-CAR20-P1: Enhanced ADaM Metadata (Regulatory-Grade Submission Package)";
+title "&STUDYID: Enhanced ADaM Metadata (Regulatory-Grade Submission Package)";
 ods html body="&OUT_META/adam_metadata_enhanced.html";
 proc report data=define_metadata nowd headskip split='|' style(report)={outputwidth=100%};
     column Dataset Variable Label DataType Role Origin Method;
@@ -111,3 +121,5 @@ run;
 %put NOTE: --------------------------------------------------;
 %put NOTE: ✅ ENHANCED METADATA GENERATION COMPLETE;
 %put NOTE: --------------------------------------------------;
+
+

@@ -10,7 +10,17 @@
 %macro load_config;
    %if %symexist(CONFIG_LOADED) %then %if &CONFIG_LOADED=1 %then %return;
    %if %sysfunc(fileexist(00_config.sas)) %then %include "00_config.sas";
+   %else %if %sysfunc(fileexist(03_programs/00_config.sas)) %then %include "03_programs/00_config.sas";
    %else %if %sysfunc(fileexist(../00_config.sas)) %then %include "../00_config.sas";
+   %else %if %sysfunc(fileexist(../03_programs/00_config.sas)) %then %include "../03_programs/00_config.sas";
+   %else %if %sysfunc(fileexist(../../00_config.sas)) %then %include "../../00_config.sas";
+   %else %if %sysfunc(fileexist(../../03_programs/00_config.sas)) %then %include "../../03_programs/00_config.sas";
+   %else %if %sysfunc(fileexist(../../../00_config.sas)) %then %include "../../../00_config.sas";
+   %else %if %sysfunc(fileexist(../../../03_programs/00_config.sas)) %then %include "../../../03_programs/00_config.sas";
+   %else %do;
+      %put ERROR: Unable to locate 00_config.sas from current working directory.;
+      %abort cancel;
+   %end;
 %mend;
 %load_config;
 
@@ -20,9 +30,9 @@ data raw_ex;
     /* Aligned with EX specs */
     length STUDYID $20 USUBJID $40 ARM $200 SEX $1 RACE $100 DISEASE $5 RFSTDTC TRTSDT LDSTDT $10
            SAFFL ITTFL EFFFL $1
-           EXTRT $100 EXDOSE 8 EXDOSU $20 EXSTDTC EXENDTC $10 day0 d 8;
+           EXTRT $100 EXDOSE 8 EXDOSU $20 EXSTDTC EXENDTC $10 EXADJ $20 day0 d 8;
     input STUDYID $ USUBJID $ ARM $ SEX $ RACE $ DISEASE $ RFSTDTC $ TRTSDT $ LDSTDT $ SAFFL $ ITTFL $ EFFFL $ 
-          dose_level i subid AGE dt EXTRT $ EXDOSE EXDOSU $ EXSTDTC $ EXENDTC $ EXLOT $ day0 d;
+          dose_level i subid AGE dt EXTRT $ EXDOSE EXDOSU $ EXSTDTC $ EXENDTC $ EXLOT $ EXADJ $ day0 d;
 run;
 
 data ex;
@@ -71,7 +81,7 @@ data ex;
         EXENDY = _endt - TRTSDT_NUM + (_endt >= TRTSDT_NUM);
     end;
     
-    keep STUDYID DOMAIN USUBJID EXTRT EXDOSE EXDOSU EXDOSFRM EXROUTE 
+    keep STUDYID DOMAIN USUBJID EXTRT EXDOSE EXDOSU EXLOT EXADJ EXDOSFRM EXROUTE 
          EXSTDTC EXENDTC EXSTDY EXENDY;
 run;
 
@@ -95,3 +105,4 @@ data xpt.ex;
     set sdtm.ex;
 run;
 libname xpt clear;
+

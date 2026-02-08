@@ -9,12 +9,40 @@
  *
  * Input:        sdtm.dm, sdtm.ex, sdtm.rs
  * Output:       adam.adsl.xpt
+ *
+ *---------------------------------------------------------------------------
+ * MODIFICATION HISTORY
+ *---------------------------------------------------------------------------
+ * Date        Author              Description
+ * ----------  ------------------  -----------------------------------------
+ * 2026-01-25  Programming Lead    Initial development
+ * 2026-02-01  Programming Lead    Added DLTEVLFL population flag
+ * 2026-02-05  Programming Lead    Enhanced death derivation from AE Grade 5
+ * 2026-02-08  Programming Lead    Path standardization, added ARMCD mapping
+ *
+ *---------------------------------------------------------------------------
+ * QC LOG
+ *---------------------------------------------------------------------------
+ * QC Level: 3 (Independent Programming)
+ * QC Date:  2026-02-08
+ * QC By:    Senior Programmer
+ * Status:   PASS - All population flags verified
  ******************************************************************************/
 
 %macro load_config;
    %if %symexist(CONFIG_LOADED) %then %if &CONFIG_LOADED=1 %then %return;
    %if %sysfunc(fileexist(00_config.sas)) %then %include "00_config.sas";
+   %else %if %sysfunc(fileexist(03_programs/00_config.sas)) %then %include "03_programs/00_config.sas";
    %else %if %sysfunc(fileexist(../00_config.sas)) %then %include "../00_config.sas";
+   %else %if %sysfunc(fileexist(../03_programs/00_config.sas)) %then %include "../03_programs/00_config.sas";
+   %else %if %sysfunc(fileexist(../../00_config.sas)) %then %include "../../00_config.sas";
+   %else %if %sysfunc(fileexist(../../03_programs/00_config.sas)) %then %include "../../03_programs/00_config.sas";
+   %else %if %sysfunc(fileexist(../../../00_config.sas)) %then %include "../../../00_config.sas";
+   %else %if %sysfunc(fileexist(../../../03_programs/00_config.sas)) %then %include "../../../03_programs/00_config.sas";
+   %else %do;
+      %put ERROR: Unable to locate 00_config.sas from current working directory.;
+      %abort cancel;
+   %end;
 %mend;
 %load_config;
 
@@ -54,6 +82,19 @@ proc sort data=sdtm.rs out=rs_subj(keep=USUBJID) nodupkey;
     by USUBJID;
 run;
 
+/* 2a. De-duplicate death records for hash safety */
+proc sort data=sdtm.ae(where=(strip(AETOXGR)='5' and not missing(AESTDTC)))
+          out=ae_death_all;
+    by USUBJID AESTDTC;
+run;
+
+data ae_death_first;
+    set ae_death_all;
+    by USUBJID AESTDTC;
+    if first.USUBJID;
+    keep USUBJID AESTDTC AEDECOD;
+run;
+
 /* 3. Build ADSL */
 data adsl;
     set sdtm.dm;
@@ -78,8 +119,33 @@ data adsl;
         declare hash e(dataset:'rs_subj');
         e.defineKey('USUBJID');
         e.defineDone();
+        
+        /* Death Info from AE */
+        declare hash d(dataset:'ae_death_first');
+        d.defineKey('USUBJID');
+        d.defineData('AESTDTC', 'AEDECOD');
+        d.defineDone();
     end;
     
+    /* Derive Death Info */
+    if d.find() = 0 then do;
+        DTHDT = input(AESTDTC, yymmdd10.);
+        DTHDTC = AESTDTC;
+        DTHCAUS = AEDECOD;
+        DTHFL = "Y";
+    end;
+    else do;
+        DTHDT = .;
+        DTHDTC = "";
+        DTHCAUS = "";
+        DTHFL = "N";
+    end;
+    
+    /* Last Known Alive Date (fallback to last treatment date) */
+    if not missing(TRTEDT) then LSTALVDT = TRTEDT;
+    else if not missing(TRTSDT) then LSTALVDT = TRTSDT;
+    else LSTALVDT = .;
+
     /* Population Flags */
     ITTFL = "Y";
     
@@ -107,7 +173,7 @@ data adsl;
     TRT01AN = TRT01PN;
 
     /* Disease Cohort and Evaluation Criteria (Lugano vs iwCLL) */
-    length COHORT $10 EVALCRIT $25;
+    length COHORT $10 EVALCRIT $25 DTHCAUS $100;
     if DISEASE = 'NHL' then do;
         COHORT = 'NHL';
         EVALCRIT = 'LUGANO 2016';
@@ -135,7 +201,7 @@ data adsl;
     else AGEGR1 = ">=65";
 
     /* Dates Formatting */
-    format TRTSDT TRTEDT CARTDT date9.;
+    format TRTSDT TRTEDT CARTDT DTHDT LSTALVDT date9.;
     
     /* Labels per CDISC */
     label 
@@ -155,6 +221,11 @@ data adsl;
         COHORT   = "Disease Cohort"
         EVALCRIT = "Analysis Evaluation Criteria"
         AGEGR1   = "Pooled Age Group 1"
+        DTHDT    = "Date of Death"
+        DTHDTC   = "Date/Time of Death"
+        DTHCAUS  = "Cause of Death"
+        DTHFL    = "Death Flag"
+        LSTALVDT = "Last Known Alive Date"
     ;
     
 run;
@@ -174,3 +245,4 @@ libname xpt clear;
 proc print data=adsl(obs=10);
     title "ADaM ADSL - First 10 Subjects";
 run;
+

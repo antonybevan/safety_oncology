@@ -12,8 +12,17 @@
 %macro load_config;
    %if %symexist(CONFIG_LOADED) %then %if &CONFIG_LOADED=1 %then %return;
    %if %sysfunc(fileexist(00_config.sas)) %then %include "00_config.sas";
+   %else %if %sysfunc(fileexist(03_programs/00_config.sas)) %then %include "03_programs/00_config.sas";
    %else %if %sysfunc(fileexist(../00_config.sas)) %then %include "../00_config.sas";
+   %else %if %sysfunc(fileexist(../03_programs/00_config.sas)) %then %include "../03_programs/00_config.sas";
+   %else %if %sysfunc(fileexist(../../00_config.sas)) %then %include "../../00_config.sas";
    %else %if %sysfunc(fileexist(../../03_programs/00_config.sas)) %then %include "../../03_programs/00_config.sas";
+   %else %if %sysfunc(fileexist(../../../00_config.sas)) %then %include "../../../00_config.sas";
+   %else %if %sysfunc(fileexist(../../../03_programs/00_config.sas)) %then %include "../../../03_programs/00_config.sas";
+   %else %do;
+      %put ERROR: Unable to locate 00_config.sas from current working directory.;
+      %abort cancel;
+   %end;
 %mend;
 %load_config;
 
@@ -107,7 +116,7 @@ run;
 
 /* 4. Final Formatting & Output */
 options nodate nonumber;
-title1 "BV-CAR20-P1: CAR-T Safety Study";
+title1 "&STUDYID: CAR-T Safety Study";
 title2 "Table 14.3.1: Overview of Treatment-Emergent Adverse Events";
 title3 "Safety Population";
 
@@ -126,3 +135,5 @@ run;
 ods html body="&OUT_TABLES/t_ae_summ.html";
 proc print data=final_report(obs=10); run;
 ods html close;
+
+

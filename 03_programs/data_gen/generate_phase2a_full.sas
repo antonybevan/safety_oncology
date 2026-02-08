@@ -13,7 +13,17 @@
 %macro load_config;
    %if %symexist(CONFIG_LOADED) %then %if &CONFIG_LOADED=1 %then %return;
    %if %sysfunc(fileexist(00_config.sas)) %then %include "00_config.sas";
+   %else %if %sysfunc(fileexist(03_programs/00_config.sas)) %then %include "03_programs/00_config.sas";
    %else %if %sysfunc(fileexist(../00_config.sas)) %then %include "../00_config.sas";
+   %else %if %sysfunc(fileexist(../03_programs/00_config.sas)) %then %include "../03_programs/00_config.sas";
+   %else %if %sysfunc(fileexist(../../00_config.sas)) %then %include "../../00_config.sas";
+   %else %if %sysfunc(fileexist(../../03_programs/00_config.sas)) %then %include "../../03_programs/00_config.sas";
+   %else %if %sysfunc(fileexist(../../../00_config.sas)) %then %include "../../../00_config.sas";
+   %else %if %sysfunc(fileexist(../../../03_programs/00_config.sas)) %then %include "../../../03_programs/00_config.sas";
+   %else %do;
+      %put ERROR: Unable to locate 00_config.sas from current working directory.;
+      %abort cancel;
+   %end;
 %mend;
 %load_config;
 
@@ -40,7 +50,7 @@ data dm_arm_a;
            PHASE $3 COHORT $30 DISEASETYPE $20 PRIORLINES 8
            CYTOGENETICS $50 PRIORIBRUTINIB $1;
     
-    STUDYID = "BV-CAR20-P1";
+    STUDYID = "&STUDYID";
     DOMAIN = "DM";
     PHASE = "2a";
     COHORT = "Arm A: CLL/SLL Ibrutinib";
@@ -85,7 +95,7 @@ data dm_arm_b;
            PHASE $3 COHORT $30 DISEASETYPE $20 PRIORLINES 8
            PRIORCHOP $1 PRIORCHOPRESPONSE $20;
     
-    STUDYID = "BV-CAR20-P1";
+    STUDYID = "&STUDYID";
     DOMAIN = "DM";
     PHASE = "2a";
     COHORT = "Arm B: DLBCL post-R-CHOP";
@@ -128,7 +138,7 @@ data dm_arm_c;
            PHASE $3 COHORT $30 DISEASETYPE $20 PRIORLINES 8
            PRIORCART $1 PRIORCARTPRODUCT $30;
     
-    STUDYID = "BV-CAR20-P1";
+    STUDYID = "&STUDYID";
     DOMAIN = "DM";
     PHASE = "2a";
     COHORT = "Arm C: High-grade NHL post-CAR-T";
@@ -172,6 +182,74 @@ data dm_phase2a_full;
 run;
 
 /* -------------------------------------------------------------------------
+   4.1 SYNTHETIC REGIMEN TIMELINE (LD + CAR-T)
+   ------------------------------------------------------------------------- */
+data phase2a_timeline;
+    set dm_phase2a_full;
+    by USUBJID;
+    retain _idx 0;
+    _idx + 1;
+
+    LDSTDT = '01MAR2025'd + (_idx - 1) * 3;
+    CARTDT = LDSTDT + 5;
+    TRTSDT = LDSTDT;
+    TRTEDT = CARTDT + 28;
+
+    format LDSTDT CARTDT TRTSDT TRTEDT date9.;
+    keep STUDYID USUBJID LDSTDT CARTDT TRTSDT TRTEDT;
+run;
+
+/* -------------------------------------------------------------------------
+   4.2 GENERATE EXPOSURE DATA (SDTM.EX) FOR PHASE 2A
+   ------------------------------------------------------------------------- */
+data ex_phase2a_full;
+    length STUDYID $20 DOMAIN $2 USUBJID $40
+           EXTRT $100 EXDOSE 8 EXDOSU $20
+           EXSTDTC EXENDTC $10
+           EXDOSFRM $20 EXROUTE $20;
+    set phase2a_timeline;
+
+    DOMAIN = "EX";
+    EXDOSFRM = "STEADY STATE";
+    EXROUTE = "INTRAVENOUS";
+
+    EXTRT = "FLUDARABINE";
+    EXDOSE = 30;
+    EXDOSU = "MG/M2";
+    EXSTDTC = put(LDSTDT, yymmdd10.);
+    EXENDTC = put(LDSTDT + 2, yymmdd10.);
+    output;
+
+    EXTRT = "CYCLOPHOSPHAMIDE";
+    EXDOSE = 500;
+    EXDOSU = "MG/M2";
+    EXSTDTC = put(LDSTDT, yymmdd10.);
+    EXENDTC = put(LDSTDT + 2, yymmdd10.);
+    output;
+
+    EXTRT = "BV-CAR20";
+    EXDOSE = 480;
+    EXDOSU = "X10^6 CELLS";
+    EXSTDTC = put(CARTDT, yymmdd10.);
+    EXENDTC = put(CARTDT, yymmdd10.);
+    output;
+
+    keep STUDYID DOMAIN USUBJID EXTRT EXDOSE EXDOSU EXSTDTC EXENDTC EXDOSFRM EXROUTE;
+run;
+
+proc sort data=ex_phase2a_full;
+    by USUBJID EXSTDTC EXTRT;
+run;
+
+data sdtm.ex_phase2a_full;
+    set ex_phase2a_full;
+    by USUBJID;
+    retain EXSEQ;
+    if first.USUBJID then EXSEQ = 0;
+    EXSEQ + 1;
+run;
+
+/* -------------------------------------------------------------------------
    5. GENERATE TUMOR RESPONSE BY ARM (Primary Endpoints)
    - Calibrated with ZUMA-1 (Yescarta) and JULIET (Kymriah) benchmarks
    ------------------------------------------------------------------------- */
@@ -183,13 +261,13 @@ data rs_phase2a_full;
     
     set dm_phase2a_full(keep=USUBJID COHORT DISEASETYPE);
     
-    STUDYID = "BV-CAR20-P1";
+    STUDYID = "&STUDYID";
     DOMAIN = "RS";
     RSSEQ = 1;
     RSTESTCD = "OVRLRESP";
     RSTEST = "Overall Response";
     
-    call streaminit(&SEED + 4000);
+    if _n_ = 1 then call streaminit(&SEED + 4000);
     
     /* Calibrated Response Rates (Real-World Benchmarks) */
     if DISEASETYPE = 'DLBCL' then do;
@@ -239,9 +317,9 @@ data cart_kinetics;
     
     set dm_phase2a_full(keep=USUBJID);
     
-    STUDYID = "BV-CAR20-P1";
+    STUDYID = "&STUDYID";
     
-    call streaminit(&SEED + 5000);
+    if _n_ = 1 then call streaminit(&SEED + 5000);
     
     /* Simulate CAR-T expansion curve (Peak around Day 7-10) */
     do VISIT = 'Day 0', 'Day 7', 'Day 10', 'Day 14', 'Day 28', 'Week 12', 'Month 6';
@@ -273,9 +351,9 @@ data cytokines;
     
     set dm_phase2a_full(keep=USUBJID);
     
-    STUDYID = "BV-CAR20-P1";
+    STUDYID = "&STUDYID";
     
-    call streaminit(&SEED + 6000);
+    if _n_ = 1 then call streaminit(&SEED + 6000);
     
     do VISIT = 'Baseline', 'Day 1', 'Day 3', 'Day 7', 'Day 14';
         select(VISIT);
@@ -298,6 +376,54 @@ data cytokines;
 run;
 
 /* -------------------------------------------------------------------------
+   8. GENERATE MRD DATA (Minimal Residual Disease)
+   ------------------------------------------------------------------------- */
+data mrd_phase2a_full;
+    length STUDYID $20 USUBJID $40 MRDTEST $30 MRDMETHOD $30 
+           MRDRESULT $20 MRDNEG 8 TIMEPOINT $20 DISEASE $10;
+    
+    if _n_ = 1 then call streaminit(&SEED + 7000);
+    
+    set dm_phase2a_full(keep=USUBJID DISEASETYPE COHORT);
+    rename DISEASETYPE=DISEASE;
+    
+    STUDYID = "&STUDYID";
+    
+    /* MRD rates vary by disease and response */
+    if DISEASE = 'NHL' then _mrd_neg_rate = 0.55;
+    else _mrd_neg_rate = 0.45;
+    
+    /* Week 4 assessment */
+    TIMEPOINT = "Week 4";
+    MRDTEST = "MRD Assessment";
+    MRDMETHOD = "Flow Cytometry (10^-4)";
+    
+    if rand('uniform') < _mrd_neg_rate * 0.8 then do;
+        MRDRESULT = "Negative";
+        MRDNEG = 1;
+    end;
+    else do;
+        MRDRESULT = "Positive";
+        MRDNEG = 0;
+    end;
+    output;
+    
+    /* Week 12 assessment */
+    TIMEPOINT = "Week 12";
+    if MRDRESULT = "Positive" and rand('uniform') < 0.3 then do;
+        MRDRESULT = "Negative";
+        MRDNEG = 1;
+    end;
+    else if MRDRESULT = "Negative" and rand('uniform') < 0.1 then do;
+        MRDRESULT = "Positive";
+        MRDNEG = 0;
+    end;
+    output;
+    
+    drop _mrd_neg_rate;
+run;
+
+/* -------------------------------------------------------------------------
    9. GENERATE AE DATA (CRS & ICANS CALIBRATION)
    - Calibrated with ZUMA-1: CRS 94% (13% Gr3+), ICANS 87% (31% Gr3+)
    - Median Onset: CRS=2d, ICANS=4d
@@ -310,10 +436,10 @@ data ae_phase2a_full;
     
     set dm_phase2a_full(keep=USUBJID COHORT DISEASETYPE);
     
-    STUDYID = "BV-CAR20-P1";
+    STUDYID = "&STUDYID";
     DOMAIN = "AE";
     
-    call streaminit(&SEED + 8000);
+    if _n_ = 1 then call streaminit(&SEED + 8000);
     
     /* 1. Generate CRS for ~94% of subjects (ZUMA-1 Benchmark) */
     if rand('uniform') < 0.94 then do;
@@ -365,18 +491,348 @@ data ae_phase2a_full;
     end;
 run;
 
-/* Combine with Phase 1 AE and save */
-data sdtm.ae_phase2a_full;
-    set sdtm.ae ae_phase2a_full;
+/* Save all datasets to libraries for persistence */
+data sdtm.dm_phase2a_full; set dm_phase2a_full; run;
+data sdtm.ae_phase2a_full; set ae_phase2a_full; run;
+data sdtm.rs_phase2a_full; set rs_phase2a_full; run;
+data sdtm.cart_kinetics; set cart_kinetics; run;
+data sdtm.cytokines; set cytokines; run;
+data sdtm.mrd_phase2a_full; set mrd_phase2a_full; run;
+
+/* -------------------------------------------------------------------------
+   Build Phase 2a ADSL records aligned to ADaM ADSL structure
+   ------------------------------------------------------------------------- */
+proc sort data=sdtm.ex_phase2a_full out=ex_p2_sorted;
+    by USUBJID EXSTDTC;
 run;
 
-/* Save other domains */
-data sdtm.dm_phase2a_full; set dm_phase2a_full; run;
-data sdtm.rs_phase2a_full; set rs_phase2a_full; run;
+data car_dates_p2;
+    set ex_p2_sorted;
+    by USUBJID;
+
+    retain TRTSDT TRTEDT CARTDT LDSTDT;
+    format TRTSDT TRTEDT CARTDT LDSTDT date9.;
+
+    if first.USUBJID then do;
+        %iso_to_sas(iso_var=EXSTDTC, sas_var=TRTSDT);
+        if upcase(EXTRT) in ('FLUDARABINE', 'CYCLOPHOSPHAMIDE') then LDSTDT = TRTSDT;
+    end;
+
+    if upcase(EXTRT) = 'BV-CAR20' and missing(CARTDT) then do;
+        %iso_to_sas(iso_var=EXSTDTC, sas_var=CARTDT);
+    end;
+
+    if last.USUBJID then do;
+        %iso_to_sas(iso_var=EXENDTC, sas_var=TRTEDT);
+        output;
+    end;
+
+    keep USUBJID TRTSDT TRTEDT CARTDT LDSTDT;
+run;
+
+proc sort data=sdtm.rs_phase2a_full out=rs_subj_p2(keep=USUBJID) nodupkey;
+    by USUBJID;
+run;
+
+proc sort data=sdtm.ae_phase2a_full(where=(AETOXGRN=5 or AETOXGR='5')) out=ae_death_phase2a;
+    by USUBJID ASTDT;
+run;
+
+data ae_death_phase2a;
+    set ae_death_phase2a;
+    by USUBJID ASTDT;
+    if first.USUBJID;
+    keep USUBJID ASTDT AEDECOD;
+    rename ASTDT=DEATHDY AEDECOD=DTHCAUS;
+run;
+
+proc sort data=dm_phase2a_full out=dm_phase2a_sorted;
+    by USUBJID;
+run;
+
+data adsl_phase2a;
+    if 0 then set adam.adsl;
+    set dm_phase2a_sorted;
+    by USUBJID;
+
+    length DISEASE $5 COHORT $10 EVALCRIT $25 AGEGR1 $10 PHASE $3 DTHCAUS $100;
+    format TRTSDT TRTEDT CARTDT LDSTDT DTHDT LSTALVDT date9.;
+
+    if _n_ = 1 then do;
+        declare hash h(dataset:'car_dates_p2');
+        h.defineKey('USUBJID');
+        h.defineData('TRTSDT', 'TRTEDT', 'CARTDT', 'LDSTDT');
+        h.defineDone();
+
+        declare hash e(dataset:'rs_subj_p2');
+        e.defineKey('USUBJID');
+        e.defineDone();
+
+        declare hash dh(dataset:'ae_death_phase2a');
+        dh.defineKey('USUBJID');
+        dh.defineData('DEATHDY', 'DTHCAUS');
+        dh.defineDone();
+    end;
+
+    if h.find() ne 0 then do;
+        TRTSDT = .; TRTEDT = .; CARTDT = .; LDSTDT = .;
+    end;
+
+    TRTDUR = .;
+    if not missing(TRTSDT) and not missing(TRTEDT) then TRTDUR = TRTEDT - TRTSDT + 1;
+
+    RFSTDTC = put(LDSTDT - 7, yymmdd10.);
+    RFICDTC = RFSTDTC;
+    RFXSTDTC = put(LDSTDT, yymmdd10.);
+    RFXENDTC = put(TRTEDT, yymmdd10.);
+    RFENDTC = "";
+    RFPENDTC = "";
+
+    DOMAIN = "DM";
+    AGEU = "YEARS";
+    ETHNIC = "NOT HISPANIC OR LATINO";
+    COUNTRY = "USA";
+
+    ITTFL = "Y";
+    if not missing(TRTSDT) then SAFFL = "Y";
+    else SAFFL = "N";
+
+    if SAFFL = "Y" and e.find() = 0 then EFFFL = "Y";
+    else EFFFL = "N";
+
+    if not missing(CARTDT) then DOSESCLFL = "Y";
+    else DOSESCLFL = "N";
+
+    if DOSESCLFL = "Y" and TRTDUR >= 28 then DLTEVLFL = "Y";
+    else if DOSESCLFL = "Y" then DLTEVLFL = "N";
+    else DLTEVLFL = "N";
+
+    TRT01P = ARM;
+    TRT01A = ARM;
+    if ARMCD = 'DL1' then TRT01PN = 1;
+    else if ARMCD = 'DL2' then TRT01PN = 2;
+    else if ARMCD = 'DL3' then TRT01PN = 3;
+    TRT01AN = TRT01PN;
+
+    if DISEASETYPE = "CLL/SLL" then do;
+        DISEASE = "CLL";
+        COHORT = "CLL";
+        EVALCRIT = "iwCLL 2018";
+    end;
+    else do;
+        DISEASE = "NHL";
+        COHORT = "NHL";
+        EVALCRIT = "LUGANO 2016";
+    end;
+
+    if missing(AGE) then AGEGR1 = "";
+    else if AGE < 65 then AGEGR1 = "<65";
+    else AGEGR1 = ">=65";
+
+    DTHDT = .;
+    DTHDTC = "";
+    DTHCAUS = "";
+    DTHFL = "N";
+
+    if dh.find() = 0 then do;
+        if not missing(CARTDT) then DTHDT = CARTDT + DEATHDY;
+        if not missing(DTHDT) then DTHDTC = put(DTHDT, yymmdd10.);
+        DTHFL = "Y";
+    end;
+
+    if not missing(TRTEDT) then LSTALVDT = TRTEDT;
+    else if not missing(TRTSDT) then LSTALVDT = TRTSDT;
+    else LSTALVDT = .;
+
+    PHASE = "2a";
+    drop DEATHDY DISEASETYPE PRIORLINES CYTOGENETICS PRIORIBRUTINIB PRIORCHOP PRIORCHOPRESPONSE PRIORCART PRIORCARTPRODUCT;
+run;
+
+/* Create Expanded ADaM for Reports (Combine Phase 1 and 2a) */
+data adam.adsl_expanded;
+    length PHASE $3;
+    set adam.adsl(in=ph1) adsl_phase2a(in=ph2);
+    if ph1 then PHASE = '1';
+    else if ph2 then PHASE = '2a';
+run;
+
+/* Build Phase 2a ADRS (BOR) aligned with ADaM structure */
+proc sort data=rs_phase2a_full;
+    by USUBJID;
+run;
+
+proc sort data=adsl_phase2a;
+    by USUBJID;
+run;
+
+data adrs_phase2a;
+    merge rs_phase2a_full(in=a) adsl_phase2a(in=b keep=USUBJID TRTSDT CARTDT TRT01A TRT01AN ITTFL SAFFL EFFFL DISEASE ARMCD ARM EVALCRIT);
+    by USUBJID;
+    if a;
+
+    PARAMCD = "BOR";
+    PARAM = "Best Overall Response";
+
+    length CRIT1 PARCAT3 $100;
+    if DISEASE = 'NHL' then CRIT1 = "Lugano 2016 (Metabolic)";
+    else if DISEASE = 'CLL' then CRIT1 = "iwCLL 2018";
+    PARCAT3 = EVALCRIT;
+
+    SRCDOM = "RS";
+    SRCVAR = "RSORRES";
+    SRCSEQ = RSSEQ;
+
+    AVALC = strip(upcase(RSSTRESC));
+    if AVALC = "CR" or AVALC = "CMR" then do; AVAL = 1; AVALC = "CR"; end;
+    else if AVALC = "PR" or AVALC = "PMR" then do; AVAL = 2; AVALC = "PR"; end;
+    else if AVALC = "SD" or AVALC = "NMR" then do; AVAL = 3; AVALC = "SD"; end;
+    else if AVALC = "PD" or AVALC = "PMD" then do; AVAL = 4; AVALC = "PD"; end;
+    else AVAL = .;
+
+    /* Use Week 12 (RSDY=84) anchored to CARTDT */
+    if not missing(CARTDT) then ADT = CARTDT + coalesce(RSDY, 84);
+    format ADT date9.;
+    if not missing(ADT) and not missing(TRTSDT) then 
+        ADY = ADT - TRTSDT + (ADT >= TRTSDT);
+
+    ANL01FL = "Y";
+run;
+
+data adam.adrs_expanded;
+    set adam.adrs(in=ph1) adrs_phase2a(in=ph2);
+run;
+
+/* Build Phase 2a ADAE aligned with ADaM structure */
+proc sort data=sdtm.ae_phase2a_full out=ae_phase2a_sorted;
+    by USUBJID AESEQ;
+run;
+
+data adae_phase2a;
+    merge ae_phase2a_sorted(in=a) adsl_phase2a(in=b keep=USUBJID TRTSDT CARTDT LDSTDT TRT01A TRT01AN ARM ARMCD);
+    by USUBJID;
+    if a;
+
+    length AESICAT $10 DLTREAS $100 AESEV $20 AEOUT AECONTRT $100;
+    length TRTEMFL LDAEFL PSTCARFL DLTFL DLTWINFL INFFL AOCCPFL $1;
+
+    /* Convert relative days to actual dates */
+    if not missing(CARTDT) then do;
+        ASTDT = CARTDT + ASTDT;
+        AENDT = CARTDT + AENDT;
+    end;
+    format ASTDT AENDT date9.;
+
+    TRTA = TRT01A;
+    TRTAN = TRT01AN;
+
+    SRCDOM = "AE";
+    SRCVAR = "AEDECOD";
+    SRCSEQ = AESEQ;
+
+    AESOC = strip(AESOC);
+    AEREL = "RELATED";
+    AEOUT = "";
+    AECONTRT = "";
+
+    /* Map Grade to Severity */
+    if AETOXGRN = 1 then AESEV = 'MILD';
+    else if AETOXGRN = 2 then AESEV = 'MODERATE';
+    else if AETOXGRN in (3, 4) then AESEV = 'SEVERE';
+    else if AETOXGRN = 5 then AESEV = 'DEATH';
+
+    if not missing(ASTDT) and not missing(LDSTDT) then do;
+        if ASTDT >= LDSTDT then TRTEMFL = "Y";
+        else TRTEMFL = "N";
+    end;
+    else TRTEMFL = "N";
+
+    if not missing(ASTDT) and not missing(LDSTDT) and not missing(CARTDT) then do;
+        if ASTDT >= LDSTDT and ASTDT < CARTDT then LDAEFL = "Y";
+        else LDAEFL = "N";
+    end;
+    else LDAEFL = "N";
+
+    if not missing(ASTDT) and not missing(CARTDT) then do;
+        if ASTDT >= CARTDT then PSTCARFL = "Y";
+        else PSTCARFL = "N";
+    end;
+    else PSTCARFL = "N";
+
+    /* AETOXGRN is already populated in phase 2a AE generation */
+    if missing(AETOXGRN) and not missing(AETOXGR) then AETOXGRN = input(AETOXGR, best.);
+
+    AESIFL = "N";
+    DLTFL = "N";
+    AESICAT = "";
+
+    if index(upcase(AEDECOD), 'CYTOKINE RELEASE') > 0 then do;
+        AESIFL = "Y";
+        AESICAT = "CRS";
+    end;
+    else if index(upcase(AEDECOD), 'NEUROTOXICITY') > 0 or
+            index(upcase(AEDECOD), 'IMMUNE EFFECTOR') > 0 then do;
+        AESIFL = "Y";
+        AESICAT = "ICANS";
+    end;
+
+    if index(upcase(AEDECOD), 'INFECT') > 0 or 
+       index(upcase(AEDECOD), 'SEPSIS') > 0 or 
+       index(upcase(AEDECOD), 'PNEUMONIA') > 0 then INFFL = "Y";
+    else INFFL = "N";
+
+    if not missing(ASTDT) and not missing(AENDT) then AEDUR = AENDT - ASTDT + 1;
+    else AEDUR = .;
+
+    if not missing(ASTDT) and not missing(CARTDT) then do;
+        DLTWINDY = ASTDT - CARTDT;
+        if DLTWINDY >= 0 and DLTWINDY <= 28 then DLTWINFL = "Y";
+        else DLTWINFL = "N";
+    end;
+    else DLTWINFL = "N";
+
+    if DLTWINFL = "Y" then do;
+        if AESICAT = "CRS" and AETOXGRN = 4 then do;
+            DLTFL = "Y";
+            DLTREAS = "CRS Grade 4 (Immediate DLT)";
+        end;
+        else if AESICAT = "CRS" and AETOXGRN = 3 then do;
+            if AEDUR > 3 then do;
+                DLTFL = "Y";
+                DLTREAS = "CRS Grade 3 not resolved within 72h";
+            end;
+        end;
+        else if AESICAT = "ICANS" and AETOXGRN >= 3 then do;
+            if AEDUR > 3 then do;
+                DLTFL = "Y";
+                DLTREAS = "ICANS Grade 3+ not resolved within 72h";
+            end;
+        end;
+    end;
+run;
+
+proc sort data=adae_phase2a;
+    by USUBJID AEDECOD ASTDT AESEQ;
+run;
+
+data adae_phase2a;
+    set adae_phase2a;
+    by USUBJID AEDECOD;
+    if TRTEMFL = 'Y' then do;
+        if first.AEDECOD then AOCCPFL = "Y";
+        else AOCCPFL = "N";
+    end;
+    else AOCCPFL = "N";
+run;
+
+data adam.adae_expanded;
+    set adam.adae(in=ph1) adae_phase2a(in=ph2);
+run;
 
 %put NOTE: ==========================================================;
-%put NOTE: ✅ DATA CALIBRATED WITH ZUMA-1 & JULIET BENCHMARKS;
+%put NOTE: DATA CALIBRATED WITH ZUMA-1 & JULIET BENCHMARKS;
 %put NOTE:    DLBCL ORR ~72% (CR ~48%) | CLL ORR ~60% (CR ~25%);
 %put NOTE:    CRS Rate ~94% (Med Onset 2d) | ICANS Rate ~87% (Med Onset 4d);
 %put NOTE:    Cytokine Peaks Calibrated (>1000 pg/mL in severe cases);
+%put NOTE: PERSISTED: Kinetics, Cytokines, MRD, Expanded ADaM;
 %put NOTE: ==========================================================;
+

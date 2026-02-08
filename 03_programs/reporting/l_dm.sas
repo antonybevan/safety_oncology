@@ -10,7 +10,17 @@
 %macro load_config;
    %if %symexist(CONFIG_LOADED) %then %if &CONFIG_LOADED=1 %then %return;
    %if %sysfunc(fileexist(00_config.sas)) %then %include "00_config.sas";
+   %else %if %sysfunc(fileexist(03_programs/00_config.sas)) %then %include "03_programs/00_config.sas";
    %else %if %sysfunc(fileexist(../00_config.sas)) %then %include "../00_config.sas";
+   %else %if %sysfunc(fileexist(../03_programs/00_config.sas)) %then %include "../03_programs/00_config.sas";
+   %else %if %sysfunc(fileexist(../../00_config.sas)) %then %include "../../00_config.sas";
+   %else %if %sysfunc(fileexist(../../03_programs/00_config.sas)) %then %include "../../03_programs/00_config.sas";
+   %else %if %sysfunc(fileexist(../../../00_config.sas)) %then %include "../../../00_config.sas";
+   %else %if %sysfunc(fileexist(../../../03_programs/00_config.sas)) %then %include "../../../03_programs/00_config.sas";
+   %else %do;
+      %put ERROR: Unable to locate 00_config.sas from current working directory.;
+      %abort cancel;
+   %end;
 %mend;
 %load_config;
 
@@ -31,7 +41,7 @@ proc sort data=disposition;
 run;
 
 /* 2. Format Listing */
-title1 "BV-CAR20-P1: CAR-T Clinical Review";
+title1 "&STUDYID: CAR-T Clinical Review";
 title2 "Listing 16.2.1: Subject Disposition";
 title3 "All Enrolled Subjects";
 
@@ -55,3 +65,5 @@ run;
 ods html body="&OUT_LISTINGS/l_dm.html";
 proc print data=disposition; run;
 ods html close;
+
+

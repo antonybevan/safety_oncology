@@ -17,7 +17,17 @@
 %macro load_config;
    %if %symexist(CONFIG_LOADED) %then %if &CONFIG_LOADED=1 %then %return;
    %if %sysfunc(fileexist(00_config.sas)) %then %include "00_config.sas";
+   %else %if %sysfunc(fileexist(03_programs/00_config.sas)) %then %include "03_programs/00_config.sas";
    %else %if %sysfunc(fileexist(../00_config.sas)) %then %include "../00_config.sas";
+   %else %if %sysfunc(fileexist(../03_programs/00_config.sas)) %then %include "../03_programs/00_config.sas";
+   %else %if %sysfunc(fileexist(../../00_config.sas)) %then %include "../../00_config.sas";
+   %else %if %sysfunc(fileexist(../../03_programs/00_config.sas)) %then %include "../../03_programs/00_config.sas";
+   %else %if %sysfunc(fileexist(../../../00_config.sas)) %then %include "../../../00_config.sas";
+   %else %if %sysfunc(fileexist(../../../03_programs/00_config.sas)) %then %include "../../../03_programs/00_config.sas";
+   %else %do;
+      %put ERROR: Unable to locate 00_config.sas from current working directory.;
+      %abort cancel;
+   %end;
 %mend;
 %load_config;
 
@@ -95,7 +105,7 @@ proc print data=exposure_list noobs label split='*';
           ROUTE = "Route"
           COMPLIANCE = "Compliance*Status";
     title1 "Listing L-TA1: Planned and Actual Treatment Administered";
-    title2 "BV-CAR20-P1 Phase 1 — Safety Population";
+    title2 "&STUDYID Phase 1 — Safety Population";
     footnote1 "Source: SDTM EX Domain";
     footnote2 "Lymphodepletion: Fludarabine 30 mg/m2/day + Cyclophosphamide 500 mg/m2/day (Days -5 to -3)";
     footnote3 "CAR-T: BV-CAR20 administered on Day 0";
@@ -114,3 +124,5 @@ run;
 %put NOTE: ----------------------------------------------------;
 %put NOTE: ✅ EXPOSURE LISTING GENERATED;
 %put NOTE: ----------------------------------------------------;
+
+

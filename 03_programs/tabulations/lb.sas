@@ -10,7 +10,17 @@
 %macro load_config;
    %if %symexist(CONFIG_LOADED) %then %if &CONFIG_LOADED=1 %then %return;
    %if %sysfunc(fileexist(00_config.sas)) %then %include "00_config.sas";
+   %else %if %sysfunc(fileexist(03_programs/00_config.sas)) %then %include "03_programs/00_config.sas";
    %else %if %sysfunc(fileexist(../00_config.sas)) %then %include "../00_config.sas";
+   %else %if %sysfunc(fileexist(../03_programs/00_config.sas)) %then %include "../03_programs/00_config.sas";
+   %else %if %sysfunc(fileexist(../../00_config.sas)) %then %include "../../00_config.sas";
+   %else %if %sysfunc(fileexist(../../03_programs/00_config.sas)) %then %include "../../03_programs/00_config.sas";
+   %else %if %sysfunc(fileexist(../../../00_config.sas)) %then %include "../../../00_config.sas";
+   %else %if %sysfunc(fileexist(../../../03_programs/00_config.sas)) %then %include "../../../03_programs/00_config.sas";
+   %else %do;
+      %put ERROR: Unable to locate 00_config.sas from current working directory.;
+      %abort cancel;
+   %end;
 %mend;
 %load_config;
 
@@ -35,6 +45,9 @@ data lb;
         LBTEST $40
         LBORRES $20
         LBORRESU $20
+        LBSTRESC $20
+        LBSTRESN 8
+        LBSTRESU $20
         LBORNRLO 8
         LBORNRHI 8
         LBDTC $10
@@ -60,11 +73,18 @@ data lb;
     /* Units and Ranges */
     if LBTESTCD = 'NEUT' then LBORRESU = '10^9/L';
     else if LBTESTCD = 'PLAT' then LBORRESU = '10^9/L';
+    else if LBTESTCD = 'FERR' then LBORRESU = 'ng/mL';
     
     _lo = input(_LBORNRLO, ?? 8.);
     _hi = input(_LBORNRHI, ?? 8.);
     LBORNRLO = _lo;
     LBORNRHI = _hi;
+
+    /* Standardized result variables (SDTM) */
+    LBSTRESN = input(LBORRES, ?? best32.);
+    if not missing(LBSTRESN) then LBSTRESC = strip(put(LBSTRESN, best.));
+    else LBSTRESC = strip(LBORRES);
+    LBSTRESU = LBORRESU;
     
     /* Date and Visit */
     LBDTC = strip(LBDTC);
@@ -77,14 +97,13 @@ data lb;
     end;
     
     /* Derive Normal Range Indicator */
-    _val = input(LBORRES, ?? 8.);
-    if not missing(_val) then do;
-        if not missing(_lo) and _val < _lo then LBNRIND = 'LOW';
-        else if not missing(_hi) and _val > _hi then LBNRIND = 'HIGH';
+    if not missing(LBSTRESN) then do;
+        if not missing(_lo) and LBSTRESN < _lo then LBNRIND = 'LOW';
+        else if not missing(_hi) and LBSTRESN > _hi then LBNRIND = 'HIGH';
         else LBNRIND = 'NORMAL';
     end;
     
-    keep STUDYID DOMAIN USUBJID LBTESTCD LBTEST LBORRES LBORRESU 
+    keep STUDYID DOMAIN USUBJID LBTESTCD LBTEST LBORRES LBORRESU LBSTRESC LBSTRESN LBSTRESU
          LBORNRLO LBORNRHI LBDTC LBDY VISIT LBNRIND;
 run;
 
@@ -108,3 +127,4 @@ data xpt.lb;
     set sdtm.lb;
 run;
 libname xpt clear;
+

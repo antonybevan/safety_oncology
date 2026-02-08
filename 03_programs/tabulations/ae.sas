@@ -11,7 +11,17 @@
 %macro load_config;
    %if %symexist(CONFIG_LOADED) %then %if &CONFIG_LOADED=1 %then %return;
    %if %sysfunc(fileexist(00_config.sas)) %then %include "00_config.sas";
+   %else %if %sysfunc(fileexist(03_programs/00_config.sas)) %then %include "03_programs/00_config.sas";
    %else %if %sysfunc(fileexist(../00_config.sas)) %then %include "../00_config.sas";
+   %else %if %sysfunc(fileexist(../03_programs/00_config.sas)) %then %include "../03_programs/00_config.sas";
+   %else %if %sysfunc(fileexist(../../00_config.sas)) %then %include "../../00_config.sas";
+   %else %if %sysfunc(fileexist(../../03_programs/00_config.sas)) %then %include "../../03_programs/00_config.sas";
+   %else %if %sysfunc(fileexist(../../../00_config.sas)) %then %include "../../../00_config.sas";
+   %else %if %sysfunc(fileexist(../../../03_programs/00_config.sas)) %then %include "../../../03_programs/00_config.sas";
+   %else %do;
+      %put ERROR: Unable to locate 00_config.sas from current working directory.;
+      %abort cancel;
+   %end;
 %mend;
 %load_config;
 
@@ -21,9 +31,9 @@ data raw_ae;
     /* Aligned with generate_data.sas: raw_dm (17 vars) + AE specific (8 vars) */
     length STUDYID $20 USUBJID $40 ARM $200 SEX $1 RACE $100 DISEASE $5 RFSTDTC TRTSDT LDSTDT $10
            SAFFL ITTFL EFFFL $1
-           AEDECOD AETERM AETOXGR AESOC AEREL $100 AESTDTC AEENDTC $10 AESER $1 AESID 8 day0 8;
+           AEDECOD AETERM AETOXGR AESOC AEREL $100 AESTDTC AEENDTC $10 AESER $1 AESID 8 AEOUT AECONTRT $100 day0 8;
     input STUDYID $ USUBJID $ ARM $ SEX $ RACE $ DISEASE $ RFSTDTC $ TRTSDT $ LDSTDT $ SAFFL $ ITTFL $ EFFFL $ 
-          dose_level i subid AGE dt AEDECOD $ AETERM $ AETOXGR $ AESOC $ AEREL $ AESTDTC $ AEENDTC $ AESER $ AESID day0;
+          dose_level i subid AGE dt AEDECOD $ AETERM $ AETOXGR $ AESOC $ AEREL $ AESTDTC $ AEENDTC $ AESER $ AESID AEOUT $ AECONTRT $ day0;
 run;
 
 data ae;
@@ -41,6 +51,7 @@ data ae;
         AETOXGR $2
         AESER $1
         AESEV $20
+        AEACN $40
         TRTSDT_NUM 8.
     ;
 
@@ -75,6 +86,9 @@ data ae;
     else if AETOXGR in ('2') then AESEV = 'MODERATE';
     else if AETOXGR in ('3', '4') then AESEV = 'SEVERE';
     else if AETOXGR in ('5') then AESEV = 'DEATH';
+
+    /* Action taken with study treatment is not captured in source synthetic EDC */
+    AEACN = "";
     
     /* Study Days Calculation */
     if not missing(AESTDTC) and not missing(TRTSDT_NUM) then do;
@@ -87,7 +101,7 @@ data ae;
     end;
     
     keep STUDYID DOMAIN USUBJID AETERM AEDECOD AESTDTC AEENDTC 
-         AESTDY AEENDY AETOXGR AESER AESEV AESID AESOC AEREL LDSTDT;
+         AESTDY AEENDY AETOXGR AESER AESEV AEACN AESID AESOC AEREL LDSTDT AEOUT AECONTRT;
 run;
 
 /* Assign sequence numbers */
@@ -119,3 +133,4 @@ run;
 proc print data=sdtm.ae(obs=10);
     title "SDTM AE Domain - First 10 Records";
 run;
+

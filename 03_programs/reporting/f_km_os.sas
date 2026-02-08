@@ -5,7 +5,7 @@
  * Author:       Clinical Programming Lead
  * Date:         2026-02-05
  * SAS Version:  9.4
- * SAP Reference: §1.4 (Exploratory)
+ * SAP Reference: Section 1.4 (Exploratory)
  *
  * Input:        adam.adsl
  * Output:       Figure F-EFF2: Kaplan-Meier Curve for OS
@@ -16,13 +16,23 @@
 %macro load_config;
    %if %symexist(CONFIG_LOADED) %then %if &CONFIG_LOADED=1 %then %return;
    %if %sysfunc(fileexist(00_config.sas)) %then %include "00_config.sas";
+   %else %if %sysfunc(fileexist(03_programs/00_config.sas)) %then %include "03_programs/00_config.sas";
    %else %if %sysfunc(fileexist(../00_config.sas)) %then %include "../00_config.sas";
+   %else %if %sysfunc(fileexist(../03_programs/00_config.sas)) %then %include "../03_programs/00_config.sas";
+   %else %if %sysfunc(fileexist(../../00_config.sas)) %then %include "../../00_config.sas";
+   %else %if %sysfunc(fileexist(../../03_programs/00_config.sas)) %then %include "../../03_programs/00_config.sas";
+   %else %if %sysfunc(fileexist(../../../00_config.sas)) %then %include "../../../00_config.sas";
+   %else %if %sysfunc(fileexist(../../../03_programs/00_config.sas)) %then %include "../../../03_programs/00_config.sas";
+   %else %do;
+      %put ERROR: Unable to locate 00_config.sas from current working directory.;
+      %abort cancel;
+   %end;
 %mend;
 %load_config;
 
 /* ============================================================================
    KAPLAN-MEIER ANALYSIS FOR OVERALL SURVIVAL
-   Per SAP §1.4: KM methods for time-to-event variables
+   Per SAP Section 1.4: KM methods for time-to-event variables
    ============================================================================ */
 
 /* 1. Derive OS Data from ADSL */
@@ -30,6 +40,10 @@ data os_data;
     set adam.adsl;
     where SAFFL = "Y"; /* Safety Population */
     
+    /* Data cutoff for censoring */
+    OS_CUTOFF = input("&DATA_CUTOFF", yymmdd10.);
+    if missing(OS_CUTOFF) then OS_CUTOFF = coalesce(LSTALVDT, TRTEDT, TRTSDT);
+
     /* Derive OS time and event */
     if not missing(DTHDT) then do;
         OS_TIME = DTHDT - TRTSDT + 1;
@@ -38,7 +52,9 @@ data os_data;
     end;
     else do;
         /* Censored at last known alive date or data cut */
-        OS_TIME = max(TRTEDT, LSTALVDT, TRTSDT + 360) - TRTSDT + 1;
+        OS_LAST = coalesce(LSTALVDT, TRTEDT, TRTSDT, OS_CUTOFF);
+        if OS_LAST > OS_CUTOFF then OS_LAST = OS_CUTOFF;
+        OS_TIME = OS_LAST - TRTSDT + 1;
         if OS_TIME <= 0 then OS_TIME = 1;
         OS_CNSR = 1; /* Censored */
         OS_EVENT = "Censored";
@@ -81,7 +97,7 @@ proc lifetest data=os_data method=KM
     time OS_MONTHS * OS_CNSR(1);
     strata ARMCD / order=internal;
     title1 "Figure F-EFF2: Kaplan-Meier Curve for Overall Survival";
-    title2 "BV-CAR20-P1 Phase 1 — Safety Population";
+    title2 "&STUDYID Phase 1 - Safety Population";
     footnote1 "OS defined as time from Day 0 to death from any cause.";
     footnote2 "Subjects alive at data cut censored at last known alive date.";
     footnote3 "Tick marks indicate censored observations.";
@@ -111,5 +127,7 @@ proc print data=os_landmarks noobs;
 run;
 
 %put NOTE: ----------------------------------------------------;
-%put NOTE: ✅ KM OS FIGURE GENERATED: f_km_os.png;
+%put NOTE: KM OS FIGURE GENERATED: f_km_os.png;
 %put NOTE: ----------------------------------------------------;
+
+

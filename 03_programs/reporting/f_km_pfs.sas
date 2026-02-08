@@ -5,7 +5,7 @@
  * Author:       Clinical Programming Lead
  * Date:         2026-02-05
  * SAS Version:  9.4
- * SAP Reference: §1.4, §7.1.2, Table 6
+ * SAP Reference: Section 1.4, Section 7.1.2, Table 6
  *
  * Input:        adam.adrs (PFS parameter)
  * Output:       Figure F-EFF1: Kaplan-Meier Curve for PFS
@@ -17,13 +17,23 @@
 %macro load_config;
    %if %symexist(CONFIG_LOADED) %then %if &CONFIG_LOADED=1 %then %return;
    %if %sysfunc(fileexist(00_config.sas)) %then %include "00_config.sas";
+   %else %if %sysfunc(fileexist(03_programs/00_config.sas)) %then %include "03_programs/00_config.sas";
    %else %if %sysfunc(fileexist(../00_config.sas)) %then %include "../00_config.sas";
+   %else %if %sysfunc(fileexist(../03_programs/00_config.sas)) %then %include "../03_programs/00_config.sas";
+   %else %if %sysfunc(fileexist(../../00_config.sas)) %then %include "../../00_config.sas";
+   %else %if %sysfunc(fileexist(../../03_programs/00_config.sas)) %then %include "../../03_programs/00_config.sas";
+   %else %if %sysfunc(fileexist(../../../00_config.sas)) %then %include "../../../00_config.sas";
+   %else %if %sysfunc(fileexist(../../../03_programs/00_config.sas)) %then %include "../../../03_programs/00_config.sas";
+   %else %do;
+      %put ERROR: Unable to locate 00_config.sas from current working directory.;
+      %abort cancel;
+   %end;
 %mend;
 %load_config;
 
 /* ============================================================================
    KAPLAN-MEIER ANALYSIS FOR PFS
-   Per SAP §1.4: "Time-to-event variables will be summarized using 
+   Per SAP Section 1.4: "Time-to-event variables will be summarized using 
    Kaplan-Meier methods and figures for the estimated median time"
    ============================================================================ */
 
@@ -34,7 +44,7 @@ data pfs_data;
     
     /* Ensure proper event/censor coding */
     /* CNSR = 0 for events, CNSR = 1 for censored */
-    if CNSR = . then CNSR = 0; /* Assume event if missing */
+    if CNSR = . then CNSR = 1; /* Conservative fallback: censored if missing */
     
     /* Time in days (AVAL) */
     if AVAL <= 0 then AVAL = 0.5; /* Handle zero/negative times */
@@ -77,7 +87,7 @@ proc lifetest data=pfs_data method=KM
     time AVAL_MONTHS * CNSR(1);
     strata ARMCD / order=internal;
     title1 "Figure F-EFF1: Kaplan-Meier Curve for Progression-Free Survival";
-    title2 "BV-CAR20-P1 Phase 1 — Response Evaluable Population";
+    title2 "&STUDYID Phase 1 - Response Evaluable Population";
     footnote1 "PFS defined as time from Day 0 to disease progression or death.";
     footnote2 "Censoring per SAP Table 6 and FDA Clinical Trial Endpoints Guidance.";
     footnote3 "Tick marks indicate censored observations.";
@@ -98,5 +108,7 @@ proc print data=km_est(obs=20) noobs;
 run;
 
 %put NOTE: ----------------------------------------------------;
-%put NOTE: ✅ KM PFS FIGURE GENERATED: f_km_pfs.png;
+%put NOTE: KM PFS FIGURE GENERATED: f_km_pfs.png;
 %put NOTE: ----------------------------------------------------;
+
+

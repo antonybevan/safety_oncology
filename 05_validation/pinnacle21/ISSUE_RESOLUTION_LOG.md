@@ -1,36 +1,24 @@
 # Pinnacle 21 Validation Issue Resolution Log
 **Study**: BV-CAR20-P1  
-**Software**: Pinnacle 21 Community v4.0  
+**Tooling**: Pinnacle 21 CLI  
 **Date**: 2026-02-08
 
----
+## Validation Status
+- Validation is **pending execution** in this workspace.
+- Reason: `p21` CLI not currently installed and no current `.xpt` payload is staged under `02_datasets/tabulations` and `02_datasets/analysis`.
 
-## 1. Conformance Statement
-All SDTM and ADaM datasets have been validated against CDISC SDTMIG v3.4 and ADaMIG v1.3. No **REJECT** or **ERROR** level issues remain. The following **WARNINGS** have been adjudicated and deemed acceptable per the rationales below.
+## Run Command
+```powershell
+powershell -ExecutionPolicy Bypass -File 99_utilities/run_p21_validation.ps1
+```
 
-## 2. SDTM Issue Log
+## To Be Completed After Run
+1. Attach SDTM report: `05_validation/pinnacle21/p21_sdtm_report.csv`
+2. Attach ADaM report: `05_validation/pinnacle21/p21_adam_report.csv`
+3. Record all REJECT/ERROR findings and disposition.
+4. Record any retained WARNING with rationale and approver sign-off.
 
-| Domain | Rule ID | Message | Rationale / Resolution |
-|:---|:---|:---|:---|
-| **SUPPAE** | SD1077 | Variable QVAL length > 200 | Required to capture full ASTCT 2019 Consensus Grade text for clinical clarity. |
-| **LB** | SD1063 | Missing LBNRIND for some records | Site-specific normal ranges were not provided for certain exploratory biomarkers. |
-| **EX** | SD0063 | EXENDTC is before EXSTDTC | None - All exposure records verified for chronological integrity. |
-| **AE** | SD1085 | Variable LDSTDT type inconsistency | Resolved - Character `LDSTDT` dropped from SDTM.AE to prevent conflict with numeric ADaM version. |
-
-## 3. ADaM Issue Log
-
-| Dataset | Rule ID | Message | Rationale / Resolution |
-|:---|:---|:---|:---|
-| **ADAE** | AD1102 | Multiple records for same USUBJID/AEDECOD | Acceptable; multiple occurrences of the same event are required for duration and DLT flagging. |
-| **ADAE** | AD0099 | LDSTDT type mismatch | Resolved - Dropped conflicting character variable from SDTM source; numeric version from ADSL is authoritative. |
-| **ADRS** | AD0018 | Variable length does not match SDTM | Expected; `AVALC` and `AVAL` expanded to accommodate response criteria terminology. |
-| **ADSL** | AD0047 | Required variable missing (e.g., RFSTDTC) | `RFSTDTC` is present in SDTM.DM; ADSL focuses on analysis-ready flags (`TRTSDT`). |
-| **ADSL** | AD0095 | Variable name length > 8 characters | Resolved - `DLTEVALFL` renamed to `DLTEVLFL` (8 chars) for XPORT V5 compliance. |
-
-## 4. Conclusion
-The BV-CAR20-P1 dataset package is conformant to regulatory standards. All remaining warnings are clinical/technical exceptions inherent to the study design (Oncology CAR-T) and do not impact data integrity.
-
----
-**Certified by**: Quality Control Lead  
-**Status**: Log Finalized (2026-02-08)
-
+## Sign-Off
+- Programming Lead: Pending
+- QC Lead: Pending
+- Biostatistics Lead: Pending
