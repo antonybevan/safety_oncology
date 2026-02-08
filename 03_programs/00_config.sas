@@ -10,11 +10,14 @@
 %global IS_CLOUD PROJ_ROOT PROG_PATH LEGACY_PATH SDTM_PATH ADAM_PATH STUDYID CONFIG_LOADED DATA_CUTOFF;
 %let CONFIG_LOADED = 1;
 
-/* Define project-wide study identifier in one place */
-%if not %symexist(STUDYID) or %superq(STUDYID)= %then %let STUDYID = BV-CAR20-P1;
+%macro _init_study_env;
+    /* Define project-wide study identifier in one place */
+    %if not %symexist(STUDYID) or %superq(STUDYID)= %then %let STUDYID = BV-CAR20-P1;
 
-/* Data cutoff date for time-to-event and ongoing durations (override as needed) */
-%if not %symexist(DATA_CUTOFF) or %superq(DATA_CUTOFF)= %then %let DATA_CUTOFF = %sysfunc(today(), yymmdd10.);
+    /* Data cutoff date for time-to-event and ongoing durations (override as needed) */
+    %if not %symexist(DATA_CUTOFF) or %superq(DATA_CUTOFF)= %then %let DATA_CUTOFF = %sysfunc(today(), yymmdd10.);
+%mend _init_study_env;
+%_init_study_env;
 
 %macro _derive_root_from_path(path_value);
     %local _path_literal;
