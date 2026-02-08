@@ -146,10 +146,9 @@ data adae;
     %calc_astct(source_grade=AETOXGR, out_grade=AETOXGRN);
 
     /* --- ASTCT vs CTCAE Traceability (Professional CAR-T Requirement) --- */
-    /* Preserve ASTCT specific grading in a dedicated audit variable */
-    length ASTCTGR 8;
-    if AESICAT in ("CRS", "ICANS") then ASTCTGR = AETOXGRN;
-    else ASTCTGR = .;
+    /* ASTCTGR is character from SUPPAE, preserve it */
+    if missing(ASTCTGR) and (AESICAT in ("CRS", "ICANS")) then 
+        ASTCTGR = put(AETOXGRN, 1.);
 
 
     /* AESI Flag and DLT logic */

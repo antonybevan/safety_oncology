@@ -50,6 +50,13 @@ data raw_dm;
    /* SAP-aligned enrollment with DL2 skipped per amendment */
    /* DL1: 3 subjects, DL2: 0 subjects (skipped), DL3: 6 subjects */
    array n_per_dose[3] _temporary_ (3, 0, 6);
+   
+   do dose_level = 1 to 3;
+      do i = 1 to n_per_dose[dose_level];
+         subid = dose_level * 100 + i;
+         USUBJID = catx('-', "&STUDYID", put(round(rand('uniform')*900+100), 3.), put(subid, z3.));
+         AGE = round(rand('normal', 62, 10));
+         ARM = put(dose_level, dose_arm.);
          
          /* Sex Distribution (NHL: ~55% male) */
          if rand('uniform') < 0.55 then SEX = 'M'; else SEX = 'F';

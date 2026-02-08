@@ -111,6 +111,7 @@ run;
 
 /* 3. Build ADSL */
 data adsl;
+    length DTHCAUS $100 COHORT $10 EVALCRIT $25;
     set sdtm.dm;
     
     /* Merge in dates */
@@ -208,7 +209,6 @@ data adsl;
     TRT01AN = TRT01PN;
 
     /* Disease Cohort and Evaluation Criteria (Lugano vs iwCLL) */
-    length COHORT $10 EVALCRIT $25 DTHCAUS $100;
     if DISEASE = 'NHL' then do;
         COHORT = 'NHL';
         EVALCRIT = 'LUGANO 2016';

@@ -120,7 +120,19 @@
     %let OUT_META     = &OUT_PATH/metadata;
     %let OUTPUT_PATH  = &OUT_PATH;
 
-    /* Assign libraries */
+    /* Assign libraries with directory creation protection */
+    data _null_;
+       length path $1024;
+       array paths[2] $1024 ("&SDTM_PATH", "&ADAM_PATH");
+       do i = 1 to 2;
+          path = paths[i];
+          if not fileexist(path) then do;
+             rc = dcreate(scan(path, -1, '/'), substr(path, 1, find(path, scan(path, -1, '/'))-2));
+             put "NOTE: Creating directory " path " RC=" rc;
+          end;
+       end;
+    run;
+
     libname raw  "&LEGACY_PATH" access=readonly;
     libname sdtm "&SDTM_PATH";
     libname adam "&ADAM_PATH";
