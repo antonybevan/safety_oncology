@@ -200,6 +200,13 @@ data adsl;
     else if AGE < 65 then AGEGR1 = "<65";
     else AGEGR1 = ">=65";
 
+    /* End of Study Status (CDISC ADaM requirement) */
+    length EOSSTT $30;
+    if DTHFL = "Y" then EOSSTT = "DEAD";
+    else if not missing(TRTSDT) then EOSSTT = "ONGOING";
+    else EOSSTT = "DISCONTINUED";
+
+
     /* Dates Formatting */
     format TRTSDT TRTEDT CARTDT DTHDT LSTALVDT date9.;
     

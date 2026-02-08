@@ -91,12 +91,20 @@ data dm;
     ETHNIC = "NOT HISPANIC OR LATINO";  /* Default for US trial */
     COUNTRY = "USA";
     
+    /* Derive BRTHDTC from AGE (CDISC requirement) */
+    if not missing(AGE) and not missing(RFSTDTC) then do;
+        _refdt = input(RFSTDTC, yymmdd10.);
+        _birthyear = year(_refdt) - AGE;
+        BRTHDTC = put(_birthyear, 4.);  /* Year only (partial date) */
+    end;
+    
     /* Treatment Arms */
     if DOSE_LEVEL = 1 then do;
         ARMCD = "DL1";
         ARM = "DL1: 1x10E6 cells/kg";
     end;
     else if DOSE_LEVEL = 2 then do;
+
         ARMCD = "DL2";
         ARM = "DL2: 3x10E6 cells/kg";
     end;
