@@ -91,7 +91,7 @@
        union all select 'ADAM.ADSL (Safety Population)', count(SAFFL) from adam.adsl where SAFFL='Y'
        union all select 'ADAM.ADSL (Screen Failures)', count(*) from adam.adsl where SAFFL='N'
        union all select 'ADAM.ADSL (Efficacy Population)', count(EFFFL) from adam.adsl where EFFFL='Y'
-       union all select 'ADAM.ADSL (mBOIN Dose-Escalation)', count(MBOINFL) from adam.adsl where MBOINFL='Y'
+       union all select 'ADAM.ADSL (Dose-Escalation Set)', count(DOSESCLFL) from adam.adsl where DOSESCLFL='Y'
        union all select 'ADAM.ADSL (DLT Evaluable)', count(DLTEVLFL) from adam.adsl where DLTEVLFL='Y'
        union all select 'ADAM.ADAE (TEAEs)', count(*) from adam.adae where TRTEMFL='Y'
        union all select 'ADAM.ADAE (DLTs Found)', count(*) from adam.adae where DLTFL='Y'

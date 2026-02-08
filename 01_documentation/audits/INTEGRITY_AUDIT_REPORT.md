@@ -20,7 +20,7 @@ This document captures the final verification of the BV-CAR20-P1 clinical safety
 ## 3. Clinical Logic Alignment (Deep Audit)
 ### 3.1 Dose Escalation (3+3 Design)
 - **Constraint**: The pipeline strictly enforces the 3+3 design mandated by Protocol V5.0. 
-- **Verification**: Cross-domain audit confirms "Source Contamination" from unrelated protocols (e.g., mBOIN) has been strictly isolated and excluded from the primary submission logic.
+- **Verification**: Cross-domain audit confirms non-SAP portfolio extensions are isolated and excluded from the primary submission logic.
 - **Population Logic**: `DLTEVLFL` (DLT Evaluable) correctly handles the 28-day evaluation window and replacement rules.
 
 ### 3.2 Safety Population & TEAE Definition

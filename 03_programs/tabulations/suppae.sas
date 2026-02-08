@@ -1,5 +1,5 @@
 /******************************************************************************
-BV-CAR20-P1 (Phase 1/2a Allogeneic CAR-T) (75 sources)
+ * Program:      suppae.sas
  * Protocol:     BV-CAR20-P1
  * Purpose:      Create SDTM Supplemental AE (SUPPAE) domain for ASTCT grading
  * Author:       Clinical Programming Lead

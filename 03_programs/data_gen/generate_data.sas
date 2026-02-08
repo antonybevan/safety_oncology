@@ -7,7 +7,7 @@
  * SAS Version:  9.4
  *
  * Characteristics:
- *   - mBOIN-guided dose-escalation enrollment
+ *   - SAP-aligned 3+3 dose-escalation enrollment
  *   - Screening failure modeling (~15%)
  *   - Demographics calibrated for Hematology indications
  *   - Toxicity profiles (CRS/ICANS) aligned with ZUMA-1 benchmarks
@@ -37,16 +37,16 @@ data raw_dm;
    
    call streaminit(&SEED);
    
-   /* mBOIN-guided enrollment: Variable N per dose level */
-   /* DL1: 3 subjects, DL2: 6 subjects (expansion), DL3: 9 subjects (RP2D confirmation) */
-   array n_per_dose[3] _temporary_ (3, 6, 9);
+   /* SAP-aligned enrollment with DL2 skipped per amendment */
+   /* DL1: 3 subjects, DL2: 0 subjects (skipped), DL3: 6 subjects */
+   array n_per_dose[3] _temporary_ (3, 0, 6);
    
    do dose_level = 1 to 3;
       do i = 1 to n_per_dose[dose_level];
          subid = 100 + dose_level*100 + i;
          USUBJID = catx('-', '101', subid);
          
-         /* Protocol Defined Doses per SAP */
+         /* Protocol Defined Doses per SAP (DL2 retained as reserved code; skipped in enrollment) */
          if dose_level = 1 then ARM = "DL1: 1x10^6 cells/kg";
          else if dose_level = 2 then ARM = "DL2: 3x10^6 cells/kg";
          else ARM = "DL3: 480x10^6 cells";
@@ -350,7 +350,7 @@ run;
 %put NOTE: ✅ ENHANCED SYNTHETIC DATA GENERATION COMPLETE;
 %put NOTE: ----------------------------------------------------;
 %put NOTE: Realism Features:;
-%put NOTE:   - Variable enrollment: DL1=3, DL2=6, DL3=9 (mBOIN);
+%put NOTE:   - Variable enrollment: DL1=3, DL2=0 (skipped), DL3=6;
 %put NOTE:   - Screen failures: ~15%;
 %put NOTE:   - CRS rates: 65-94% (dose-dependent);
 %put NOTE:   - ICANS rates: 50-70% (dose-dependent);

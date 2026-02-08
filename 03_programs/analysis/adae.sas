@@ -74,9 +74,9 @@ data adae;
     AESOC = strip(AESOC);
     AEREL = strip(AEREL);
 
-    /* Treatment Emergent Flag (SAP §8.2.1: On/After first PBCAR20A dose) */
-    if not missing(ASTDT) and not missing(CARTDT) then do;
-        if ASTDT >= CARTDT then TRTEMFL = "Y";
+    /* Treatment Emergent Flag (SAP Section 8.2.1: On/After first lymphodepletion dose) */
+    if not missing(ASTDT) and not missing(LDSTDT) then do;
+        if ASTDT >= LDSTDT then TRTEMFL = "Y";
         else TRTEMFL = "N";
     end;
     else TRTEMFL = "N";
@@ -280,3 +280,4 @@ proc freq data=adae;
     tables TRTEMFL * AESIFL / nopercent norow nocol;
     title "Treatment Emergence vs AESI Counts";
 run;
+

@@ -1,7 +1,7 @@
 # Analysis Data Reviewer Guide (ADRG)
 **Study**: BV-CAR20-P1  
 **Product**: PBCAR20A (Allogeneic CD20 CAR-T)  
-**Date**: 2026-02-05
+**Date**: 2026-02-08
 
 ---
 
@@ -13,7 +13,7 @@ All analysis datasets use **CDISC Controlled Terminology (v2025-12-20)**. No cus
 
 ## 2. Protocol Design & Clinical Alignment
 ### 2.1 Study Design
-BV-CAR20-P1 is a Phase 1/2a, open-label, dose-escalation study. The primary objective is to evaluate the safety and MTD of PBCAR20A in subjects with r/r NHL or r/r CLL/SLL.
+BV-CAR20-P1 is a Phase 1, open-label, dose-escalation study. The primary objective is to evaluate the safety and MTD of PBCAR20A in subjects with r/r NHL or r/r CLL/SLL.
 - **Design**: Standard 3+3 Dose Escalation.
 - **Dose Levels**: 
   - DL1: 1 x 10^6 cells/kg

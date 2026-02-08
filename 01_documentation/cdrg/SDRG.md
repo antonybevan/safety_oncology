@@ -16,7 +16,7 @@ The SDTM datasets represent the direct tabulation of source data from electronic
 
 ### 3.1 DM (Demographics)
 - **RFSTDTC**: Set to the date of the first study-related procedure (Lymphodepletion start).
-- **ARMCD/ARM**: Standardized to 'DL1', 'DL2', 'DL3' dosing cohorts.
+- **ARMCD/ARM**: Standardized to protocol dose levels; active cohorts are DL1 and DL3 (DL2 skipped per amendment).
 
 ### 3.2 AE (Adverse Events)
 - **AESEV**: Mapped from eCRF severity (Mild, Moderate, Severe).
@@ -33,7 +33,7 @@ The SDTM datasets represent the direct tabulation of source data from electronic
 
 ### 3.5 Trial Design (TS, TA, TE)
 - **TS (Trial Summary)**: Contains trial objectives, registry IDs, and product identifiers.
-- **TA (Trial Arms)**: Defines the dose level cohorts (DL1-DL3).
+- **TA (Trial Arms)**: Defines the active dose level cohorts (DL1 and DL3; DL2 skipped per amendment).
 - **TE (Trial Elements)**: Maps the lifecycle from Screening to Follow-up.
 
 ## 4. Conformance Summary

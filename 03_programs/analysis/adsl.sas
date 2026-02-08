@@ -89,10 +89,10 @@ data adsl;
     if SAFFL = "Y" and e.find() = 0 then EFFFL = "Y";
     else EFFFL = "N";
 
-    /* mBOIN Dose-Escalation Set Flag (CAR-T recipients only) */
-    /* Per Protocol: MBOINFL = Y if subject received CAR-T infusion */
-    if not missing(CARTDT) then MBOINFL = "Y";
-    else MBOINFL = "N";
+    /* Dose-Escalation Set Flag (CAR-T recipients only) */
+    /* Set to Y if subject received CAR-T infusion */
+    if not missing(CARTDT) then DOSESCLFL = "Y";
+    else DOSESCLFL = "N";
 
     /* Analysis Treatments per ADaM IG */
     length TRT01P TRT01A $200;
@@ -118,9 +118,9 @@ data adsl;
     end;
 
     /* DLT Evaluable Population Flag (Per Protocol Section 6.2.3) */
-    /* DLTEVLFL = Y if MBOINFL = Y AND (DLT or completed 28-day window) */
+    /* DLTEVLFL = Y if CAR-T infused AND 28-day window completed */
     length DLTEVLFL $1;
-    if MBOINFL = 'Y' then do;
+    if DOSESCLFL = 'Y' then do;
         TRTDUR = TRTEDT - TRTSDT + 1;
         /* Evaluability: 28-day window completion or early DLT (Manual adjudication expected) */
         if TRTDUR >= 28 then DLTEVLFL = 'Y';
@@ -146,7 +146,7 @@ data adsl;
         ITTFL    = "Intent-To-Treat Population Flag"
         SAFFL    = "Safety Population Flag"
         EFFFL    = "Efficacy Population Flag"
-        MBOINFL  = "mBOIN Dose-Escalation Set Flag"
+        DOSESCLFL = "Dose-Escalation Set Flag"
         DLTEVLFL = "DLT Evaluability Flag"
         TRT01P   = "Planned Treatment for Period 01"
         TRT01PN  = "Planned Treatment for Period 01 (N)"

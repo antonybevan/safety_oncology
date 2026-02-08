@@ -6,7 +6,7 @@ This matrix identifies the technical implementation of specific Statistical Anal
 | SAP Requirement | Implementation Feature | compliance Status |
 |:---|:---|:---:|
 | **Population Flags** (§4) | ADSL: `SAFFL`, `ITTFL`, `EFFFL`, `DLTEVLFL` | ✅ |
-| **Treatment Mapping** (§5.3) | `TRT01P` / `TRT01A` (Dose Levels 1, 2, 3) | ✅ |
+| **Treatment Mapping** (§5.3) | `TRT01P` / `TRT01A` (planned Levels 1-3; DL2 may be skipped) | ✅ |
 | **Study Day 0** (§5.7) | Scale: -1, 0, 2 (Matching literal SAP §5.7) | ✅ |
 | **Baseline Definition** | Last non-missing result prior to treatment | ✅ |
 
