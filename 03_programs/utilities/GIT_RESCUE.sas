@@ -1,58 +1,46 @@
+/* QUOTE & MACRO KILLER BLOCK - Resets SAS state if previous errors left things open */
+*';*";*/;QUIT;RUN;
+%macro _null_; %mend; 
+
 /******************************************************************************
- * Program:      GIT_RESCUE.sas
+ * Program:      GIT_RESCUE.sas (Bootstrap Recovery Version)
  * Purpose:      Force-sync SAS OnDemand with GitHub (Public Repo)
+ *               NO DEPENDENCIES - Direct System Call Clone
  ******************************************************************************/
 
 %let repo_url = https://github.com/antonybevan/safety_oncology.git;
 %let home_dir = /home/u63849890;
 %let safe_path = &home_dir/clinical_safety;
 
-/* 
-   ROBUST CLEANUP MACRO 
-   Uses Linux 'rm -rf' via SYSTEM call to ensure non-empty dirs are gone.
-*/
-%macro force_clean(dir);
-   data _null_;
-      fname = "tempfile";
-      rc = filename(fname, "&dir");
-      if fexist(fname) or fileexist("&dir") then do;
-          put "NOTE: Directory exists. Executing recursive delete on: &dir";
-          call system("rm -rf &dir");
-      end;
-      else put "NOTE: Directory does not exist, nothing to clean.";
-   run;
-%mend;
+options notes stimer source spool;
 
 data _null_;
    put "NOTE: --------------------------------------------------";
-   put "NOTE: Starting GIT RESCUE Operation...";
-   
-   /* 1. Attempt PULL first */
-   rc = gitfn_pull("&safe_path");
-   put "NOTE: gitfn_pull returned RC=" rc;
-   
-   if rc = 0 then put "NOTE: ✅ SUCCESS! Project updated from GitHub.";
-   else if rc = 1 then put "NOTE: Repository is already up to date.";
-   
-   /* 
-      Catch-all for failures:
-      RC = 22 (Conflict)
-      RC = -1 (Generic Failure / Repo missing)
-      RC = 128 (Not a repo)
-   */
-   else do; 
-       put "NOTE: Pull failed (Conflict or Missing). Initiating FRESH CLONE Protocol...";
-       
-       /* Nuke it from orbit */
-       call execute('%force_clean(&safe_path)');
-       
-       /* Clone fresh */
-       put "NOTE: Cloning from &repo_url...";
-       rc_clone = gitfn_clone("&repo_url", "&safe_path");
-       
-       if rc_clone = 0 then put "NOTE: ✅ SUCCESS! Project reset and re-cloned.";
-       else put "ERR" "OR: Clone failed. RC=" rc_clone;
-   end;
-   
+   put "NOTE: STARTING BOOTSTRAP GIT RESCUE...";
+   put "NOTE: Repository: &repo_url";
+   put "NOTE: Target:     &safe_path";
    put "NOTE: --------------------------------------------------";
+
+   /* Step 1: Force Clean via Linux System Call */
+   put "NOTE: Cleaning local directory (Nuke from orbit)...";
+   rc_rm = system("rm -rf &safe_path");
+   put "NOTE: rm -rf returned RC=" rc_rm;
+   
+   /* Step 2: Fresh Clone */
+   put "NOTE: Cloning fresh from GitHub... this may take 10-20 seconds.";
+   rc_clone = system("git clone &repo_url &safe_path");
+   
+   if rc_clone = 0 then do;
+       put "NOTE: --------------------------------------------------";
+       put "NOTE: ✅ SUCCESS: Repository restored and updated.";
+       put "NOTE: All fixes (including 00_config.sas) are now on the server.";
+       put "NOTE: You can now run your programs normally.";
+       put "NOTE: --------------------------------------------------";
+   end;
+   else do;
+       put "NOTE: --------------------------------------------------";
+       put "ERROR: Clone failed with RC=" rc_clone;
+       put "NOTE: Check your internet connection or GitHub availability.";
+       put "NOTE: --------------------------------------------------";
+   end;
 run;
