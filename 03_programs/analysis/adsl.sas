@@ -111,7 +111,7 @@ run;
 
 /* 3. Build ADSL */
 data adsl;
-    length DTHCAUS $100 COHORT $10 EVALCRIT $25;
+    length AESTDTC $10 DTHCAUS $100 COHORT $10 EVALCRIT $25;
     set sdtm.dm;
     
     /* Merge in dates */
@@ -156,6 +156,7 @@ data adsl;
         DTHFL = "N";
     end;
 
+    
     /* 3a. Merge DLT Status for Evaluability (SAP §4) */
     if _n_ = 1 then do;
         declare hash dlt(dataset:'sdtm_dlts');
@@ -164,17 +165,17 @@ data adsl;
         dlt.defineDone();
     end;
     
-    length _ae_stdtc $10 _dlt_event_fl $1;
+    length AESTDT_C $10 DLTEV_FL $1;
     if dlt.find() = 0 then do;
         _dlt_dt = input(AESTDTC, yymmdd10.);
         /* Event must be within 28 days of infusion */
         if not missing(_dlt_dt) and not missing(CARTDT) then do;
-            if 0 <= (_dlt_dt - CARTDT) <= 28 then _dlt_event_fl = 'Y';
-            else _dlt_event_fl = 'N';
+            if 0 <= (_dlt_dt - CARTDT) <= 28 then DLTEV_FL = 'Y';
+            else DLTEV_FL = 'N';
         end;
-        else _dlt_event_fl = 'N';
+        else DLTEV_FL = 'N';
     end;
-    else _dlt_event_fl = 'N';
+    else DLTEV_FL = 'N';
 
     
     /* Last Known Alive Date (fallback to last treatment date) */
@@ -193,8 +194,8 @@ data adsl;
 
     /* Dose-Escalation Set Flag (CAR-T recipients only) */
     /* Set to Y if subject received CAR-T infusion */
-    if not missing(CARTDT) then DOSESCLFL = "Y";
-    else DOSESCLFL = "N";
+    if not missing(CARTDT) then DSCLFL = "Y";
+    else DSCLFL = "N";
 
     /* Analysis Treatments per ADaM IG */
     length TRT01P TRT01A $200;
@@ -224,8 +225,8 @@ data adsl;
        2. OR Received CAR-T AND had a DLT event within the window
     */
     length DLTEVLFL MBOINFL $1;
-    if DOSESCLFL = 'Y' and not missing(CARTDT) then do;
-        TRTDUR = DATA_CUTOFF_DATE - CARTDT + 1; /* DATA_CUTOFF_DATE from config */
+    if DSCLFL = 'Y' and not missing(CARTDT) then do;
+        TRTDUR = DCUTDT - CARTDT + 1; /* DCUTDT from config */
         
         /* Dose Intensity Calculation (Submission-Grade Math) */
         if not missing(TRT01PN) and TRT01PN > 0 then do;
@@ -235,7 +236,7 @@ data adsl;
         end;
         else _dose_int = 1.0;
         
-        if (TRTDUR >= 28 or _dlt_event_fl = 'Y') and _dose_int >= 0.8 then DLTEVLFL = 'Y';
+        if (TRTDUR >= 28 or DLTEV_FL = 'Y') and _dose_int >= 0.8 then DLTEVLFL = 'Y';
         else DLTEVLFL = 'N';
         
         MBOINFL = 'Y'; /* Any dose-escalation subject receiving CAR-T */
@@ -272,7 +273,7 @@ data adsl;
         ITTFL    = "Intent-To-Treat Population Flag"
         SAFFL    = "Safety Population Flag"
         EFFFL    = "Efficacy Population Flag"
-        DOSESCLFL = "Dose-Escalation Set Flag"
+        DSCLFL   = "Dose-Escalation Set Flag"
         DLTEVLFL = "DLT Evaluability Flag"
         MBOINFL  = "mBOIN Decision Population Flag"
         TRT01P   = "Planned Treatment for Period 01"
@@ -301,6 +302,7 @@ run;
 libname xpt xport "&ADAM_PATH/adsl.xpt";
 data xpt.adsl;
     set adsl;
+    drop AESTDTC AEDECOD; /* Drop hash-loaded intermediate vars */
 run;
 libname xpt clear;
 

@@ -347,6 +347,12 @@ run;
                outfile="&LEGACY_PATH/&ds..csv"
                dbms=csv replace;
    run;
+   
+   /* Standardize day0 format for CSV to prevent import errors */
+   data _null_;
+      set &ds;
+      format _all_;
+   run;
 %mend;
 
 %export_raw(raw_dm);

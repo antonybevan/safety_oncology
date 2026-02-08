@@ -20,6 +20,14 @@
 
     /* Data cutoff date for time-to-event and ongoing durations (override as needed) */
     %if not %symexist(DATA_CUTOFF) or %superq(DATA_CUTOFF)= %then %let DATA_CUTOFF = %sysfunc(today(), yymmdd10.);
+
+    /* Global Formats */
+    proc format;
+       value dose_arm
+          1 = "DL1: 50x10^6 cells"
+          2 = "DL2: 150x10^6 cells"
+          3 = "DL3: 450x10^6 cells";
+    run;
 %mend _init_study_env;
 %_init_study_env;
 
