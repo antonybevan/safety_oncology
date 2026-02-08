@@ -1,3 +1,7 @@
+/* SESSION RESET - Neutralize any zombie quotes from previous failed runs */
+*';*";*/;QUIT;RUN;
+%macro _null_; %mend; 
+
 /******************************************************************************
  * Program:      00_main.sas
  * Protocol:     BV-CAR20-P1
@@ -105,26 +109,26 @@
     title "&STUDYID: End-to-End Pipeline Integrity Audit";
     proc sql;
        create table integrity_audit as
-       select 'SDTM.DM (Total Subjects)' as Metric, count(*) as Value from sdtm.dm
-       union all select 'SDTM.TS/TA/TE Verified (Count=3)', count(*) from (
+       select 'SDTM.DM (Total Subjects)'         as Metric, count(*) as Value from sdtm.dm
+       union all select 'SDTM.TS/TA/TE Verified' as Metric, count(*) from (
            select memname from dictionary.tables
            where libname='SDTM' and memname in ('TS', 'TA', 'TE')
        )
-       union all select 'ADAM.ADSL (ITT Population)', count(ITTFL) from adam.adsl where ITTFL='Y'
-       union all select 'ADAM.ADSL (Safety Population)', count(SAFFL) from adam.adsl where SAFFL='Y'
-       union all select 'ADAM.ADSL (Screen Failures)', count(*) from adam.adsl where SAFFL='N'
-       union all select 'ADAM.ADSL (Efficacy Population)', count(EFFFL) from adam.adsl where EFFFL='Y'
-       union all select 'ADAM.ADSL (Dose-Escalation Set)', count(DOSESCLFL) from adam.adsl where DOSESCLFL='Y'
-       union all select 'ADAM.ADSL (DLT Evaluable)', count(DLTEVLFL) from adam.adsl where DLTEVLFL='Y'
-       union all select 'ADAM.ADAE (TEAEs)', count(*) from adam.adae where TRTEMFL='Y'
-       union all select 'ADAM.ADAE (DLTs Found)', count(*) from adam.adae where DLTFL='Y'
-       union all select 'ADAM.ADAE (DLT Window Events)', count(*) from adam.adae where DLTWINFL='Y'
-       union all select 'ADAM.ADAE (CRS Identified)', count(*) from adam.adae where AESICAT='CRS'
-       union all select 'ADAM.ADAE (ICANS Identified)', count(*) from adam.adae where AESICAT='ICANS'
-       union all select 'ADAM.ADAE (Infections Found)', count(*) from adam.adae where INFFL='Y'
-       union all select 'ADAM.ADRS (BOR Records)', count(*) from adam.adrs where PARAMCD='BOR'
-       union all select 'ADAM.ADRS (PFS Parameters)', count(*) from adam.adrs where PARAMCD='PFS'
-       union all select 'SDTM.CP (Cellular Kinetics)', count(*) from sdtm.cp;
+       union all select 'ADAM.ADSL (ITT)'        as Metric, count(ITTFL) from adam.adsl where ITTFL='Y'
+       union all select 'ADAM.ADSL (Safety)'     as Metric, count(SAFFL) from adam.adsl where SAFFL='Y'
+       union all select 'ADAM.ADSL (Scrn Fail)'  as Metric, count(*) from adam.adsl where SAFFL='N'
+       union all select 'ADAM.ADSL (Efficacy)'   as Metric, count(EFFFL) from adam.adsl where EFFFL='Y'
+       union all select 'ADAM.ADSL (Dose Esc)'   as Metric, count(DOSESCLFL) from adam.adsl where DOSESCLFL='Y'
+       union all select 'ADAM.ADSL (DLT Eval)'   as Metric, count(DLTEVLFL) from adam.adsl where DLTEVLFL='Y'
+       union all select 'ADAM.ADAE (TEAEs)'      as Metric, count(*) from adam.adae where TRTEMFL='Y'
+       union all select 'ADAM.ADAE (DLTs)'       as Metric, count(*) from adam.adae where DLTFL='Y'
+       union all select 'ADAM.ADAE (DLT Win)'    as Metric, count(*) from adam.adae where DLTWINFL='Y'
+       union all select 'ADAM.ADAE (CRS)'        as Metric, count(*) from adam.adae where AESICAT='CRS'
+       union all select 'ADAM.ADAE (ICANS)'      as Metric, count(*) from adam.adae where AESICAT='ICANS'
+       union all select 'ADAM.ADAE (Infect)'     as Metric, count(*) from adam.adae where INFFL='Y'
+       union all select 'ADAM.ADRS (BOR)'        as Metric, count(*) from adam.adrs where PARAMCD='BOR'
+       union all select 'ADAM.ADRS (PFS)'        as Metric, count(*) from adam.adrs where PARAMCD='PFS'
+       union all select 'SDTM.CP (Kinetics)'     as Metric, count(*) from sdtm.cp;
     quit;
 
     proc print data=integrity_audit noobs;

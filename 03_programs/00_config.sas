@@ -1,3 +1,7 @@
+/* SESSION RESET - Neutralize any zombie quotes from previous failed runs */
+*';*";*/;QUIT;RUN;
+%macro _null_; %mend; 
+
 /******************************************************************************
  * Program:      00_config.sas
  * Protocol:     BV-CAR20-P1
