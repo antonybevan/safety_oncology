@@ -1,3 +1,7 @@
+/* SESSION RESET - Neutralize any zombie quotes from previous failed runs */
+*';*";*/;QUIT;RUN;
+%macro _null_; %mend; 
+
 /******************************************************************************
  * Program:      00_phase2a_full_driver.sas
  * Protocol:     BV-CAR20-P1 (Full Phase 2a per Original Protocol V5.0)
@@ -65,25 +69,25 @@
 
     proc sql;
         create table full_implementation_summary as
-        select 'Phase 1 Subjects' as Category length=50,
-               count(distinct USUBJID) as N
+        select 'Phase 1 Subjects'           as Category length=50,
+               count(distinct USUBJID)      as N
         from adam.adsl_expanded
         where PHASE = '1'
         union all
-        select 'Phase 2a Subjects', count(distinct USUBJID)
+        select 'Phase 2a Subjects'          as Category, count(distinct USUBJID)
         from adam.adsl_expanded
         where PHASE = '2a'
         union all
-        select 'Phase 2a Arm A (CLL/SLL)', count(distinct case when COHORT='Arm A: CLL/SLL Ibrutinib' then USUBJID end)
+        select 'Phase 2a Arm A (CLL/SLL)'    as Category, count(distinct case when COHORT='Arm A: CLL/SLL Ibrutinib' then USUBJID end)
         from sdtm.dm_phase2a_full
         union all
-        select 'Phase 2a Arm B (DLBCL)', count(distinct case when COHORT='Arm B: DLBCL post-R-CHOP' then USUBJID end)
+        select 'Phase 2a Arm B (DLBCL)'      as Category, count(distinct case when COHORT='Arm B: DLBCL post-R-CHOP' then USUBJID end)
         from sdtm.dm_phase2a_full
         union all
-        select 'Phase 2a Arm C (High-grade NHL)', count(distinct case when COHORT='Arm C: High-grade NHL post-CAR-T' then USUBJID end)
+        select 'Phase 2a Arm C (High-grade)' as Category, count(distinct case when COHORT='Arm C: High-grade NHL post-CAR-T' then USUBJID end)
         from sdtm.dm_phase2a_full
         union all
-        select 'TOTAL SUBJECTS', count(distinct USUBJID)
+        select 'TOTAL SUBJECTS'              as Category, count(distinct USUBJID)
         from adam.adsl_expanded;
     quit;
 
