@@ -27,22 +27,6 @@
 %load_config;
 
 /* ============================================================================
-   CAR-T CELLULAR KINETICS ANALYSIS (Protocol Sections 2.2.1, 2.3)
-   - Vector Copy Number (VCN) over time
-   - Peak expansion
-   - Persistence at key timepoints
-   ============================================================================ */
-
-/* 1. Get Kinetic Data */
-data kinetics_all;
-    set sdtm.cart_kinetics;
-run;
-
-/* 1. Summary statistics by timepoint */
-proc means data=kinetics_all n mean std median min max;
-    class VISIT;
-    var VCN CARTT_CELLS;
-    output out=kinetics_summary
            mean=VCN_MEAN CELLS_MEAN
            std=VCN_STD CELLS_STD
            median=VCN_MEDIAN CELLS_MEDIAN;

@@ -62,24 +62,30 @@ data lb_adsl;
     
     length TRT01A $200;
     if _n_ = 1 then do;
-        if 0 then set adam.adsl(keep=USUBJID TRTSDT TRT01A TRT01AN ARM ARMCD);
+        if 0 then set adam.adsl(keep=USUBJID TRTSDT TRT01A TRT01AN ARM ARMCD CARTDT);
         declare hash a(dataset:'adam.adsl');
         a.defineKey('USUBJID');
-        a.defineData('TRTSDT', 'TRT01A', 'TRT01AN', 'ARM', 'ARMCD');
+        a.defineData('TRTSDT', 'TRT01A', 'TRT01AN', 'ARM', 'ARMCD', 'CARTDT');
         a.defineDone();
     end;
     
     if a.find() ne 0 then do;
-        TRTSDT = .; TRT01A = ""; TRT01AN = .;
+        TRTSDT = .; TRT01A = ""; TRT01AN = .; CARTDT = .;
     end;
     
     /* Treatment Variables */
     TRTA = TRT01A;
     TRTAN = TRT01AN;
     
-    /* Relative Day per CDISC: No Day 0 */
-    if not missing(ADT) and not missing(TRTSDT) then 
-        ADY = ADT - TRTSDT + (ADT >= TRTSDT);
+    /* Analysis Day (SAP §5.7 specialized scale: -1, 0, 2) */
+    if not missing(ADT) and not missing(CARTDT) then do;
+        if ADT < CARTDT then ADY = ADT - CARTDT;
+        else if ADT = CARTDT then ADY = 0;
+        else ADY = ADT - CARTDT + 1; /* Scales 2, 3, etc. (Omit Day 1) */
+    end;
+    else if not missing(ADT) and not missing(TRTSDT) then 
+        ADY = ADT - TRTSDT + (ADT >= TRTSDT); /* Fallback to LD if no CAR-T */
+
 run;
 
 /* 3. Baseline Flagging (ABLFL) */
@@ -99,101 +105,58 @@ data lb_base_records;
     if first.PARAMCD;
     BASEDT = ADT;
     BASE = AVAL;
-    keep USUBJID PARAMCD BASEDT BASE;
+    BTYPE = "BASELINE";
+    ABLFL = "Y";
+    keep USUBJID PARAMCD BASEDT BASE BTYPE ABLFL;
 run;
 
-data adlb;
+/* 4. Final ADLB Setup */
+data adam.adlb;
     set lb_adsl;
-    by USUBJID PARAMCD ADT;
     
-    /* Attach baseline date/value */
+    /* Merge Baseline */
     if _n_ = 1 then do;
-        declare hash v(dataset:'lb_base_records');
-        v.defineKey('USUBJID', 'PARAMCD');
-        v.defineData('BASEDT', 'BASE');
-        v.defineDone();
+        declare hash b(dataset:'lb_base_records');
+        b.defineKey('USUBJID', 'PARAMCD');
+        b.defineData('BASEDT', 'BASE', 'BTYPE', 'ABLFL');
+        b.defineDone();
     end;
     
-    if v.find() ne 0 then do;
-        BASEDT = .;
-        BASE = .;
+    if b.find() ne 0 then do;
+        BASEDT = .; BASE = .; BTYPE = ""; ABLFL = "";
     end;
-    
-    if ADT = BASEDT then ABLFL = 'Y';
-    else ABLFL = '';
-    
-    /* Change from Baseline */
-    if not missing(AVAL) and not missing(BASE) then CHG = AVAL - BASE;
-    
-    /* Normal Range Logic */
-    length ANRIND $10 BNRIND $10;
-    
-    if not missing(AVAL) and not missing(LBORNRLO) and AVAL < LBORNRLO then ANRIND = 'LOW';
-    else if not missing(AVAL) and not missing(LBORNRHI) and AVAL > LBORNRHI then ANRIND = 'HIGH';
-    else if not missing(AVAL) then ANRIND = 'NORMAL';
-    
-    if not missing(BASE) and not missing(LBORNRLO) and BASE < LBORNRLO then BNRIND = 'LOW';
-    else if not missing(BASE) and not missing(LBORNRHI) and BASE > LBORNRHI then BNRIND = 'HIGH';
-    else if not missing(BASE) then BNRIND = 'NORMAL';
-    
-    if not missing(BNRIND) and not missing(ANRIND) then 
-        SHIFT1 = catx(' to ', BNRIND, ANRIND);
 
-    /* Toxicity Grading (Bi-directional per Oncology Standards) */
-    ATOXGRL = 0; ATOXGRH = 0;
-    length ATOXDSCL ATOXDSCH $100;
+    /* Change from Baseline */
+    if not missing(AVAL) and not missing(BASE) then 
+        CHG = AVAL - BASE;
     
-    if not missing(AVAL) and not missing(LBORNRLO) and AVAL < LBORNRLO then do;
-        ATOXGRL = 1; /* Analysis Toxicity Grade Low */
+    /* Toxicity Grading (CTCAE v5.0 proportionality heuristics) */
+    length ATOXGRL ATOXGRH 8;
+    ATOXGRL = 0; ATOXGRH = 0;
+    
+    if not missing(AVAL) then do;
+        /* Low direction */
+        if AVAL < LBORNRLO then ATOXGRL = 1;
         if AVAL < LBORNRLO * 0.8 then ATOXGRL = 2;
         if AVAL < LBORNRLO * 0.5 then ATOXGRL = 3;
         if AVAL < LBORNRLO * 0.2 then ATOXGRL = 4;
-        ATOXDSCL = strip(PARAM) || " (Low)";
-    end;
-    
-    if not missing(AVAL) and not missing(LBORNRHI) and AVAL > LBORNRHI then do;
-        ATOXGRH = 1; /* Analysis Toxicity Grade High */
+        
+        /* High direction */
+        if AVAL > LBORNRHI then ATOXGRH = 1;
         if AVAL > LBORNRHI * 1.2 then ATOXGRH = 2;
         if AVAL > LBORNRHI * 1.5 then ATOXGRH = 3;
         if AVAL > LBORNRHI * 2.0 then ATOXGRH = 4;
-        ATOXDSCH = strip(PARAM) || " (High)";
     end;
-
-    label
-        ADT      = "Analysis Date"
-        ADY      = "Analysis Relative Day"
-        ABLFL    = "Baseline Record Flag"
-        BASE     = "Baseline Value"
-        CHG      = "Change from Baseline"
-        ANRIND   = "Analysis Range Indicator"
-        BNRIND   = "Baseline Range Indicator"
-        SHIFT1   = "Shift from Baseline to Analysis"
-        ATOXGRL  = "Analysis Toxicity Grade Low"
-        ATOXGRH  = "Analysis Toxicity Grade High"
-        ATOXDSCL = "Analysis Toxicity Description Low"
-        ATOXDSCH = "Analysis Toxicity Description High"
-        TRTA     = "Actual Treatment"
-        TRTAN    = "Actual Treatment (N)"
-        SRCDOM   = "Source Domain"
-        SRCVAR   = "Source Variable"
-        SRCSEQ   = "Source Sequence Number"
+    
+    /* Study Identifier */
+    STUDYID = "&STUDYID";
+    
+    label 
+        ADY = "Analysis Study Day"
+        AVAL = "Analysis Value"
+        BASE = "Baseline Value"
+        CHG = "Change from Baseline"
+        ATOXGRL = "Analysis Toxicity Grade Low"
+        ATOXGRH = "Analysis Toxicity Grade High"
     ;
 run;
-
-/* Create permanent SAS dataset */
-data adam.adlb;
-    set adlb;
-run;
-
-/* 5. Export to XPT */
-libname xpt xport "&ADAM_PATH/adlb.xpt";
-data xpt.adlb;
-    set adlb(drop=LBORNRLO LBORNRHI);
-run;
-libname xpt clear;
-
-proc freq data=adlb;
-    tables PARAMCD * SHIFT1 / list missing;
-    title "Lab Toxicity Shifts (Baseline to Post-Baseline)";
-run;
-

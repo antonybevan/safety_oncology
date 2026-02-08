@@ -103,9 +103,17 @@ data adae;
     AESOC = strip(AESOC);
     AEREL = strip(AEREL);
 
-    /* Study Day for AE start */
-    if not missing(ASTDT) and not missing(TRTSDT) then 
-        ASTDY = ASTDT - TRTSDT + (ASTDT >= TRTSDT);
+    /* Analysis Day (SAP §5.7 specialized scale: -1, 0, 2) */
+    if not missing(ASTDT) and not missing(CARTDT) then do;
+        if ASTDT < CARTDT then ASTDY = ASTDT - CARTDT;
+        else if ASTDT = CARTDT then ASTDY = 0;
+        else ASTDY = ASTDT - CARTDT + 1; /* Scales 2, 3, etc. (Omit Day 1) */
+    end;
+    if not missing(AENDT) and not missing(CARTDT) then do;
+        if AENDT < CARTDT then AENDY = AENDT - CARTDT;
+        else if AENDT = CARTDT then AENDY = 0;
+        else AENDY = AENDT - CARTDT + 1;
+    end;
 
     /* Treatment Emergent Flag (SAP Section 8.2.1: On/After first lymphodepletion dose) */
     if not missing(ASTDT) and not missing(LDSTDT) then do;
