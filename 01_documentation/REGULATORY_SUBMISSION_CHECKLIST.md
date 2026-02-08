@@ -1,6 +1,7 @@
 # Regulatory Submission Checklist
 **Study**: BV-CAR20-P1  
 **Submission Type**: IND/NDA Module 5 Clinical Study Data  
+**Reference**: FDA SDTCG December 2025  
 **Date**: 2026-02-08
 
 ---
@@ -8,54 +9,77 @@
 ## Pre-Submission Checklist
 
 ### 1. Data Standards Compliance
+| Requirement | Standard | Status | Notes |
+|:------------|:---------|:------:|:------|
+| SDTM datasets | IG 3.4 | ✅ | All domains implemented |
+| ADaM datasets | IG 1.3 | ✅ | ADSL, ADAE, ADRS, ADLB, ADTR |
+| Define-XML | v2.1 | ⏳ Shell | Requires P21 or SAS Clinical |
+| Controlled Terminology | CDISC CT 2025-12-20 | ✅ | Applied throughout |
+| XPT format | v5 transport | ✅ | All datasets exported |
+| SDSP | Study Data Standardization Plan | ✅ | Documented in SAP |
+
+### 2. Oncology TAUG Compliance
+| Requirement | Status | Implementation |
+|:------------|:------:|:---------------|
+| Tumor Response (RS) | ✅ | Lugano 2016 / iwCLL 2018 |
+| Staging (TU/TR) | ⚠️ | Not required for Phase 1 |
+| BOR Derivation | ✅ | ADRS with AVALC ranking |
+| PFS/OS Parameters | ✅ | Time-to-event with censoring |
+| Cell Therapy Variables | ✅ | CARTDT, LDSTDT, CAR-T kinetics |
+| CRS/ICANS Grading | ✅ | ASTCT Consensus v2020 |
+
+### 3. Pinnacle 21 Validation
+| Requirement | Tool | Status | Target |
+|:------------|:-----|:------:|:-------|
+| SDTM validation | P21 Community | ⏳ | Zero REJECT |
+| ADaM validation | P21 Community | ⏳ | Zero REJECT |
+| Define-XML validation | P21 | ⏳ | Zero ERROR |
+| REJECT findings | Required: 0 | ⏳ | Blocking |
+| ERROR findings | Required: 0 | ⏳ | Blocking |
+| WARNING review | Document all | ⏳ | Document rationale |
+
+### 4. Reviewer's Guides
+| Document | Location | Status | FDA Required |
+|:---------|:---------|:------:|:------------:|
+| ADRG | 01_documentation/adrg/ | ✅ | Required |
+| SDRG | 01_documentation/cdrg/ | ✅ | Required |
+| Define-XML | 02_datasets/define/ | ⏳ Shell | Required |
+| SAP | 01_documentation/sap/ | ✅ | Recommended |
+| aCRF | N/A | N/A | Required for NDA |
+
+### 5. eCTD Submission Format
 | Requirement | Standard | Status |
 |:------------|:---------|:------:|
-| SDTM datasets | IG 3.4 | ✅ Complete |
-| ADaM datasets | IG 1.3 | ✅ Complete |
-| Define-XML | v2.1 | ⏳ Shell only |
-| Controlled Terminology | CDISC CT 2025-12-20 | ✅ Applied |
-| XPT format | v5 transport | ✅ Ready |
+| eCTD version | v3.2.2 (transitional) / v4.0 | ⏳ |
+| ESG transmission | FDA Electronic Submissions Gateway | ⏳ |
+| Module 5 structure | datasets/, programs/, misc/ | ✅ |
+| File naming | Max 8 chars, lowercase | ✅ |
+| Path length | ≤150 characters | ✅ |
 
-### 2. Validation
-| Requirement | Tool | Status |
-|:------------|:-----|:------:|
-| Pinnacle 21 SDTM | Community 4.0 | ⏳ Pending |
-| Pinnacle 21 ADaM | Community 4.0 | ⏳ Pending |
-| Define-XML validation | P21 | ⏳ Pending |
-| Zero REJECT findings | Required | ⏳ Pending |
-| Zero ERROR findings | Required | ⏳ Pending |
-
-### 3. Documentation
-| Document | Location | Status |
-|:---------|:---------|:------:|
-| ADRG | 01_documentation/adrg/ | ✅ Complete |
-| SDRG | 01_documentation/cdrg/ | ✅ Complete |
-| SAP | 01_documentation/sap/ | ✅ Complete |
-| Define-XML | 02_datasets/define/ | ⏳ Shell only |
-| Annotated CRF | Not applicable | N/A |
-
-### 4. Programs
-| Requirement | Status |
-|:------------|:------:|
-| ASCII text format | ✅ |
-| PhUSE-compliant headers | ✅ |
-| Modification history | ✅ |
-| QC sign-off | ✅ |
-
-### 5. Quality Control
-| Requirement | Status |
-|:------------|:------:|
-| Level 3 QC for critical outputs | ✅ |
-| QC evidence log | ✅ |
-| SOP compliance attestation | ✅ |
+### 6. Programs & QC
+| Requirement | Status | Evidence |
+|:------------|:------:|:---------|
+| ASCII text format | ✅ | All .sas files |
+| PhUSE headers | ✅ | Modification history, QC block |
+| Level 3 QC | ✅ | Primary endpoints double-programmed |
+| QC evidence log | ✅ | 05_validation/independent/ |
+| Version control | ✅ | Git with signed commits |
 
 ---
 
-## Post-Submission Checklist
-- [ ] Archive final submission package
-- [ ] Lock repository at submission version
-- [ ] Store Pinnacle 21 reports
-- [ ] Document any post-submission amendments
+## Maximum Compliance Roadmap
+
+### Immediate (Before Submission)
+1. **Run Pinnacle 21** - Generate validation reports
+2. **Complete Define-XML** - Use P21 Enterprise or SAS Clinical
+3. **Review all WARNINGs** - Document rationale for each
+4. **Finalize eCTD package** - Per SDTCG folder structure
+
+### Optional Enhancements
+- [ ] DOR (Duration of Response) parameter
+- [ ] TTR (Time to Response) parameter  
+- [ ] ADTR (Tumor Response BDS) if tumor data available
+- [ ] aCRF generation from EDC
 
 ---
 
@@ -68,4 +92,4 @@
 | Regulatory Affairs | | 2026-02-08 | [Pending] |
 
 ---
-*This checklist is maintained as part of the regulatory submission audit trail.*
+*Reference: FDA Study Data Technical Conformance Guide (December 2025)*
