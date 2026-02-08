@@ -6,6 +6,10 @@
  * Date:         2026-02-08
  ******************************************************************************/
 
+/* 0. Silent Session Neutralization (Pro-Grade Recovery) */
+*';*";*/;QUIT;RUN;
+%macro _null_; %mend;
+
 /* 1. Integrated Environment */
 %include "00_config.sas";
 
@@ -29,6 +33,8 @@
 %include "&PROG_PATH/reporting/f_cytokines.sas";
 
 /* 4. Multi-Phase Summary */
+%put NOTE: [PORTFOLIO] Running Portfolio-Wide Implementation Summary...;
+
 title "&STUDYID: Portfolio-Wide Implementation Summary";
 proc sql;
     select 'Phase 1 Core subjects' as Group, count(distinct USUBJID) as N 
