@@ -131,6 +131,13 @@ data adae;
     /* Numeric Grading - Use Centralized Macro */
     %calc_astct(source_grade=AETOXGR, out_grade=AETOXGRN);
 
+    /* --- ASTCT vs CTCAE Traceability (Professional CAR-T Requirement) --- */
+    /* Preserve ASTCT specific grading in a dedicated audit variable */
+    length ASTCTGR 8;
+    if AESICAT in ("CRS", "ICANS") then ASTCTGR = AETOXGRN;
+    else ASTCTGR = .;
+
+
     /* AESI Flag and DLT logic */
     AESIFL = "N";
     DLTFL = "N";
@@ -266,7 +273,9 @@ data adae;
         TRTAN    = "Actual Treatment (N)"
         TRTEMFL  = "Trt Emergent Analysis Flag (Regimen)"
         PSTCARFL = "Post-CAR-T Infusion Flag"
+        ASTCTGR  = "ASTCT Consensus Grade (Numeric)"
         AETOXGRN = "Analysis Toxicity Grade (N)"
+
         AESIFL   = "Adverse Event of Special Interest Flag"
         AESICAT  = "AESI Category"
         ASTCTGR  = "ASTCT 2019 Grade"

@@ -41,8 +41,8 @@
 ### 4. Reviewer's Guides
 | Document | Location | Status | FDA Required |
 |:---------|:---------|:------:|:------------:|
-| ADRG | 01_documentation/adrg/ | ✅ | Required |
-| SDRG | 01_documentation/cdrg/ | ✅ | Required |
+| adrg.pdf | 01_documentation/adrg/ | ✅ Complete | Required |
+| csdrg.pdf | 01_documentation/cdrg/ | ✅ Complete | Required |
 | Define-XML | 02_datasets/define/ | ⏳ Shell | Required |
 | SAP | 01_documentation/sap/ | ✅ | Recommended |
 | aCRF | N/A | N/A | Required for NDA |

@@ -185,7 +185,7 @@ data adsl;
 
     /* DLT Evaluable Population Flag (Per Protocol Section 6.2.3) */
     /* DLTEVLFL = Y if CAR-T infused AND 28-day window completed */
-    length DLTEVLFL $1;
+    length DLTEVLFL MBOINFL $1;
     if DOSESCLFL = 'Y' then do;
         TRTDUR = TRTEDT - TRTSDT + 1;
         /* Evaluability: 28-day window completion or early DLT (Manual adjudication expected) */
@@ -193,6 +193,10 @@ data adsl;
         else DLTEVLFL = 'N';
     end;
     else DLTEVLFL = 'N';
+
+    /* mBOIN Decision Population Flag (Submission-Grade) */
+    MBOINFL = DLTEVLFL;
+
 
     /* Age Grouping */
     length AGEGR1 $10;
@@ -221,7 +225,9 @@ data adsl;
         EFFFL    = "Efficacy Population Flag"
         DOSESCLFL = "Dose-Escalation Set Flag"
         DLTEVLFL = "DLT Evaluability Flag"
+        MBOINFL  = "mBOIN Decision Population Flag"
         TRT01P   = "Planned Treatment for Period 01"
+
         TRT01PN  = "Planned Treatment for Period 01 (N)"
         TRT01A   = "Actual Treatment for Period 01"
         TRT01AN  = "Actual Treatment for Period 01 (N)"

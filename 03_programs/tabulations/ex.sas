@@ -54,24 +54,6 @@ data ex;
 
     set raw_ex;
 
-    /* Standard Variables */
-    STUDYID = "&STUDYID";
-    DOMAIN = "EX";
-    USUBJID = strip(USUBJID);
-    TRTSDT_NUM = input(TRTSDT, yymmdd10.);
-    
-    /* Treatment Info */
-    EXTRT = strip(EXTRT);
-    EXDOSE = EXDOSE;
-    EXDOSU = strip(EXDOSU);
-    EXDOSFRM = "STEADY STATE";
-    EXROUTE = "INTRAVENOUS";
-
-    /* Dates */
-    EXSTDTC = strip(EXSTDTC);
-    EXENDTC = strip(EXENDTC);
-    
-    /* Study Days Calculation */
     if not missing(EXSTDTC) and not missing(TRTSDT_NUM) then do;
         _stdt = input(EXSTDTC, yymmdd10.);
         EXSTDY = _stdt - TRTSDT_NUM + (_stdt >= TRTSDT_NUM);
@@ -81,8 +63,12 @@ data ex;
         EXENDY = _endt - TRTSDT_NUM + (_endt >= TRTSDT_NUM);
     end;
     
-    keep STUDYID DOMAIN USUBJID EXTRT EXDOSE EXDOSU EXLOT EXADJ EXDOSFRM EXROUTE 
+    keep STUDYID DOMAIN USUBJID EXTRT EXCAT EXDOSE EXDOSU EXLOT EXADJ EXDOSFRM EXROUTE 
          EXSTDTC EXENDTC EXSTDY EXENDY;
+    
+    label 
+        EXCAT = "Category of Exposure"
+    ;
 run;
 
 /* Assign sequence numbers */
