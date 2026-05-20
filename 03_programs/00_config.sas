@@ -176,14 +176,15 @@ run;
         filename _mclib "&PROG_PATH/macros";
         options mautosource sasautos=(SASAUTOS _mclib);
     %end;
-    /* Force compilation of macros to prevent SAS session caching from using stale versions */
-    %include "&PROG_PATH/macros/calc_astct.sas";
-    %include "&PROG_PATH/macros/iso_to_sas.sas";
-    %include "&PROG_PATH/macros/load_config.sas";
-    %include "&PROG_PATH/macros/ods_setup.sas";
-    %include "&PROG_PATH/macros/xpt_export.sas";
 %mend _setup_mautos;
 %_setup_mautos;
+
+/* Force compilation of macros to prevent SAS session caching from using stale versions */
+%include "&PROG_PATH/macros/calc_astct.sas";
+%include "&PROG_PATH/macros/iso_to_sas.sas";
+%include "&PROG_PATH/macros/load_config.sas";
+%include "&PROG_PATH/macros/ods_setup.sas";
+%include "&PROG_PATH/macros/xpt_export.sas";
 
 
 /* ============================================================================
