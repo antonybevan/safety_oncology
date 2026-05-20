@@ -111,20 +111,38 @@
     %put NOTE: --------------------------------------------------;
     %put NOTE: Starting GIT RESCUE Operation...;
 
-    /* 1. Attempt PULL first */
-    %let rc = %sysfunc(gitfn_pull(&safe_path));
-    %put NOTE: gitfn_pull returned RC=&rc;
+    /* 1. Only attempt pull if local directory is an initialized Git repo (.git exists) */
+    %if %sysfunc(fileexist(&safe_path/.git)) %then %do;
+        %put NOTE: Local repository detected. Attempting gitfn_pull...;
+        %let rc = %sysfunc(gitfn_pull(&safe_path));
+        %put NOTE: gitfn_pull returned RC=&rc;
 
-    %if &rc = 0 %then %do;
-        %put NOTE: SUCCESS! Project updated from GitHub.;
-    %end;
-    %else %if &rc = 1 %then %do;
-        %put NOTE: Repository is already up to date.;
+        %if &rc = 0 %then %do;
+            %put NOTE: SUCCESS! Project updated from GitHub.;
+        %end;
+        %else %if &rc = 1 %then %do;
+            %put NOTE: Repository is already up to date.;
+        %end;
+        %else %do;
+            %put NOTE: Pull failed with RC=&rc.. Initiating FRESH CLONE Protocol...;
+
+            /* Native recursive delete executes synchronously */
+            %clean_dir_native(&safe_path);
+
+            %put NOTE: Cloning from &repo_url...;
+            %let rc_clone = %sysfunc(gitfn_clone(&repo_url, &safe_path));
+
+            %if &rc_clone = 0 %then %do;
+                %put NOTE: SUCCESS! Project reset and re-cloned.;
+            %end;
+            %else %do;
+                %put ERROR: Clone failed. RC=&rc_clone;
+            %end;
+        %end;
     %end;
     %else %do;
-        %put NOTE: Pull failed (Conflict or Missing). Initiating FRESH CLONE Protocol...;
+        %put NOTE: No local repository found at &safe_path.. Initiating FRESH CLONE Protocol...;
 
-        /* Native recursive delete executes synchronously */
         %clean_dir_native(&safe_path);
 
         %put NOTE: Cloning from &repo_url...;
