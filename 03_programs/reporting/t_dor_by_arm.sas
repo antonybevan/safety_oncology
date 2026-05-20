@@ -184,7 +184,9 @@ quit;
         %put WARNING: No DoR analysis records were available. No KM output generated.;
     %end;
 %mend;
+%ods_setup(type=RTF, outpath=&OUT_TABLES/t_dor_by_arm.rtf);
 %run_dor;
+%ods_close(type=RTF);
 
 %put NOTE: ----------------------------------------------------;
 %put NOTE: DOR BY ARM ANALYSIS COMPLETE;

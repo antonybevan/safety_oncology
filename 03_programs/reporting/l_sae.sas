@@ -22,6 +22,8 @@ proc sort data=tesae_listing;
 run;
 
 /* 3. Production Listing */
+%ods_setup(type=RTF, outpath=&OUT_LISTINGS/l_sae.rtf);
+
 title1 "&STUDYID: CAR-T Clinical Trial";
 title2 "Listing L-SAE1: All Treatment-Emergent Serious Adverse Events";
 title3 "Safety Population";
@@ -43,10 +45,7 @@ proc report data=tesae_listing nowd headskip split='|' style(report)={outputwidt
     define DLTFL / "DLT" width=5;
 run;
 
-/* Export results */
-ods html5 body="&OUT_LISTINGS/l_sae.html";
-proc print data=tesae_listing noobs; run;
-ods html5 close;
+%ods_close(type=RTF);
 
 %put NOTE: --------------------------------------------------;
 %put NOTE: ✅ LISTING L-SAE1 (All TESAEs) GENERATED;

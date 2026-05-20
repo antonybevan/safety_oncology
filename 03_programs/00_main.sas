@@ -102,20 +102,81 @@
 
 /* 4. Reporting & Figures Suite */
 %put NOTE: [MAIN] Step 4: Generating Clinical Tables & Figures (TFLs)...;
+
+/* Category 1: Demographics and Baseline Characteristics */
+%include "&PROG_PATH/reporting/t_dm.sas";
+%check_err(t_dm.sas);
+
+%include "&PROG_PATH/reporting/t_prot_dev.sas";
+%check_err(t_prot_dev.sas);
+
+/* Category 2: Efficacy and Exploratory Endpoints */
+%include "&PROG_PATH/reporting/t_eff.sas";
+%check_err(t_eff.sas);
+
+%include "&PROG_PATH/reporting/t_dor_by_arm.sas";
+%check_err(t_dor_by_arm.sas);
+
+%include "&PROG_PATH/reporting/t_mrd.sas";
+%check_err(t_mrd.sas);
+
+/* Category 3: Adverse Events Tables */
 %include "&PROG_PATH/reporting/t_ae_summ.sas";
 %check_err(t_ae_summ.sas);
 
 %include "&PROG_PATH/reporting/t_ae_aesi.sas";
 %check_err(t_ae_aesi.sas);
 
-%include "&PROG_PATH/reporting/t_eff.sas";
-%check_err(t_eff.sas);
+%include "&PROG_PATH/reporting/t_ae_cm.sas";
+%check_err(t_ae_cm.sas);
+
+%include "&PROG_PATH/reporting/t_aesi_duration.sas";
+%check_err(t_aesi_duration.sas);
+
+%include "&PROG_PATH/reporting/t_sae_cart.sas";
+%check_err(t_sae_cart.sas);
+
+%include "&PROG_PATH/reporting/t_sae_ld.sas";
+%check_err(t_sae_ld.sas);
+
+/* Category 4: Lab Toxicity Tables */
+%include "&PROG_PATH/reporting/t_lb_grad.sas";
+%check_err(t_lb_grad.sas);
+
+/* Category 5: Patient Listings */
+%include "&PROG_PATH/reporting/l_dm.sas";
+%check_err(l_dm.sas);
+
+%include "&PROG_PATH/reporting/l_screen_fail.sas";
+%check_err(l_screen_fail.sas);
+
+%include "&PROG_PATH/reporting/l_exposure.sas";
+%check_err(l_exposure.sas);
+
+%include "&PROG_PATH/reporting/l_ae_aesi.sas";
+%check_err(l_ae_aesi.sas);
+
+%include "&PROG_PATH/reporting/l_sae.sas";
+%check_err(l_sae.sas);
+
+%include "&PROG_PATH/reporting/l_deaths.sas";
+%check_err(l_deaths.sas);
+
+%include "&PROG_PATH/reporting/l_lb_grad.sas";
+%check_err(l_lb_grad.sas);
+
+/* Category 6: Figures */
+%include "&PROG_PATH/reporting/f_ae_time.sas";
+%check_err(f_ae_time.sas);
 
 %include "&PROG_PATH/reporting/f_km_os.sas";
 %check_err(f_km_os.sas);
 
 %include "&PROG_PATH/reporting/f_km_pfs.sas";
 %check_err(f_km_pfs.sas);
+
+%include "&PROG_PATH/reporting/f_swimmer.sas";
+%check_err(f_swimmer.sas);
 
 %include "&PROG_PATH/reporting/f_waterfall.sas";
 %check_err(f_waterfall.sas);

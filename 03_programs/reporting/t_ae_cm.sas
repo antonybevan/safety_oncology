@@ -43,6 +43,8 @@ proc sql;
     group by CMCAT, CMTRT, ARMCD;
 quit;
 
+%ods_setup(type=RTF, outpath=&OUT_TABLES/t_ae_cm.rtf);
+
 proc report data=t_ae_cm_summary nowd headskip split='|' style(report)={outputwidth=100%};
     column CMCAT CMTRT ARMCD, N;
     define CMCAT / group "Medication Class";
@@ -56,9 +58,4 @@ proc report data=t_ae_cm_summary nowd headskip split='|' style(report)={outputwi
     endcomp;
 run;
 
-/* Export */
-ods html5 body="&OUT_TABLES/t_ae_cm.html";
-proc print data=t_ae_cm_data(obs=10); run;
-ods html5 close;
-
-
+%ods_close(type=RTF);

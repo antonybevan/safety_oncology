@@ -21,6 +21,8 @@ proc sql;
 quit;
 
 /* 2. Production Listing */
+%ods_setup(type=RTF, outpath=&OUT_LISTINGS/l_screen_fail.rtf);
+
 title1 "&STUDYID: CAR-T Clinical Trial";
 title2 "Listing L-SD1: Screen Failures";
 title3 "All Screened Population";
@@ -39,10 +41,7 @@ proc report data=screen_fail nowd headskip split='|' style(report)={outputwidth=
     define FAILURE_REASON / "Reason for Screen Failure" width=40;
 run;
 
-/* Export results */
-ods html5 body="&OUT_LISTINGS/l_screen_fail.html";
-proc print data=screen_fail noobs; run;
-ods html5 close;
+%ods_close(type=RTF);
 
 %put NOTE: --------------------------------------------------;
 %put NOTE: ✅ LISTING L-SD1 (Screen Failures) GENERATED;

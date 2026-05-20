@@ -26,6 +26,8 @@ proc sort data=lb_grade_listing;
 run;
 
 /* 2. Format Listing */
+%ods_setup(type=RTF, outpath=&OUT_LISTINGS/l_lb_grad.rtf);
+
 title1 "&STUDYID: CAR-T Clinical Review";
 title2 "Listing 16.2.8: Grade 3 or 4 Laboratory Abnormalities";
 title3 "Safety Population";
@@ -47,9 +49,6 @@ proc report data=lb_grade_listing nowd headskip split='|' style(report)={outputw
     break after USUBJID / skip;
 run;
 
-/* Export results */
-ods html5 body="&OUT_LISTINGS/l_lb_grad.html";
-proc print data=lb_grade_listing; run;
-ods html5 close;
+%ods_close(type=RTF);
 
 

@@ -106,6 +106,8 @@ data aesi_report;
 run;
 
 /* 4. Generate Table */
+%ods_setup(type=RTF, outpath=&OUT_TABLES/t_aesi_duration.rtf);
+
 proc report data=aesi_report nowd split='*';
     column AESI_TYPE ARMCD N_SUBJECTS N_EVENTS MAX_GRADE Onset_Display Duration_Display;
     define AESI_TYPE / group "AESI Type" left;
@@ -132,10 +134,11 @@ proc tabulate data=aesi_detail format=8.1;
           ARMCD * (ONSET_DAYS='Onset (days)' * (median min max)
                    DURATION_DAYS='Duration (days)' * (median min max));
     title1 "Table 3.3a: AESI Onset and Duration by Type and Grade (Supplementary)";
+    title2 "&STUDYID Phase 1 - Safety Population";
 run;
+
+%ods_close(type=RTF);
 
 %put NOTE: ----------------------------------------------------;
 %put NOTE: AESI ONSET/DURATION TABLE GENERATED;
 %put NOTE: ----------------------------------------------------;
-
-

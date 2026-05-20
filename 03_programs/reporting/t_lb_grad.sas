@@ -43,6 +43,8 @@ proc sql;
 quit;
 
 /* 5. Reporting */
+%ods_setup(type=RTF, outpath=&OUT_TABLES/t_lb_grad.rtf);
+
 title1 "&STUDYID: CAR-T Safety Analysis";
 title2 "Table 14.3.3: Summary of Grade 3 or 4 Laboratory Toxicities";
 title3 "Safety Population";
@@ -63,9 +65,6 @@ proc report data=lb_subj_summ nowd headskip split='|' style(report)={outputwidth
     endcomp;
 run;
 
-/* Export results */
-ods html5 body="&OUT_TABLES/t_lb_grad.html";
-proc print data=lb_subj_summ(obs=10); run;
-ods html5 close;
+%ods_close(type=RTF);
 
 

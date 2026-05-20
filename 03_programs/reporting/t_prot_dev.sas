@@ -108,9 +108,11 @@ run;
         run;
     %end;
 %mend;
+
+%ods_setup(type=RTF, outpath=&OUT_TABLES/t_prot_dev.rtf);
 %output_deviations;
+%ods_close(type=RTF);
 
 %put NOTE: ----------------------------------------------------;
 %put NOTE: ✅ PROTOCOL DEVIATIONS TABLE GENERATED;
 %put NOTE: ----------------------------------------------------;
-

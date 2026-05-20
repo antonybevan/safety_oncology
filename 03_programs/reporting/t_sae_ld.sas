@@ -88,6 +88,8 @@ data sae_ld_report;
 run;
 
 /* 6. Generate Table */
+%ods_setup(type=RTF, outpath=&OUT_TABLES/t_sae_ld.rtf);
+
 proc report data=sae_ld_report nowd split='*';
     column AEDECOD ARMCD, (GR1 GR2 GR3 GR4 GR5 Result);
     define AEDECOD / group "Preferred Term" left;
@@ -113,6 +115,8 @@ proc sql;
            count(*) as N_Events
     from sae_ld;
 quit;
+
+%ods_close(type=RTF);
 
 %put NOTE: ----------------------------------------------------;
 %put NOTE: ✅ LYMPHODEPLETION-RELATED SAE TABLE GENERATED;

@@ -74,6 +74,8 @@ proc sql;
 quit;
 
 /* 3. Generate Listing */
+%ods_setup(type=RTF, outpath=&OUT_LISTINGS/l_exposure.rtf);
+
 proc print data=exposure_list noobs label split='*';
     var USUBJID DOSE_LEVEL TREATMENT_PHASE DRUG_NAME 
         EXDOSE EXDOSU START_DATETIME END_DATETIME 
@@ -105,6 +107,8 @@ proc tabulate data=exposure_summary format=8.;
     title1 "Table 3.1: Summary of Extent of Exposure";
     title2 "Safety Population";
 run;
+
+%ods_close(type=RTF);
 
 %put NOTE: ----------------------------------------------------;
 %put NOTE: ✅ EXPOSURE LISTING GENERATED;

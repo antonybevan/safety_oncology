@@ -38,6 +38,8 @@ proc sort data=all_deaths nodupkey;
 run;
 
 /* 2. Production Listing */
+%ods_setup(type=RTF, outpath=&OUT_LISTINGS/l_deaths.rtf);
+
 title1 "&STUDYID: CAR-T Clinical Trial";
 title2 "Listing L-SAE2: All Deaths";
 title3 "Safety Population";
@@ -56,10 +58,7 @@ proc report data=all_deaths nowd headskip split='|' style(report)={outputwidth=1
     define DTHCAUS / "Cause of Death" width=40;
 run;
 
-/* Export results */
-ods html5 body="&OUT_LISTINGS/l_deaths.html";
-proc print data=all_deaths noobs; run;
-ods html5 close;
+%ods_close(type=RTF);
 
 %put NOTE: --------------------------------------------------;
 %put NOTE: ✅ LISTING L-SAE2 (All Deaths) GENERATED;

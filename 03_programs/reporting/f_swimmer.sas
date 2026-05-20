@@ -10,8 +10,8 @@
  * Input:        adam.adrs (BOR, PFS), adam.adsl
  * Output:       Swimmer Plot showing response duration by subject
  *
- * Note:         Per SAP: "For retreatment subjects, combine initial 
- *               with retreatment data"
+ * Note:         For retreatment subjects, combine initial 
+ *               with retreatment data
  ******************************************************************************/
 
 %load_config;
@@ -87,8 +87,7 @@ data swimmer_plot;
 run;
 
 /* 2. Create Swimmer Plot using SGPLOT */
-ods graphics on / reset=all imagename="f_swimmer" imagefmt=png width=10in height=8in;
-ods listing image_dpi=300 gpath="&OUT_FIGURES";
+%ods_setup(type=GRAPH, imgname=f_swimmer, imgw=10in, imgh=8in);
 
 proc sgplot data=swimmer_plot;
     /* Horizontal bars for duration */
@@ -120,7 +119,7 @@ proc sgplot data=swimmer_plot;
     footnote3 "Vertical dashed lines indicate Week 4 (DLT window) and Week 12.";
 run;
 
-ods graphics off;
+%ods_close(type=GRAPH);
 
 /* 3. Summary table for swimmer data */
 proc print data=swimmer_plot(obs=20) noobs label;
@@ -136,5 +135,3 @@ run;
 %put NOTE: ----------------------------------------------------;
 %put NOTE: SWIMMER PLOT GENERATED: f_swimmer.png;
 %put NOTE: ----------------------------------------------------;
-
-

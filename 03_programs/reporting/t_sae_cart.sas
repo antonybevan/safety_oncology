@@ -81,6 +81,8 @@ data sae_report;
 run;
 
 /* 6. Generate Table */
+%ods_setup(type=RTF, outpath=&OUT_TABLES/t_sae_cart.rtf);
+
 proc report data=sae_report nowd split='*';
     column AEDECOD ARMCD, (GR1 GR2 GR3 GR4 GR5 Result);
     define AEDECOD / group "Preferred Term" left;
@@ -106,6 +108,8 @@ proc sql;
            count(*) as N_Events
     from sae_cart;
 quit;
+
+%ods_close(type=RTF);
 
 %put NOTE: ----------------------------------------------------;
 %put NOTE: ✅ CAR-T RELATED SAE TABLE GENERATED;

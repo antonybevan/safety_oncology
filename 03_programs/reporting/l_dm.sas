@@ -26,6 +26,8 @@ proc sort data=disposition;
 run;
 
 /* 2. Format Listing */
+%ods_setup(type=RTF, outpath=&OUT_LISTINGS/l_dm.rtf);
+
 title1 "&STUDYID: CAR-T Clinical Review";
 title2 "Listing 16.2.1: Subject Disposition";
 title3 "All Enrolled Subjects";
@@ -46,9 +48,6 @@ proc report data=disposition nowd headskip split='|' style(report)={outputwidth=
     define STATUS   / "Analysis Status" width=25;
 run;
 
-/* Export results */
-ods html5 body="&OUT_LISTINGS/l_dm.html";
-proc print data=disposition; run;
-ods html5 close;
+%ods_close(type=RTF);
 
 

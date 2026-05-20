@@ -31,7 +31,9 @@ data mrd_data;
     /* Map disease names if needed */
 run;
 
-/* 2. MRD Negativity Rate by Disease and Timepoint */
+/* 2. MRD Negativity Rate by Disease and Timepoint (Table Output) */
+%ods_setup(type=RTF, outpath=&OUT_TABLES/t_mrd.rtf);
+
 proc freq data=mrd_data;
     tables DISEASE * TIMEPOINT * MRDRESULT / nocum nopercent;
     title1 "Table 2.4: MRD Status by Disease and Timepoint";
@@ -59,9 +61,24 @@ proc print data=mrd_summary noobs label;
     title "MRD Negativity Rate Summary";
 run;
 
-/* 4. MRD Rate Over Time - Line Plot */
-ods graphics on / reset=all imagename="f_mrd_time" imagefmt=png width=8in height=6in;
-ods listing image_dpi=300 gpath="&OUT_FIGURES";
+/* 5. MRD and Response Correlation */
+proc sql;
+    create table mrd_response as
+    select a.USUBJID, a.DISEASE, a.MRDRESULT, a.TIMEPOINT, b.AVALC as BOR
+    from mrd_data a
+    inner join sdtm.rs_phase2a_full b on a.USUBJID = b.USUBJID and b.RSTESTCD = 'OVRLRESP'
+    where a.TIMEPOINT = 'Week 12';
+quit;
+
+proc freq data=mrd_response;
+    tables BOR * MRDRESULT / chisq;
+    title "MRD Status vs Best Overall Response at Week 12";
+run;
+
+%ods_close(type=RTF);
+
+/* 4. MRD Rate Over Time - Line Plot (Figure Output) */
+%ods_setup(type=GRAPH, imgname=f_mrd_time, imgw=8in, imgh=6in);
 
 proc sgplot data=mrd_summary;
     series x=TIMEPOINT y=MRD_Neg_Rate / group=DISEASE 
@@ -77,24 +94,8 @@ proc sgplot data=mrd_summary;
     footnote1 "MRD assessed by flow cytometry at 10^-4 sensitivity.";
 run;
 
-ods graphics off;
-
-/* 5. MRD and Response Correlation */
-proc sql;
-    create table mrd_response as
-    select a.USUBJID, a.DISEASE, a.MRDRESULT, a.TIMEPOINT, b.AVALC as BOR
-    from mrd_data a
-    inner join sdtm.rs_phase2a_full b on a.USUBJID = b.USUBJID and b.RSTESTCD = 'OVRLRESP'
-    where a.TIMEPOINT = 'Week 12';
-quit;
-
-proc freq data=mrd_response;
-    tables BOR * MRDRESULT / chisq;
-    title "MRD Status vs Best Overall Response at Week 12";
-run;
+%ods_close(type=GRAPH);
 
 %put NOTE: ----------------------------------------------------;
 %put NOTE: ✅ MRD ANALYSIS COMPLETE;
 %put NOTE: ----------------------------------------------------;
-
-

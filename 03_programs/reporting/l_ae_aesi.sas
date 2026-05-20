@@ -24,6 +24,8 @@ proc sort data=aesi_listing;
 run;
 
 /* 2. Format for Clinical Review */
+%ods_setup(type=RTF, outpath=&OUT_LISTINGS/l_ae_aesi.rtf);
+
 title1 "&STUDYID: CAR-T Clinical Review";
 title2 "Listing 16.2.7: Adverse Events of Special Interest (AESI)";
 title3 "Safety Population";
@@ -46,9 +48,6 @@ proc report data=aesi_listing nowd headskip split='|' style(report)={outputwidth
     break after USUBJID / skip;
 run;
 
-/* Export results */
-ods html5 body="&OUT_LISTINGS/l_ae_aesi.html";
-proc print data=aesi_listing; run;
-ods html5 close;
+%ods_close(type=RTF);
 
 
