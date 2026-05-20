@@ -9,10 +9,11 @@ ods _all_ close;
 options sasautos=(SASAUTOS);
 
 %macro _clear_libs;
-    %if %sysfunc(libref(sdtm)) = 0 %then libname sdtm clear;
-    %if %sysfunc(libref(adam)) = 0 %then libname adam clear;
-    %if %sysfunc(libref(raw)) = 0 %then libname raw clear;
-    %if %sysfunc(libref(legacy)) = 0 %then libname legacy clear;
+    /* pathname() returns blank when a libref is NOT assigned — reliable on all SAS platforms */
+    %if %length(%sysfunc(pathname(sdtm)))   > 0 %then %do; libname sdtm   clear; %end;
+    %if %length(%sysfunc(pathname(adam)))   > 0 %then %do; libname adam   clear; %end;
+    %if %length(%sysfunc(pathname(raw)))    > 0 %then %do; libname raw    clear; %end;
+    %if %length(%sysfunc(pathname(legacy))) > 0 %then %do; libname legacy clear; %end;
 %mend _clear_libs;
 %_clear_libs;
 /* Silently deassign _mclib — SAS holds an internal lock on the fileref even after removing it
