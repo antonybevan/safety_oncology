@@ -2,6 +2,18 @@
 *';*";*/;QUIT;RUN;
 %macro _null_; %mend;
 
+/* Release any active library, file, and ODS locks to avoid in-use errors during cleanup */
+ods _all_ close;
+
+/* Remove _mclib from the sasautos autocall path list to release system-level directory locks */
+options sasautos=(SASAUTOS);
+
+libname sdtm clear;
+libname adam clear;
+libname raw clear;
+libname legacy clear;
+filename _mclib clear;
+
 /******************************************************************************
  * Program:      GIT_RESCUE.sas
  * Purpose:      Force-sync SAS OnDemand or SAS 9.4 with GitHub (Public Repo)
@@ -10,7 +22,7 @@
  * NOTES:
  *   - Locates project root dynamically, or defaults safely based on OS.
  *   - gitfn_pull / gitfn_clone require SAS Foundation 9.4 TS1M5+ or ODA.
- ******************************************************************************/
+ * *****************************************************************************/
 
 %let repo_url   = https://github.com/antonybevan/safety_oncology.git;
 
@@ -110,18 +122,6 @@
 
     %put NOTE: --------------------------------------------------;
     %put NOTE: Starting GIT RESCUE Operation...;
-
-    /* Release any active library, file, and ODS locks to avoid in-use errors during cleanup */
-    ods _all_ close;
-
-    /* Remove _mclib from the sasautos autocall path list to release system-level directory locks */
-    options sasautos=(SASAUTOS);
-
-    libname sdtm clear;
-    libname adam clear;
-    libname raw clear;
-    libname legacy clear;
-    filename _mclib clear;
 
     /* 1. Only attempt pull if local directory is an initialized Git repo (.git/config exists) */
     %if %sysfunc(fileexist(&safe_path/.git/config)) %then %do;
