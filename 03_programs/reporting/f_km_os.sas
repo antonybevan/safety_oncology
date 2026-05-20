@@ -41,12 +41,28 @@ data os_data;
 run;
 
 /* 2. Kaplan-Meier Analysis */
-ods output ProductLimitEstimates=os_km_est Quartiles=os_km_quartiles;
+ods output ProductLimitEstimates=os_km_est_raw Quartiles=os_km_quartiles;
 proc lifetest data=os_data method=KM plots=survival(atrisk=0 to 24 by 6);
     time OS_MONTHS * OS_CNSR(1);
     strata ARMCD / test=logrank;
 run;
 ods output clear;
+
+/* Carry forward survival estimates for censoring times (which have missing Survival values in ODS) */
+data os_km_est;
+    set os_km_est_raw;
+    by Stratum;
+    retain _survival _stderr;
+    if first.Stratum then do;
+        _survival = 1.0;
+        _stderr = 0.0;
+    end;
+    if Survival ne . then _survival = Survival;
+    if StdErr ne . then _stderr = StdErr;
+    
+    if Survival = . then Survival = _survival;
+    if StdErr = . then StdErr = _stderr;
+run;
 
 /* 3. Extract Median OS with 95% CI */
 data os_median;

@@ -72,6 +72,10 @@ data shell;
     end;
 run;
 
+proc sort data=shell;
+    by _NAME_ ARMCD;
+run;
+
 data trans_aesi_all;
     merge shell(in=s) trans_aesi(in=a);
     by _NAME_ ARMCD;

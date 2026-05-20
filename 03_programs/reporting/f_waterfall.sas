@@ -30,19 +30,13 @@
         %let adtr_has_aval = 0;
         %let adtr_has_paramcd = 0;
 
-        proc sql noprint;
-            select count(*) into :adtr_has_chg trimmed
-            from dictionary.columns
-            where libname='ADAM' and memname='ADTR' and upcase(name)='CHG';
-
-            select count(*) into :adtr_has_aval trimmed
-            from dictionary.columns
-            where libname='ADAM' and memname='ADTR' and upcase(name)='AVAL';
-
-            select count(*) into :adtr_has_paramcd trimmed
-            from dictionary.columns
-            where libname='ADAM' and memname='ADTR' and upcase(name)='PARAMCD';
-        quit;
+        %let dsid = %sysfunc(open(adam.adtr));
+        %if &dsid %then %do;
+            %if %sysfunc(varnum(&dsid, CHG)) > 0 %then %let adtr_has_chg = 1;
+            %if %sysfunc(varnum(&dsid, AVAL)) > 0 %then %let adtr_has_aval = 1;
+            %if %sysfunc(varnum(&dsid, PARAMCD)) > 0 %then %let adtr_has_paramcd = 1;
+            %let rc = %sysfunc(close(&dsid));
+        %end;
 
         %if &adtr_has_chg > 0 %then %do;
             proc sql;
@@ -81,19 +75,12 @@
         %let adrs_has_aval = 0;
         %let adrs_has_paramcd = 0;
 
-        proc sql noprint;
-            select count(*) into :adrs_has_aval trimmed
-            from dictionary.columns
-            where libname='ADAM'
-              and memname=upcase(scan("&adrs_src", 2, "."))
-              and upcase(name)='AVAL';
-
-            select count(*) into :adrs_has_paramcd trimmed
-            from dictionary.columns
-            where libname='ADAM'
-              and memname=upcase(scan("&adrs_src", 2, "."))
-              and upcase(name)='PARAMCD';
-        quit;
+        %let dsid = %sysfunc(open(&adrs_src));
+        %if &dsid %then %do;
+            %if %sysfunc(varnum(&dsid, AVAL)) > 0 %then %let adrs_has_aval = 1;
+            %if %sysfunc(varnum(&dsid, PARAMCD)) > 0 %then %let adrs_has_paramcd = 1;
+            %let rc = %sysfunc(close(&dsid));
+        %end;
 
         %if (&adrs_has_aval > 0 and &adrs_has_paramcd > 0) %then %do;
             proc sql;
