@@ -12,7 +12,9 @@ libname sdtm clear;
 libname adam clear;
 libname raw clear;
 libname legacy clear;
-filename _mclib clear;
+/* Silently deassign _mclib — SAS holds an internal lock on the fileref even after removing it
+   from sasautos, so using %sysfunc(filename()) avoids the "still in use" ERROR in the log.   */
+%let _rc = %sysfunc(filename(_mclib));
 
 /******************************************************************************
  * Program:      GIT_RESCUE.sas
