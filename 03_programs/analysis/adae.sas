@@ -2,7 +2,7 @@
  * Program:      adae.sas
  * Protocol:     BV-CAR20-P1
  * Purpose:      Create ADaM Adverse Event Analysis Dataset (ADAE)
- * Author:       Clinical Programming Lead
+ * Author:       Statistical Programmer
  * Date:         2026-01-25
  * SAS Version:  9.4
  * ADaM Version: 2.1 / IG v1.3
@@ -15,10 +15,10 @@
  *---------------------------------------------------------------------------
  * Date        Author              Description
  * ----------  ------------------  -----------------------------------------
- * 2026-01-25  Programming Lead    Initial development
- * 2026-02-01  Programming Lead    Added DLT logic per SAP Section 8.3
- * 2026-02-05  Programming Lead    Enhanced ASTCT grading integration
- * 2026-02-08  Programming Lead    Path standardization, AESICAT derivation
+ * 2026-01-25  Statistical Programmer    Initial development
+ * 2026-02-01  Statistical Programmer    Added DLT logic per SAP Section 8.3
+ * 2026-02-05  Statistical Programmer    Enhanced ASTCT grading integration
+ * 2026-02-08  Statistical Programmer    Path standardization, AESICAT derivation
  *
  *---------------------------------------------------------------------------
  * QC LOG
@@ -88,16 +88,12 @@ data adae;
     AESOC = strip(AESOC);
     AEREL = strip(AEREL);
 
-    /* Analysis Day (SAP §5.7 specialized scale: -1, 0, 2) */
+    /* Analysis Day (CDISC standard relative day: ..., -1, 1, 2) */
     if not missing(ASTDT) and not missing(CARTDT) then do;
-        if ASTDT < CARTDT then ASTDY = ASTDT - CARTDT;
-        else if ASTDT = CARTDT then ASTDY = 0;
-        else ASTDY = ASTDT - CARTDT + 1; /* Scales 2, 3, etc. (Omit Day 1) */
+        ASTDY = ASTDT - CARTDT + (ASTDT >= CARTDT);
     end;
     if not missing(AENDT) and not missing(CARTDT) then do;
-        if AENDT < CARTDT then AENDY = AENDT - CARTDT;
-        else if AENDT = CARTDT then AENDY = 0;
-        else AENDY = AENDT - CARTDT + 1;
+        AENDY = AENDT - CARTDT + (AENDT >= CARTDT);
     end;
 
     /* Treatment Emergent Flag (SAP Section 8.2.1: On/After first lymphodepletion dose) */
@@ -130,13 +126,7 @@ data adae;
     /* Numeric Grading - Use Centralized Macro */
     %calc_astct(source_grade=AETOXGR, out_grade=AETOXGRN);
 
-    /* --- ASTCT vs CTCAE Traceability (Professional CAR-T Requirement) --- */
-    /* ASTCTGR is character from SUPPAE, preserve it */
-    if missing(ASTCTGR) and (AESICAT in ("CRS", "ICANS")) then 
-        ASTCTGR = put(AETOXGRN, 1.);
-
-
-    /* AESI Flag and DLT logic */
+    /* AESI Flag and AESI Category Derivation */
     AESIFL = "N";
     DLTFL = "N";
     length AESICAT $10;
@@ -161,6 +151,11 @@ data adae;
        index(upcase(AEDECOD), 'SEPSIS') > 0 or 
        index(upcase(AEDECOD), 'PNEUMONIA') > 0 then INFFL = "Y";
     else INFFL = "N";
+
+    /* --- ASTCT vs CTCAE Traceability (Professional CAR-T Requirement) --- */
+    /* ASTCTGR is character from SUPPAE, preserve it */
+    if missing(ASTCTGR) and (AESICAT in ("CRS", "ICANS")) then 
+        ASTCTGR = put(AETOXGRN, 1.);
 
     /* ========================================================================
        DLT DERIVATION LOGIC (Per Protocol Section 3.8)
@@ -271,7 +266,7 @@ data adae;
         TRTAN    = "Actual Treatment (N)"
         TRTEMFL  = "Trt Emergent Analysis Flag (Regimen)"
         PSTCARFL = "Post-CAR-T Infusion Flag"
-        ASTCTGR  = "ASTCT Consensus Grade (Numeric)"
+
         AETOXGRN = "Analysis Toxicity Grade (N)"
 
         AESIFL   = "Adverse Event of Special Interest Flag"
@@ -313,11 +308,7 @@ data adam.adae;
 run;
 
 /* 4. Export to XPT */
-libname xpt xport "&ADAM_PATH/adae.xpt";
-data xpt.adae;
-    set adae;
-run;
-libname xpt clear;
+%xpt_export(ds=adae, xptpath=&ADAM_PATH/adae.xpt, outname=adae);
 
 proc freq data=adae;
     tables TRTEMFL * AESIFL / nopercent norow nocol;

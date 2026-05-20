@@ -2,38 +2,12 @@
  * Program:      f_km_os.sas
  * Protocol:     BV-CAR20-P1
  * Purpose:      Kaplan-Meier Survival Curve for Overall Survival (OS)
- * Author:       Clinical Programming Lead
+ * Author:       Statistical Programmer
  * Date:         2026-02-05
  * SAS Version:  9.4
- * SAP Reference: Section 1.4 (Exploratory)
- *
- * Input:        adam.adsl
- * Output:       Figure F-EFF2: Kaplan-Meier Curve for OS
- *
- * Note:         OS defined as time from Day 0 to death from any cause
  ******************************************************************************/
 
-%macro load_config;
-   %if %symexist(CONFIG_LOADED) %then %if &CONFIG_LOADED=1 %then %return;
-   %if %sysfunc(fileexist(00_config.sas)) %then %include "00_config.sas";
-   %else %if %sysfunc(fileexist(03_programs/00_config.sas)) %then %include "03_programs/00_config.sas";
-   %else %if %sysfunc(fileexist(../00_config.sas)) %then %include "../00_config.sas";
-   %else %if %sysfunc(fileexist(../03_programs/00_config.sas)) %then %include "../03_programs/00_config.sas";
-   %else %if %sysfunc(fileexist(../../00_config.sas)) %then %include "../../00_config.sas";
-   %else %if %sysfunc(fileexist(../../03_programs/00_config.sas)) %then %include "../../03_programs/00_config.sas";
-   %else %if %sysfunc(fileexist(../../../00_config.sas)) %then %include "../../../00_config.sas";
-   %else %if %sysfunc(fileexist(../../../03_programs/00_config.sas)) %then %include "../../../03_programs/00_config.sas";
-   %else %do;
-      %put ERROR: Unable to locate 00_config.sas from current working directory.;
-      %abort cancel;
-   %end;
-%mend;
 %load_config;
-
-/* ============================================================================
-   KAPLAN-MEIER ANALYSIS FOR OVERALL SURVIVAL
-   Per SAP Section 1.4: KM methods for time-to-event variables
-   ============================================================================ */
 
 /* 1. Derive OS Data from ADSL */
 data os_data;
@@ -89,8 +63,7 @@ data os_median;
 run;
 
 /* 4. Create Publication-Quality KM Figure */
-ods graphics on / reset=all imagename="f_km_os" imagefmt=png width=8in height=6in;
-ods listing gpath="&OUT_FIGURES";
+%ods_setup(type=GRAPH, imgname=f_km_os);
 
 proc lifetest data=os_data method=KM 
     plots=survival(atrisk=0 to 24 by 6 outside(0.15) cb=hw);
@@ -103,7 +76,7 @@ proc lifetest data=os_data method=KM
     footnote3 "Tick marks indicate censored observations.";
 run;
 
-ods graphics off;
+%ods_close(type=GRAPH);
 
 /* 5. Summary Statistics */
 proc print data=os_median noobs label;
@@ -111,23 +84,43 @@ proc print data=os_median noobs label;
     title "Median OS by Dose Level";
 run;
 
-/* 6. 6-Month and 12-Month Survival Rates */
-data os_landmarks;
+/* 6. 6-Month and 12-Month Survival Rates (Step-Function Robust Approach) */
+data os_landmarks_6;
     set os_km_est;
-    where OS_MONTHS in (6, 12);
-    
-    Survival_Pct = put(Survival * 100, 5.1) || '%';
-    
-    label Survival_Pct = "Survival Rate (%)";
+    where OS_MONTHS <= 6;
+run;
+proc sort data=os_landmarks_6; by Stratum descending OS_MONTHS; run;
+data os_landmark_6;
+    set os_landmarks_6;
+    by Stratum;
+    if first.Stratum;
+    Landmark_Time = 6;
 run;
 
-proc print data=os_landmarks noobs;
-    var Stratum OS_MONTHS Survival_Pct;
+data os_landmarks_12;
+    set os_km_est;
+    where OS_MONTHS <= 12;
+run;
+proc sort data=os_landmarks_12; by Stratum descending OS_MONTHS; run;
+data os_landmark_12;
+    set os_landmarks_12;
+    by Stratum;
+    if first.Stratum;
+    Landmark_Time = 12;
+run;
+
+data os_landmarks;
+    set os_landmark_6 os_landmark_12;
+    Survival_Pct = put(Survival * 100, 5.1) || '%';
+    label Landmark_Time = "Landmark Month"
+          Survival_Pct = "Survival Rate (%)";
+run;
+
+proc print data=os_landmarks noobs label;
+    var Stratum Landmark_Time Survival_Pct;
     title "Landmark Survival Rates";
 run;
 
 %put NOTE: ----------------------------------------------------;
 %put NOTE: KM OS FIGURE GENERATED: f_km_os.png;
 %put NOTE: ----------------------------------------------------;
-
-

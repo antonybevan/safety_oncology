@@ -2,36 +2,30 @@
  * Program:      adsl.sas
  * Protocol:     BV-CAR20-P1
  * Purpose:      Create ADaM Subject Level Analysis Dataset (ADSL)
- * Author:       Clinical Programming Lead
+ * Author:       Statistical Programmer
  * Date:         2026-01-25
- * SAS Version:  9.4
+ * SAS Version:  9.4 / SAS OnDemand compatible
  * ADaM Version: 2.1 / IG v1.3
  *
- * Input:        sdtm.dm, sdtm.ex, sdtm.rs
- * Output:       adam.adsl.xpt
+ * Input:        sdtm.dm, sdtm.ex, sdtm.rs, sdtm.ae
+ * Output:       adam.adsl, adam.adsl.xpt
  *
- *---------------------------------------------------------------------------
- * MODIFICATION HISTORY
- *---------------------------------------------------------------------------
- * Date        Author              Description
- * ----------  ------------------  -----------------------------------------
- * 2026-01-25  Programming Lead    Initial development
- * 2026-02-01  Programming Lead    Added DLTEVLFL population flag
- * 2026-02-05  Programming Lead    Enhanced death derivation from AE Grade 5
- * 2026-02-08  Programming Lead    Path standardization, added ARMCD mapping
- *
- *---------------------------------------------------------------------------
- * QC LOG
- *---------------------------------------------------------------------------
- * QC Level: 3 (Independent Programming)
- * QC Date:  2026-02-08
- * QC By:    Senior Programmer
- * Status:   PASS - All population flags verified
+ * CDISC / Population Notes:
+ *   - Screen failures: ITTFL='N', SAFFL='N', EFFFL='N' — never eligible
+ *   - ITT Population: All subjects who signed ICF and were enrolled
+ *   - Safety Population (SAFFL='Y'): All subjects who received any study drug
+ *   - Efficacy Population (EFFFL='Y'): Safety subjects with >= 1 post-baseline
+ *     response assessment
+ *   - DLTEVLFL='Y': Received CAR-T AND (completed 28d window OR had DLT)
+ *   - TRTDUR: computed as &DCUTDT - CARTDT + 1 using fixed submission date
+ *   - All dates in SAS date9. format; ISO character dates kept as DTC variables
  ******************************************************************************/
 
 /* Environment assumed to be set by 00_main.sas -> 00_config.sas */
 
-/* 1. Get Dates from EX (Regimen Alignment) */
+/* ============================================================================
+   1. TREATMENT DATES FROM EX
+   ============================================================================ */
 proc sort data=sdtm.ex out=ex_sorted;
     by USUBJID EXSTDTC;
 run;
@@ -39,259 +33,261 @@ run;
 data car_dates;
     set ex_sorted;
     by USUBJID;
-    
+
     retain TRTSDT TRTEDT CARTDT LDSTDT;
     format TRTSDT TRTEDT CARTDT LDSTDT date9.;
-    
-    /* Regimen Start (Lymphodepletion or CAR-T) */
+
+    /* First exposure = regimen start (lymphodepletion or CAR-T) */
     if first.USUBJID then do;
+        TRTSDT = .;
+        CARTDT = .;
+        LDSTDT = .;
         %iso_to_sas(iso_var=EXSTDTC, sas_var=TRTSDT);
-        if upcase(EXTRT) in ('FLUDARABINE', 'CYCLOPHOSPHAMIDE') then LDSTDT = TRTSDT;
+        if upcase(EXTRT) in ('FLUDARABINE','CYCLOPHOSPHAMIDE') then LDSTDT = TRTSDT;
     end;
-    
-    /* Specific CAR-T Infusion Date */
-    if upcase(EXTRT) = 'BV-CAR20' and missing(CARTDT) then do;
+
+    /* First CAR-T infusion date */
+    if upcase(EXTRT) = 'BV-CAR20' and missing(CARTDT) then
         %iso_to_sas(iso_var=EXSTDTC, sas_var=CARTDT);
-    end;
-    
+
+    /* Last exposure date */
     if last.USUBJID then do;
         %iso_to_sas(iso_var=EXENDTC, sas_var=TRTEDT);
         output;
     end;
-    
+
     keep USUBJID TRTSDT TRTEDT CARTDT LDSTDT;
 run;
 
-/* 2. Check for Efficacy Assessments in RS */
+/* ============================================================================
+   2. EFFICACY ASSESSMENT PRESENCE (from RS)
+   ============================================================================ */
 proc sort data=sdtm.rs out=rs_subj(keep=USUBJID) nodupkey;
     by USUBJID;
 run;
 
-/* 2a. De-duplicate death records for hash safety */
+/* ============================================================================
+   3. DEATH EVENTS (Grade 5 AE — first per subject)
+   ============================================================================ */
 proc sort data=sdtm.ae(where=(strip(AETOXGR)='5' and not missing(AESTDTC)))
           out=ae_death_all;
     by USUBJID AESTDTC;
 run;
-
 data ae_death_first;
     set ae_death_all;
-    by USUBJID AESTDTC;
+    by USUBJID;
     if first.USUBJID;
     keep USUBJID AESTDTC AEDECOD;
 run;
 
-/* 2b. Identify DLT events for Population Evaluability (Submission-Grade) */
-proc sort data=sdtm.ae(where=(AETOXGR in ('3','4','5') and AEREL not in ('NOT RELATED', 'NONE')))
-          out=ae_dlts;
+/* ============================================================================
+   4. DLT EVENTS (Grades 3-5, treatment-related, for evaluability flag)
+   ============================================================================ */
+proc sort data=sdtm.ae(where=(
+    input(AETOXGR, ?? 8.) >= 3
+    and upcase(AEREL) not in ('NOT RELATED','NONE','UNRELATED')
+    and not missing(AESTDTC)
+)) out=ae_dlts;
     by USUBJID AESTDTC;
 run;
-
 data sdtm_dlts;
     set ae_dlts;
-    by USUBJID AESTDTC;
+    by USUBJID;
     if first.USUBJID;
     keep USUBJID AESTDTC;
 run;
 
-
-/* 3. Build ADSL */
+/* ============================================================================
+   5. BUILD ADSL
+   ============================================================================ */
 data adsl;
-    length AESTDTC $10 DTHCAUS $100 COHORT $10 EVALCRIT $25;
+    length DTHCAUS $100 COHORT $10 EVALCRIT $25 DLTEV_FL $1;
     set sdtm.dm;
-    
-    /* Merge in dates */
+
+    /* ---- Merge Treatment Dates (Hash) ---- */
     if _n_ = 1 then do;
         declare hash h(dataset:'car_dates');
         h.defineKey('USUBJID');
-        h.defineData('TRTSDT', 'TRTEDT', 'CARTDT', 'LDSTDT');
+        h.defineData('TRTSDT','TRTEDT','CARTDT','LDSTDT');
         h.defineDone();
-    end;
-    
-    if h.find() ne 0 then do;
-        TRTSDT = .;
-        TRTEDT = .;
-        CARTDT = .;
-        LDSTDT = .;
-    end;
 
-    /* Merge in Efficacy Flag */
-    if _n_ = 1 then do;
+        /* Efficacy assessments */
         declare hash e(dataset:'rs_subj');
         e.defineKey('USUBJID');
         e.defineDone();
-        
-        /* Death Info from AE */
+
+        /* Death info */
         declare hash d(dataset:'ae_death_first');
         d.defineKey('USUBJID');
-        d.defineData('AESTDTC', 'AEDECOD');
+        d.defineData('AESTDTC','AEDECOD');
         d.defineDone();
-    end;
-    
-    /* Derive Death Info */
-    if d.find() = 0 then do;
-        DTHDT = input(AESTDTC, yymmdd10.);
-        DTHDTC = AESTDTC;
-        DTHCAUS = AEDECOD;
-        DTHFL = "Y";
-    end;
-    else do;
-        DTHDT = .;
-        DTHDTC = "";
-        DTHCAUS = "";
-        DTHFL = "N";
-    end;
 
-    
-    /* 3a. Merge DLT Status for Evaluability (SAP §4) */
-    if _n_ = 1 then do;
+        /* DLT events */
         declare hash dlt(dataset:'sdtm_dlts');
         dlt.defineKey('USUBJID');
         dlt.defineData('AESTDTC');
         dlt.defineDone();
     end;
-    
-    length AESTDT_C $10 DLTEV_FL $1;
+
+    if h.find() ne 0 then do;
+        TRTSDT = .; TRTEDT = .; CARTDT = .; LDSTDT = .;
+    end;
+
+    /* ---- Death Derivation ---- */
+    length _DEATHDTC $10 _DEATHDECOD $100;
+    if d.find() = 0 then do;
+        _DEATHDTC   = AESTDTC;
+        _DEATHDECOD = AEDECOD;
+        DTHDT  = input(_DEATHDTC, yymmdd10.);
+        DTHDTC = _DEATHDTC;
+        DTHCAUS = _DEATHDECOD;
+        DTHFL = 'Y';
+    end;
+    else do;
+        DTHDT = .; DTHDTC = ''; DTHCAUS = ''; DTHFL = 'N';
+    end;
+
+    /* ---- DLT Evaluability (within 28 days of CAR-T) ---- */
+    length _DLTDTC $10;
     if dlt.find() = 0 then do;
-        _dlt_dt = input(AESTDTC, yymmdd10.);
-        /* Event must be within 28 days of infusion */
-        if not missing(_dlt_dt) and not missing(CARTDT) then do;
-            if 0 <= (_dlt_dt - CARTDT) <= 28 then DLTEV_FL = 'Y';
-            else DLTEV_FL = 'N';
-        end;
+        _DLTDTC = AESTDTC;
+        _dlt_dt = input(_DLTDTC, yymmdd10.);
+        if not missing(_dlt_dt) and not missing(CARTDT)
+            and 0 <= (_dlt_dt - CARTDT) <= 28 then DLTEV_FL = 'Y';
         else DLTEV_FL = 'N';
     end;
     else DLTEV_FL = 'N';
 
-    
-    /* Last Known Alive Date (fallback to last treatment date) */
-    if not missing(TRTEDT) then LSTALVDT = TRTEDT;
+    /* ---- Last Known Alive Date ---- */
+    if      not missing(TRTEDT) then LSTALVDT = TRTEDT;
     else if not missing(TRTSDT) then LSTALVDT = TRTSDT;
-    else LSTALVDT = .;
+    else                             LSTALVDT = .;
 
-    /* Population Flags */
-    ITTFL = "Y";
-    
-    if not missing(TRTSDT) then SAFFL = "Y";
-    else SAFFL = "N";
-    
-    if SAFFL = "Y" and e.find() = 0 then EFFFL = "Y";
-    else EFFFL = "N";
+    /* ---- Population Flags (CDISC ADaM IG §3.3) ----
+       Screen failures come from DM already flagged ITTFL/SAFFL='N'
+       We override only for confirmed treated subjects                  */
+    /* ITT: all enrolled (ICF signed, not screen failure) */
+    if upcase(strip(ITTFL)) ne 'N' then ITTFL = 'Y';
 
-    /* Dose-Escalation Set Flag (CAR-T recipients only) */
-    /* Set to Y if subject received CAR-T infusion */
-    if not missing(CARTDT) then DSCLFL = "Y";
-    else DSCLFL = "N";
+    /* Safety: received any study drug */
+    if not missing(TRTSDT) then SAFFL = 'Y';
+    else SAFFL = 'N';
 
-    /* Analysis Treatments per ADaM IG */
+    /* Efficacy: safety subject with >= 1 post-baseline assessment */
+    if SAFFL = 'Y' and e.find() = 0 then EFFFL = 'Y';
+    else EFFFL = 'N';
+
+    /* Dose-escalation set: received CAR-T */
+    if not missing(CARTDT) then DSCLFL = 'Y';
+    else DSCLFL = 'N';
+
+    /* ---- Analysis Treatments per ADaM IG ---- */
     length TRT01P TRT01A $200;
     TRT01P = ARM;
-    TRT01A = ARM; /* Fallback to ARM since ACTARM is missing in simulation */
-    
-    /* Numeric Analysis Treatments based on ARMCD */
+    TRT01A = ARM;
     if ARMCD = 'DL1' then TRT01PN = 1;
     else if ARMCD = 'DL2' then TRT01PN = 2;
     else if ARMCD = 'DL3' then TRT01PN = 3;
-    
     TRT01AN = TRT01PN;
 
-    /* Disease Cohort and Evaluation Criteria (Lugano vs iwCLL) */
+    /* ---- Disease Cohort ---- */
     if DISEASE = 'NHL' then do;
         COHORT = 'NHL';
         EVALCRIT = 'LUGANO 2016';
     end;
-    else if DISEASE in ('CLL', 'SLL') then do;
+    else if DISEASE in ('CLL','SLL') then do;
         COHORT = 'CLL';
         EVALCRIT = 'iwCLL 2018';
     end;
 
-    /* DLT Evaluable Population Flag (Submission-Grade Hardening) */
-    /* A subject is evaluable if they:
-       1. Received CAR-T AND completed 28-day window 
-       2. OR Received CAR-T AND had a DLT event within the window
-    */
-    length DLTEVLFL MBOINFL $1;
+    /* ---- DLT Evaluable Population (3+3 Dose Escalation) ----
+       DLT evaluable = received CAR-T AND (completed 28d window OR had DLT)  */
+    length DLTEVLFL $1;
     if DSCLFL = 'Y' and not missing(CARTDT) then do;
-        TRTDUR = DCUTDT - CARTDT + 1; /* DCUTDT from config */
-        
-        /* Dose Intensity Calculation (Submission-Grade Math) */
-        if not missing(TRT01PN) and TRT01PN > 0 then do;
-            /* In a real trial, TRT01A_DOSE and TRT01P_DOSE would be merged from EX/DS */
-            /* Using a heuristic for the synthetic data based on Cohort Number if needed */
-            _dose_int = 1.0; /* Administered / Planned Ratio */
-        end;
-        else _dose_int = 1.0;
-        
-        if (TRTDUR >= 28 or DLTEV_FL = 'Y') and _dose_int >= 0.8 then DLTEVLFL = 'Y';
+        /* TRTDUR from CAR-T to fixed data cutoff (not today() — reproducible) */
+        TRTDUR = &DCUTDT - CARTDT + 1;
+
+        if (TRTDUR >= 28 or DLTEV_FL = 'Y') then DLTEVLFL = 'Y';
         else DLTEVLFL = 'N';
-        
-        MBOINFL = 'Y'; /* Any dose-escalation subject receiving CAR-T */
+
     end;
     else do;
+        TRTDUR   = .;
         DLTEVLFL = 'N';
-        MBOINFL = 'N';
     end;
 
-
-
-    /* Age Grouping */
+    /* ---- Age Group ---- */
     length AGEGR1 $10;
-    if missing(AGE) then AGEGR1 = "";
-    else if AGE < 65 then AGEGR1 = "<65";
-    else AGEGR1 = ">=65";
+    if      missing(AGE)  then AGEGR1 = '';
+    else if AGE < 65      then AGEGR1 = '<65';
+    else                       AGEGR1 = '>=65';
 
-    /* End of Study Status (CDISC ADaM requirement) */
+    /* ---- End of Study Status ---- */
     length EOSSTT $30;
-    if DTHFL = "Y" then EOSSTT = "DEAD";
-    else if not missing(TRTSDT) then EOSSTT = "ONGOING";
-    else EOSSTT = "DISCONTINUED";
+    if      DTHFL = 'Y'           then EOSSTT = 'DEAD';
+    else if not missing(TRTSDT)   then EOSSTT = 'ONGOING';
+    else                               EOSSTT = 'DISCONTINUED';
 
+    /* ---- Date Formats ---- */
+    format TRTSDT TRTEDT CARTDT LDSTDT DTHDT LSTALVDT date9.;
 
-    /* Dates Formatting */
-    format TRTSDT TRTEDT CARTDT DTHDT LSTALVDT date9.;
-    
-    /* Labels per CDISC */
-    label 
-        TRTSDT   = "Date of First Exposure to Study Regimen"
-        TRTEDT   = "Date of Last Exposure to Study Regimen"
-        CARTDT   = "Date of CAR-T Infusion"
-        LDSTDT   = "Date of First Lymphodepletion"
-        ITTFL    = "Intent-To-Treat Population Flag"
-        SAFFL    = "Safety Population Flag"
-        EFFFL    = "Efficacy Population Flag"
-        DSCLFL   = "Dose-Escalation Set Flag"
-        DLTEVLFL = "DLT Evaluability Flag"
-        MBOINFL  = "mBOIN Decision Population Flag"
-        TRT01P   = "Planned Treatment for Period 01"
-
-        TRT01PN  = "Planned Treatment for Period 01 (N)"
-        TRT01A   = "Actual Treatment for Period 01"
-        TRT01AN  = "Actual Treatment for Period 01 (N)"
-        COHORT   = "Disease Cohort"
-        EVALCRIT = "Analysis Evaluation Criteria"
-        AGEGR1   = "Pooled Age Group 1"
-        DTHDT    = "Date of Death"
-        DTHDTC   = "Date/Time of Death"
-        DTHCAUS  = "Cause of Death"
-        DTHFL    = "Death Flag"
-        LSTALVDT = "Last Known Alive Date"
+    /* ---- Labels (CDISC ADaM IG) ---- */
+    label
+        TRTSDT   = 'Date of First Exposure to Study Regimen'
+        TRTEDT   = 'Date of Last Exposure to Study Regimen'
+        CARTDT   = 'Date of CAR-T Infusion'
+        LDSTDT   = 'Date of First Lymphodepletion'
+        TRTDUR   = 'Treatment Duration (Days to Data Cutoff)'
+        ITTFL    = 'Intent-To-Treat Population Flag'
+        SAFFL    = 'Safety Population Flag'
+        EFFFL    = 'Efficacy Population Flag'
+        DSCLFL   = 'Dose-Escalation Set Flag'
+        DLTEVLFL = 'DLT Evaluability Flag'
+        TRT01P   = 'Planned Treatment for Period 01'
+        TRT01PN  = 'Planned Treatment for Period 01 (N)'
+        TRT01A   = 'Actual Treatment for Period 01'
+        TRT01AN  = 'Actual Treatment for Period 01 (N)'
+        COHORT   = 'Disease Cohort'
+        EVALCRIT = 'Analysis Evaluation Criteria'
+        AGEGR1   = 'Pooled Age Group 1'
+        DTHDT    = 'Date of Death'
+        DTHDTC   = 'Date/Time of Death (ISO 8601)'
+        DTHCAUS  = 'Cause of Death'
+        DTHFL    = 'Death Flag'
+        LSTALVDT = 'Last Known Alive Date'
+        EOSSTT   = 'End of Study Status'
+        DLTEV_FL = 'DLT Event in Window Flag'
     ;
-    
+
+    /* Drop internal intermediate variables */
+    drop _DEATHDTC _DEATHDECOD _DLTDTC _dlt_dt DISEASE;
 run;
 
-/* Create permanent SAS dataset for other ADaM use */
+/* ============================================================================
+   6. PERMANENT SAS DATASET
+   ============================================================================ */
 data adam.adsl;
     set adsl;
 run;
 
-/* 4. Export to XPT - Drop non-standard variables for V6 compatibility */
-libname xpt xport "&ADAM_PATH/adsl.xpt";
-data xpt.adsl;
-    set adsl;
-    drop AESTDTC AEDECOD; /* Drop hash-loaded intermediate vars */
+/* ============================================================================
+   7. XPT EXPORT
+   ============================================================================ */
+data adsl_xpt;
+    set adam.adsl;
+    /* AESTDTC/AEDECOD are absorbed into DTHDT/DTHDTC/DTHCAUS above */
 run;
-libname xpt clear;
+%xpt_export(ds=adsl_xpt, xptpath=&ADAM_PATH/adsl.xpt, outname=adsl);
 
-proc print data=adsl(obs=10);
+/* ============================================================================
+   8. VALIDATION
+   ============================================================================ */
+proc freq data=adam.adsl;
+    tables ITTFL SAFFL EFFFL DLTEVLFL / missing;
+    title "ADaM ADSL: Population Flag Frequencies";
+run;
+
+proc print data=adam.adsl(obs=10);
+    var USUBJID ARMCD TRTSDT CARTDT SAFFL ITTFL EFFFL DLTEVLFL DTHFL EOSSTT;
     title "ADaM ADSL - First 10 Subjects";
 run;
-

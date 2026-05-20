@@ -2,7 +2,7 @@
  * Program:      suppae.sas
  * Protocol:     BV-CAR20-P1
  * Purpose:      Create SDTM Supplemental AE (SUPPAE) domain for ASTCT grading
- * Author:       Clinical Programming Lead
+ * Author:       Statistical Programmer
  * Date:         2026-01-31
  * SAS Version:  9.4
  ******************************************************************************/
@@ -14,11 +14,11 @@
 data raw_ae;
     infile "&LEGACY_PATH/raw_ae.csv" dlm=',' dsd firstobs=2;
     /* Aligned with AE specs */
-    length STUDYID $20 USUBJID $40 ARM $100 SEX $1 RACE $40 DISEASE $5 RFSTDTC TRTSDT LDSTDT SAFFL ITTFL EFFFL $100
-           dose_level i subid AGE dt 8
-           AEDECOD AETERM AETOXGR AESOC AEREL $100 AESTDTC AEENDTC $10 AESER $1 AESID 8 day0 8;
+    length STUDYID $20 USUBJID $40 ARM $200 SEX $1 RACE $100 DISEASE $5 RFSTDTC TRTSDT LDSTDT $10
+           SAFFL ITTFL EFFFL $1
+           AEDECOD AETERM AETOXGR AESOC AEREL $100 AESTDTC AEENDTC $10 AESER $1 AESID 8 AEOUT AECONTRT $100 day0 8;
     input STUDYID $ USUBJID $ ARM $ SEX $ RACE $ DISEASE $ RFSTDTC $ TRTSDT $ LDSTDT $ SAFFL $ ITTFL $ EFFFL $ 
-          dose_level i subid AGE dt AEDECOD $ AETERM $ AETOXGR $ AESOC $ AEREL $ AESTDTC $ AEENDTC $ AESER $ AESID day0;
+          dose_level i subid AGE dt AEDECOD $ AETERM $ AETOXGR $ AESOC $ AEREL $ AESTDTC $ AEENDTC $ AESER $ AESID AEOUT $ AECONTRT $ day0;
 run;
 
 /* First, ensure we have the actual SDTM AE domain to get the real AESEQ */
@@ -89,9 +89,5 @@ data sdtm.suppae;
 run;
 
 /* Create XPT */
-libname xpt xport "&SDTM_PATH/suppae.xpt";
-data xpt.suppae;
-    set suppae;
-run;
-libname xpt clear;
+%xpt_export(ds=suppae, xptpath=&SDTM_PATH/suppae.xpt, outname=suppae);
 

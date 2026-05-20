@@ -2,7 +2,7 @@
  * Program:      f_km_pfs.sas
  * Protocol:     BV-CAR20-P1
  * Purpose:      Kaplan-Meier Survival Curve for Progression-Free Survival (PFS)
- * Author:       Clinical Programming Lead
+ * Author:       Statistical Programmer
  * Date:         2026-02-05
  * SAS Version:  9.4
  * SAP Reference: Section 1.4, Section 7.1.2, Table 6
@@ -14,21 +14,6 @@
  *               Censoring per SAP Table 6 and FDA guidance
  ******************************************************************************/
 
-%macro load_config;
-   %if %symexist(CONFIG_LOADED) %then %if &CONFIG_LOADED=1 %then %return;
-   %if %sysfunc(fileexist(00_config.sas)) %then %include "00_config.sas";
-   %else %if %sysfunc(fileexist(03_programs/00_config.sas)) %then %include "03_programs/00_config.sas";
-   %else %if %sysfunc(fileexist(../00_config.sas)) %then %include "../00_config.sas";
-   %else %if %sysfunc(fileexist(../03_programs/00_config.sas)) %then %include "../03_programs/00_config.sas";
-   %else %if %sysfunc(fileexist(../../00_config.sas)) %then %include "../../00_config.sas";
-   %else %if %sysfunc(fileexist(../../03_programs/00_config.sas)) %then %include "../../03_programs/00_config.sas";
-   %else %if %sysfunc(fileexist(../../../00_config.sas)) %then %include "../../../00_config.sas";
-   %else %if %sysfunc(fileexist(../../../03_programs/00_config.sas)) %then %include "../../../03_programs/00_config.sas";
-   %else %do;
-      %put ERROR: Unable to locate 00_config.sas from current working directory.;
-      %abort cancel;
-   %end;
-%mend;
 %load_config;
 
 /* ============================================================================
@@ -79,8 +64,8 @@ data km_median;
 run;
 
 /* 4. Create Publication-Quality KM Figure */
-ods graphics on / reset=all imagename="f_km_pfs" imagefmt=png width=8in height=6in;
-ods listing gpath="&OUT_FIGURES";
+%ods_setup(type=GRAPH, imgname=f_km_pfs);
+
 
 proc lifetest data=pfs_data method=KM 
     plots=survival(atrisk=0 to 12 by 3 outside(0.15) cb=hw test);
@@ -93,7 +78,7 @@ proc lifetest data=pfs_data method=KM
     footnote3 "Tick marks indicate censored observations.";
 run;
 
-ods graphics off;
+%ods_close(type=GRAPH);
 
 /* 5. Summary Statistics Table */
 proc print data=km_median noobs label;

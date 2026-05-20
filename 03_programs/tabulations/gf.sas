@@ -2,7 +2,7 @@
  * Program:      gf.sas
  * Protocol:     BV-CAR20-P1
  * Purpose:      Create SDTM Genomics Findings (GF) domain placeholder
- * Author:       Professional Regulatory Lead
+ * Author:       Statistical Programmer
  * Date:         2026-02-08
  * SAS Version:  9.4
  * Note:         This domain captures Vector Copy Number (VCN) analysis 
@@ -29,10 +29,6 @@ data sdtm.gf;
 run;
 
 /* 3. Export to XPT */
-libname xpt xport "&SDTM_PATH/gf.xpt";
-data xpt.gf;
-    set sdtm.gf;
-run;
-libname xpt clear;
+%xpt_export(ds=sdtm.gf, xptpath=&SDTM_PATH/gf.xpt, outname=gf);
 
 %put NOTE: ✅ SDTM.GF (Genomics Findings) Domain Structure Created;

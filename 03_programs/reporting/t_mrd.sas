@@ -2,7 +2,7 @@
  * Program:      t_mrd.sas
  * Protocol:     BV-CAR20-P1 (Phase 2a Expansion - Portfolio Extension)
  * Purpose:      Minimal Residual Disease (MRD) Analysis
- * Author:       Clinical Programming Lead
+ * Author:       Statistical Programmer
  * Date:         2026-02-05
  * SAS Version:  9.4
  *
@@ -13,21 +13,6 @@
  *               malignancies (10^-4 or 10^-5 sensitivity)
  ******************************************************************************/
 
-%macro load_config;
-   %if %symexist(CONFIG_LOADED) %then %if &CONFIG_LOADED=1 %then %return;
-   %if %sysfunc(fileexist(00_config.sas)) %then %include "00_config.sas";
-   %else %if %sysfunc(fileexist(03_programs/00_config.sas)) %then %include "03_programs/00_config.sas";
-   %else %if %sysfunc(fileexist(../00_config.sas)) %then %include "../00_config.sas";
-   %else %if %sysfunc(fileexist(../03_programs/00_config.sas)) %then %include "../03_programs/00_config.sas";
-   %else %if %sysfunc(fileexist(../../00_config.sas)) %then %include "../../00_config.sas";
-   %else %if %sysfunc(fileexist(../../03_programs/00_config.sas)) %then %include "../../03_programs/00_config.sas";
-   %else %if %sysfunc(fileexist(../../../00_config.sas)) %then %include "../../../00_config.sas";
-   %else %if %sysfunc(fileexist(../../../03_programs/00_config.sas)) %then %include "../../../03_programs/00_config.sas";
-   %else %do;
-      %put ERROR: Unable to locate 00_config.sas from current working directory.;
-      %abort cancel;
-   %end;
-%mend;
 %load_config;
 
 /* ============================================================================
@@ -76,7 +61,7 @@ run;
 
 /* 4. MRD Rate Over Time - Line Plot */
 ods graphics on / reset=all imagename="f_mrd_time" imagefmt=png width=8in height=6in;
-ods listing gpath="&OUT_FIGURES";
+ods listing image_dpi=300 gpath="&OUT_FIGURES";
 
 proc sgplot data=mrd_summary;
     series x=TIMEPOINT y=MRD_Neg_Rate / group=DISEASE 

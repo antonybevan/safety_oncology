@@ -2,26 +2,11 @@
  * Program:      l_sae.sas
  * Protocol:     BV-CAR20-P1
  * Purpose:      Generate Listing L-SAE1 - All Treatment-Emergent SAEs (SAP §8.2.1)
- * Author:       Clinical Programming Lead
+ * Author:       Statistical Programmer
  * Date:         2026-02-05
  * SAS Version:  9.4
  ******************************************************************************/
 
-%macro load_config;
-   %if %symexist(CONFIG_LOADED) %then %if &CONFIG_LOADED=1 %then %return;
-   %if %sysfunc(fileexist(00_config.sas)) %then %include "00_config.sas";
-   %else %if %sysfunc(fileexist(03_programs/00_config.sas)) %then %include "03_programs/00_config.sas";
-   %else %if %sysfunc(fileexist(../00_config.sas)) %then %include "../00_config.sas";
-   %else %if %sysfunc(fileexist(../03_programs/00_config.sas)) %then %include "../03_programs/00_config.sas";
-   %else %if %sysfunc(fileexist(../../00_config.sas)) %then %include "../../00_config.sas";
-   %else %if %sysfunc(fileexist(../../03_programs/00_config.sas)) %then %include "../../03_programs/00_config.sas";
-   %else %if %sysfunc(fileexist(../../../00_config.sas)) %then %include "../../../00_config.sas";
-   %else %if %sysfunc(fileexist(../../../03_programs/00_config.sas)) %then %include "../../../03_programs/00_config.sas";
-   %else %do;
-      %put ERROR: Unable to locate 00_config.sas from current working directory.;
-      %abort cancel;
-   %end;
-%mend;
 %load_config;
 
 /* 1. Extract TESAEs from ADAE */
@@ -59,9 +44,9 @@ proc report data=tesae_listing nowd headskip split='|' style(report)={outputwidt
 run;
 
 /* Export results */
-ods html body="&OUT_LISTINGS/l_sae.html";
+ods html5 body="&OUT_LISTINGS/l_sae.html";
 proc print data=tesae_listing noobs; run;
-ods html close;
+ods html5 close;
 
 %put NOTE: --------------------------------------------------;
 %put NOTE: ✅ LISTING L-SAE1 (All TESAEs) GENERATED;

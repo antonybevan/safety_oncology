@@ -2,7 +2,7 @@
  * Program:      t_sae_ld.sas
  * Protocol:     BV-CAR20-P1
  * Purpose:      Table 3.8: Summary of Lymphodepletion-related SAEs by Max Grade
- * Author:       Clinical Programming Lead
+ * Author:       Statistical Programmer
  * Date:         2026-02-05
  * SAS Version:  9.4
  * SAP Reference: Table 12 (3.8)
@@ -14,21 +14,6 @@
  *               (Fludarabine + Cyclophosphamide)
  ******************************************************************************/
 
-%macro load_config;
-   %if %symexist(CONFIG_LOADED) %then %if &CONFIG_LOADED=1 %then %return;
-   %if %sysfunc(fileexist(00_config.sas)) %then %include "00_config.sas";
-   %else %if %sysfunc(fileexist(03_programs/00_config.sas)) %then %include "03_programs/00_config.sas";
-   %else %if %sysfunc(fileexist(../00_config.sas)) %then %include "../00_config.sas";
-   %else %if %sysfunc(fileexist(../03_programs/00_config.sas)) %then %include "../03_programs/00_config.sas";
-   %else %if %sysfunc(fileexist(../../00_config.sas)) %then %include "../../00_config.sas";
-   %else %if %sysfunc(fileexist(../../03_programs/00_config.sas)) %then %include "../../03_programs/00_config.sas";
-   %else %if %sysfunc(fileexist(../../../00_config.sas)) %then %include "../../../00_config.sas";
-   %else %if %sysfunc(fileexist(../../../03_programs/00_config.sas)) %then %include "../../../03_programs/00_config.sas";
-   %else %do;
-      %put ERROR: Unable to locate 00_config.sas from current working directory.;
-      %abort cancel;
-   %end;
-%mend;
 %load_config;
 
 /* ============================================================================

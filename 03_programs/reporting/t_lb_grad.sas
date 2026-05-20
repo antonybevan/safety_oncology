@@ -2,26 +2,11 @@
  * Program:      t_lb_grad.sas
  * Protocol:     BV-CAR20-P1
  * Purpose:      Table 14.3.3 - Grade 3 or 4 Laboratory Toxicities
- * Author:       Clinical Programming Lead
+ * Author:       Statistical Programmer
  * Date:         2026-02-01
  * SAS Version:  9.4
  ******************************************************************************/
 
-%macro load_config;
-   %if %symexist(CONFIG_LOADED) %then %if &CONFIG_LOADED=1 %then %return;
-   %if %sysfunc(fileexist(00_config.sas)) %then %include "00_config.sas";
-   %else %if %sysfunc(fileexist(03_programs/00_config.sas)) %then %include "03_programs/00_config.sas";
-   %else %if %sysfunc(fileexist(../00_config.sas)) %then %include "../00_config.sas";
-   %else %if %sysfunc(fileexist(../03_programs/00_config.sas)) %then %include "../03_programs/00_config.sas";
-   %else %if %sysfunc(fileexist(../../00_config.sas)) %then %include "../../00_config.sas";
-   %else %if %sysfunc(fileexist(../../03_programs/00_config.sas)) %then %include "../../03_programs/00_config.sas";
-   %else %if %sysfunc(fileexist(../../../00_config.sas)) %then %include "../../../00_config.sas";
-   %else %if %sysfunc(fileexist(../../../03_programs/00_config.sas)) %then %include "../../../03_programs/00_config.sas";
-   %else %do;
-      %put ERROR: Unable to locate 00_config.sas from current working directory.;
-      %abort cancel;
-   %end;
-%mend;
 %load_config;
 
 /* 1. Get Population Totals */
@@ -79,8 +64,8 @@ proc report data=lb_subj_summ nowd headskip split='|' style(report)={outputwidth
 run;
 
 /* Export results */
-ods html body="&OUT_TABLES/t_lb_grad.html";
+ods html5 body="&OUT_TABLES/t_lb_grad.html";
 proc print data=lb_subj_summ(obs=10); run;
-ods html close;
+ods html5 close;
 
 

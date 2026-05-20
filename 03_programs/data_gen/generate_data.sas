@@ -1,8 +1,8 @@
 /******************************************************************************
  * Program:      generate_data.sas
  * Protocol:     BV-CAR20-P1
- * Purpose:      Clinical Trial Synthetic Data Generation
- * Author:       Clinical Programming Lead
+ * Purpose:      Clinical Trial Raw Data Simulation
+ * Author:       Statistical Programmer
  * Date:         2026-02-07
  * SAS Version:  9.4
  *
@@ -14,21 +14,6 @@
  *   - Integrated DLT evaluability and windowing logic
  ******************************************************************************/
 
-%macro load_config;
-   %if %symexist(CONFIG_LOADED) %then %if &CONFIG_LOADED=1 %then %return;
-   %if %sysfunc(fileexist(00_config.sas)) %then %include "00_config.sas";
-   %else %if %sysfunc(fileexist(03_programs/00_config.sas)) %then %include "03_programs/00_config.sas";
-   %else %if %sysfunc(fileexist(../00_config.sas)) %then %include "../00_config.sas";
-   %else %if %sysfunc(fileexist(../03_programs/00_config.sas)) %then %include "../03_programs/00_config.sas";
-   %else %if %sysfunc(fileexist(../../00_config.sas)) %then %include "../../00_config.sas";
-   %else %if %sysfunc(fileexist(../../03_programs/00_config.sas)) %then %include "../../03_programs/00_config.sas";
-   %else %if %sysfunc(fileexist(../../../00_config.sas)) %then %include "../../../00_config.sas";
-   %else %if %sysfunc(fileexist(../../../03_programs/00_config.sas)) %then %include "../../../03_programs/00_config.sas";
-   %else %do;
-      %put ERROR: Unable to locate 00_config.sas from current working directory.;
-      %abort cancel;
-   %end;
-%mend;
 %load_config;
 
 /* Define Study Metadata */
@@ -75,14 +60,14 @@ data raw_dm;
          else DISEASE = "SLL";
          
          /* Population Flags - Realistic assignment */
-         ITTFL = 'Y';  /* All enrolled */
-         
          /* ~15% screen failures (no treatment) */
          if rand('uniform') < 0.15 then do;
+            ITTFL = 'N';
             SAFFL = 'N';
             EFFFL = 'N';
          end;
          else do;
+            ITTFL = 'Y';
             SAFFL = 'Y';
             /* Efficacy evaluable if response assessment done (~90% of treated) */
             if rand('uniform') < 0.90 then EFFFL = 'Y';
@@ -168,7 +153,10 @@ data raw_ae;
    output;
  
    /* CRS - Dose-dependent rate (DL1: 60%, DL2: 80%, DL3: 94%) */
-   _crs_prob = 0.50 + dose_level * 0.15;
+   if dose_level = 1 then _crs_prob = 0.60;
+   else if dose_level = 2 then _crs_prob = 0.80;
+   else _crs_prob = 0.94;
+   
    if rand('uniform') < _crs_prob then do;
       AEDECOD = "Cytokine release syndrome";
       AETERM  = "Cytokine release syndrome";
@@ -194,7 +182,7 @@ data raw_ae;
       /* Onset: Median 2 days post-infusion */
       _onset = max(1, round(rand('gamma', 2, 1)));
       AESTDTC = put(day0 + _onset, yymmdd10.);
-      AEENDTC = put(day0 + _onset + round(rand('gamma', 7, 1)), yymmdd10.);
+      AEENDTC = put(day0 + _onset + round(rand('gamma', 5, 1.2)), yymmdd10.); /* More realistic duration distribution */
       AESER = ifc(AETOXGR in ('GRADE 3', 'GRADE 4'), 'Y', 'N');
       AESID = 2;
       AESOC = "Immune system disorders";
@@ -225,7 +213,7 @@ data raw_ae;
       /* Onset: Median 4-5 days (typically after CRS peak) */
       _onset = max(2, round(rand('gamma', 4.5, 1)));
       AESTDTC = put(day0 + _onset, yymmdd10.);
-      AEENDTC = put(day0 + _onset + round(rand('gamma', 12, 1)), yymmdd10.);
+      AEENDTC = put(day0 + _onset + round(rand('gamma', 7, 1.2)), yymmdd10.); /* More realistic duration distribution */
       AESER = ifc(AETOXGR in ('GRADE 3', 'GRADE 4'), 'Y', 'N');
       AESID = 3;
       AESOC = "Nervous system disorders";
@@ -362,7 +350,7 @@ run;
 %export_raw(raw_rs);
 
 %put NOTE: ----------------------------------------------------;
-%put NOTE: ✅ ENHANCED SYNTHETIC DATA GENERATION COMPLETE;
+%put NOTE: ✅ ENHANCED CLINICAL TRIAL RAW DATA SIMULATION COMPLETE;
 %put NOTE: ----------------------------------------------------;
 %put NOTE: Realism Features:;
 %put NOTE:   - Variable enrollment: DL1=3, DL2=0 (skipped), DL3=6;

@@ -2,26 +2,11 @@
  * Program:      l_dm.sas
  * Protocol:     BV-CAR20-P1
  * Purpose:      Listing 16.2.1 - Subject Disposition
- * Author:       Clinical Programming Lead
+ * Author:       Statistical Programmer
  * Date:         2026-02-01
  * SAS Version:  9.4
  ******************************************************************************/
 
-%macro load_config;
-   %if %symexist(CONFIG_LOADED) %then %if &CONFIG_LOADED=1 %then %return;
-   %if %sysfunc(fileexist(00_config.sas)) %then %include "00_config.sas";
-   %else %if %sysfunc(fileexist(03_programs/00_config.sas)) %then %include "03_programs/00_config.sas";
-   %else %if %sysfunc(fileexist(../00_config.sas)) %then %include "../00_config.sas";
-   %else %if %sysfunc(fileexist(../03_programs/00_config.sas)) %then %include "../03_programs/00_config.sas";
-   %else %if %sysfunc(fileexist(../../00_config.sas)) %then %include "../../00_config.sas";
-   %else %if %sysfunc(fileexist(../../03_programs/00_config.sas)) %then %include "../../03_programs/00_config.sas";
-   %else %if %sysfunc(fileexist(../../../00_config.sas)) %then %include "../../../00_config.sas";
-   %else %if %sysfunc(fileexist(../../../03_programs/00_config.sas)) %then %include "../../../03_programs/00_config.sas";
-   %else %do;
-      %put ERROR: Unable to locate 00_config.sas from current working directory.;
-      %abort cancel;
-   %end;
-%mend;
 %load_config;
 
 /* 1. Prepare Disposition Data */
@@ -62,8 +47,8 @@ proc report data=disposition nowd headskip split='|' style(report)={outputwidth=
 run;
 
 /* Export results */
-ods html body="&OUT_LISTINGS/l_dm.html";
+ods html5 body="&OUT_LISTINGS/l_dm.html";
 proc print data=disposition; run;
-ods html close;
+ods html5 close;
 
 

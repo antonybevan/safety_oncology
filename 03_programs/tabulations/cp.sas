@@ -2,7 +2,7 @@
  * Program:      cp.sas
  * Protocol:     BV-CAR20-P1
  * Purpose:      Create SDTM Cell Phenotype (CP) domain placeholder
- * Author:       Professional Regulatory Lead
+ * Author:       Statistical Programmer
  * Date:         2026-02-08
  * SAS Version:  9.4
  * Note:         This domain captures CAR-T expansion and persistence data 
@@ -29,10 +29,6 @@ data sdtm.cp;
 run;
 
 /* 3. Export to XPT */
-libname xpt xport "&SDTM_PATH/cp.xpt";
-data xpt.cp;
-    set sdtm.cp;
-run;
-libname xpt clear;
+%xpt_export(ds=sdtm.cp, xptpath=&SDTM_PATH/cp.xpt, outname=cp);
 
 %put NOTE: ✅ SDTM.CP (Cell Phenotype) Domain Structure Created;

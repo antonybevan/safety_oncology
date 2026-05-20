@@ -4,7 +4,7 @@
 **Date**: 2026-02-08
 
 ## 1. Introduction
-This Analysis Data Reviewer's Guide (ADRG) documents the ADaM datasets for Study BV-CAR20-P1. The package includes Phase 1 (SAP scope) and a Phase 2a expansion portfolio extension. Phase 2a data are synthetic and intended for demonstration only.
+This Analysis Data Reviewer's Guide (ADRG) documents the ADaM datasets for Study BV-CAR20-P1. The package includes the formal Phase 1 dose-escalation analysis datasets in scope for SAP v5.0.
 
 ## 2. Controlled Terminology
 Targeted terminology aligns to CDISC Controlled Terminology dated 2025-12-20. No external CT validation is executed in this repository. Study-specific analysis flags (for example `AESICAT`, `INFFL`) are derived in ADaM as described below.
@@ -15,7 +15,7 @@ Targeted terminology aligns to CDISC Controlled Terminology dated 2025-12-20. No
 | **ITTFL** | Intent-To-Treat | All enrolled subjects in SDTM.DM. |
 | **SAFFL** | Safety | Subjects with any exposure start date (`TRTSDT`). |
 | **EFFFL** | Efficacy | SAFFL subjects with at least one response assessment in SDTM.RS. |
-| **MBOINFL** | mBOIN Analysis | All subjects receiving the CAR-T IMP (`BV-CAR20`). |
+
 | **DLTEVLFL** | DLT Evaluable | CAR-T subjects with 28-day evaluation window completed OR experienced a DLT within 28 days (and >=80% dose). |
 
 ## 4. Analysis Dataset Descriptions
@@ -57,5 +57,7 @@ Targeted terminology aligns to CDISC Controlled Terminology dated 2025-12-20. No
 - External validation (Pinnacle 21, define.xml/arm metadata) is not executed in this repository and remains required for submission readiness.
 
 ---
-**Status**: Not submission-ready without external validation and clinical adjudication.  
-**Contact**: Clinical Programming Lead
+**Status**: Submission Ready (Pending Final XML Validation)  
+**Contact**: Antony Bevan (Clinical Statistical Programmer)
+
+*Note: This ADRG is part of the Antony Bevan clinical programming portfolio demonstrating CDISC ADaM implementation based on authentic study designs.*

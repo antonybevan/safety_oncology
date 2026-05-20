@@ -2,26 +2,11 @@
  * Program:      l_screen_fail.sas
  * Protocol:     BV-CAR20-P1
  * Purpose:      Generate Listing L-SD1 - Screen Failures Listing (SAP §6.1)
- * Author:       Clinical Programming Lead
+ * Author:       Statistical Programmer
  * Date:         2026-02-05
  * SAS Version:  9.4
  ******************************************************************************/
 
-%macro load_config;
-   %if %symexist(CONFIG_LOADED) %then %if &CONFIG_LOADED=1 %then %return;
-   %if %sysfunc(fileexist(00_config.sas)) %then %include "00_config.sas";
-   %else %if %sysfunc(fileexist(03_programs/00_config.sas)) %then %include "03_programs/00_config.sas";
-   %else %if %sysfunc(fileexist(../00_config.sas)) %then %include "../00_config.sas";
-   %else %if %sysfunc(fileexist(../03_programs/00_config.sas)) %then %include "../03_programs/00_config.sas";
-   %else %if %sysfunc(fileexist(../../00_config.sas)) %then %include "../../00_config.sas";
-   %else %if %sysfunc(fileexist(../../03_programs/00_config.sas)) %then %include "../../03_programs/00_config.sas";
-   %else %if %sysfunc(fileexist(../../../00_config.sas)) %then %include "../../../00_config.sas";
-   %else %if %sysfunc(fileexist(../../../03_programs/00_config.sas)) %then %include "../../../03_programs/00_config.sas";
-   %else %do;
-      %put ERROR: Unable to locate 00_config.sas from current working directory.;
-      %abort cancel;
-   %end;
-%mend;
 %load_config;
 
 /* 1. Identify Screen Failures from DM */
@@ -55,9 +40,9 @@ proc report data=screen_fail nowd headskip split='|' style(report)={outputwidth=
 run;
 
 /* Export results */
-ods html body="&OUT_LISTINGS/l_screen_fail.html";
+ods html5 body="&OUT_LISTINGS/l_screen_fail.html";
 proc print data=screen_fail noobs; run;
-ods html close;
+ods html5 close;
 
 %put NOTE: --------------------------------------------------;
 %put NOTE: ✅ LISTING L-SD1 (Screen Failures) GENERATED;

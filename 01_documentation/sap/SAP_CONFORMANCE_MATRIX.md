@@ -5,7 +5,7 @@ This matrix identifies the technical implementation of specific Statistical Anal
 ## 1. Population & Parameter Mapping
 | SAP Requirement | Implementation Feature | Compliance Status |
 |:---|:---|:---:|
-| **Population Flags** (§4) | ADSL: `SAFFL`, `ITTFL`, `EFFFL`, `DLTEVLFL`, `MBOINFL` | ✅ Hardened |
+| **Population Flags** (§4) | ADSL: `SAFFL`, `ITTFL`, `EFFFL`, `DLTEVLFL` | ✅ Hardened |
 | **Treatment Mapping** (§5.3) | `TRT01P` / `TRT01A` | ✅ Correct |
 | **Study Day 0** (§5.7) | Scale: -1, 0, 2 (Matching literal SAP §5.7) | ✅ Verified |
 | **Baseline Definition** | Baseline = Pre-LD; Re-Baseline = Pre-Infusion | ✅ Hardened |

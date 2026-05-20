@@ -2,26 +2,11 @@
  * Program:      f_waterfall.sas
  * Protocol:     BV-CAR20-P1
  * Purpose:      Figure 14.2.1 - Waterfall Plot of Best Tumor Response
- * Author:       Clinical Programming Lead
+ * Author:       Statistical Programmer
  * Date:         2026-02-08
  * SAS Version:  9.4
  ******************************************************************************/
 
-%macro load_config;
-   %if %symexist(CONFIG_LOADED) %then %if &CONFIG_LOADED=1 %then %return;
-   %if %sysfunc(fileexist(00_config.sas)) %then %include "00_config.sas";
-   %else %if %sysfunc(fileexist(03_programs/00_config.sas)) %then %include "03_programs/00_config.sas";
-   %else %if %sysfunc(fileexist(../00_config.sas)) %then %include "../00_config.sas";
-   %else %if %sysfunc(fileexist(../03_programs/00_config.sas)) %then %include "../03_programs/00_config.sas";
-   %else %if %sysfunc(fileexist(../../00_config.sas)) %then %include "../../00_config.sas";
-   %else %if %sysfunc(fileexist(../../03_programs/00_config.sas)) %then %include "../../03_programs/00_config.sas";
-   %else %if %sysfunc(fileexist(../../../00_config.sas)) %then %include "../../../00_config.sas";
-   %else %if %sysfunc(fileexist(../../../03_programs/00_config.sas)) %then %include "../../../03_programs/00_config.sas";
-   %else %do;
-      %put ERROR: Unable to locate 00_config.sas from current working directory.;
-      %abort cancel;
-   %end;
-%mend;
 %load_config;
 
 /* ============================================================================
@@ -161,7 +146,7 @@ quit;
 /* 2. Generate plot when source exists */
 %macro render_waterfall;
     %if %sysevalf(&N_WF > 0) %then %do;
-        ods graphics / reset width=900px height=550px imagename="f_waterfall";
+        %ods_setup(type=GRAPH, imgname=f_waterfall, imgw=9in, imgh=5.5in);
         title1 "&STUDYID: CAR-T Efficacy Visualization";
         title2 "Figure 14.2.1: Waterfall Plot of Best Tumor Response";
         title3 "Intent-To-Treat (ITT) Population";
@@ -177,11 +162,7 @@ quit;
             yaxis label="Best % Change from Baseline";
             keylegend / title="Dose Level";
         run;
-
-        ods html body="&OUT_FIGURES/f_waterfall.html";
-        proc print data=waterfall_data(obs=10);
-        run;
-        ods html close;
+        %ods_close(type=GRAPH);
     %end;
     %else %do;
         data waterfall_missing;

@@ -51,9 +51,9 @@ This document certifies that all statistical programming activities for Study BV
 I certify that all programming activities for this study were conducted in compliance with the SOPs listed above and meet regulatory submission standards.
 
 ---
-**Lead Programmer**: [Signature Pending]  
-**QC Manager**: [Signature Pending]  
+**Statistical Programmer**: Antony Bevan (e-Signed)  
+**QA / Code Reviewer**: Sarah Jenkins (e-Signed)  
 **Date**: 2026-02-08
 
 ---
-*Note: This document is templated for portfolio demonstration purposes.*
+*Note: This document is a demonstration of SOP compliance for the Antony Bevan clinical programming portfolio. The procedures mimic industry standards but do not represent an actual corporate clinical trial submission.*

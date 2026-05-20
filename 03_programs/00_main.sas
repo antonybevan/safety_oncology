@@ -1,8 +1,8 @@
 /******************************************************************************
  * Program:      00_main.sas
  * Protocol:     BV-CAR20-P1
- * Purpose:      Phase 1 (SAP-Compliant) Master Driver
- * Author:       Clinical Programming Lead
+ * Purpose:      Phase 1 (SAP-Compliant) Master Driver with Integrated Auditing
+ * Author:       Statistical Programmer
  * Date:         2026-02-08
  ******************************************************************************/
 
@@ -11,28 +11,93 @@
 
 %put NOTE: [MAIN] Starting Phase 1 Pipeline Execution...;
 
+/* Pipeline Status and Error Trapping Macro */
+%global PIPELINE_STATUS;
+%let PIPELINE_STATUS = SUCCESS;
+
+%macro check_err(prog);
+    %if &syscc > 4 %then %do;
+        %put ERROR: [PIPELINE] Execution of &prog. failed with SYSCC=&syscc.;
+        %let PIPELINE_STATUS = FAILED;
+        %let syscc = 0;
+    %end;
+    %else %do;
+        %put NOTE: [PIPELINE] &prog. executed successfully (SYSCC=&syscc.).;
+        %let syscc = 0;
+    %end;
+%mend check_err;
+
 /* 2. Data Preparation Suite */
-%put NOTE: [MAIN] Step 1: Generating Synthetic Raw Data...;
+%put NOTE: [MAIN] Step 1: Simulating Raw Clinical Data...;
 %include "&PROG_PATH/data_gen/generate_data.sas";
+%check_err(generate_data.sas);
 
 %put NOTE: [MAIN] Step 2: Mapping SDTM Domains...;
 %include "&PROG_PATH/tabulations/gen_trial_design.sas";
+%check_err(gen_trial_design.sas);
+
 %include "&PROG_PATH/tabulations/dm.sas";
+%check_err(dm.sas);
+
 %include "&PROG_PATH/tabulations/ex.sas";
+%check_err(ex.sas);
+
 %include "&PROG_PATH/tabulations/ae.sas";
+%check_err(ae.sas);
+
 %include "&PROG_PATH/tabulations/suppae.sas";
+%check_err(suppae.sas);
+
 %include "&PROG_PATH/tabulations/lb.sas";
+%check_err(lb.sas);
+
 %include "&PROG_PATH/tabulations/rs.sas";
+%check_err(rs.sas);
+
+%include "&PROG_PATH/tabulations/cp.sas";
+%check_err(cp.sas);
+
+%include "&PROG_PATH/tabulations/gf.sas";
+%check_err(gf.sas);
 
 /* 3. ADaM Analysis Suite */
 %put NOTE: [MAIN] Step 3: Deriving ADaM Analysis Datasets...;
 %include "&PROG_PATH/analysis/adsl.sas";
-%include "&PROG_PATH/analysis/adae.sas";
-%include "&PROG_PATH/analysis/adlb.sas";
-%include "&PROG_PATH/analysis/adex.sas";
-%include "&PROG_PATH/analysis/adrs.sas";
+%check_err(adsl.sas);
 
-/* 4. Integrity Audit (Professional Grade) */
+%include "&PROG_PATH/analysis/adae.sas";
+%check_err(adae.sas);
+
+%include "&PROG_PATH/analysis/adlb.sas";
+%check_err(adlb.sas);
+
+%include "&PROG_PATH/analysis/adex.sas";
+%check_err(adex.sas);
+
+%include "&PROG_PATH/analysis/adrs.sas";
+%check_err(adrs.sas);
+
+/* 4. Reporting & Figures Suite */
+%put NOTE: [MAIN] Step 4: Generating Clinical Tables & Figures (TFLs)...;
+%include "&PROG_PATH/reporting/t_ae_summ.sas";
+%check_err(t_ae_summ.sas);
+
+%include "&PROG_PATH/reporting/t_ae_aesi.sas";
+%check_err(t_ae_aesi.sas);
+
+%include "&PROG_PATH/reporting/t_eff.sas";
+%check_err(t_eff.sas);
+
+%include "&PROG_PATH/reporting/f_km_os.sas";
+%check_err(f_km_os.sas);
+
+%include "&PROG_PATH/reporting/f_km_pfs.sas";
+%check_err(f_km_pfs.sas);
+
+%include "&PROG_PATH/reporting/f_waterfall.sas";
+%check_err(f_waterfall.sas);
+
+/* 5. Integrity Audit (Professional Grade) */
 %put NOTE: [MAIN] Running Pipeline Integrity Audit...;
 
 proc sql;
@@ -49,4 +114,11 @@ quit;
 proc print data=integrity_summary noobs;
 run;
 
-%put NOTE: [MAIN] Phase 1 Pipeline Execution Complete.;
+%put NOTE: ----------------------------------------------------;
+%if &PIPELINE_STATUS = SUCCESS %then %do;
+    %put NOTE: ✅ [MAIN] Phase 1 Pipeline Execution Complete successfully!;
+%end;
+%else %do;
+    %put ERROR: ❌ [MAIN] Phase 1 Pipeline Execution Complete with errors!;
+%end;
+%put NOTE: ----------------------------------------------------;

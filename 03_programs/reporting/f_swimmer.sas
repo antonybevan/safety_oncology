@@ -2,7 +2,7 @@
  * Program:      f_swimmer.sas
  * Protocol:     BV-CAR20-P1
  * Purpose:      Figure F-SW: Swimmer Plot for Progression-Free Survival
- * Author:       Clinical Programming Lead
+ * Author:       Statistical Programmer
  * Date:         2026-02-05
  * SAS Version:  9.4
  * SAP Reference: Table 11 (2.1/F-SW)
@@ -14,21 +14,6 @@
  *               with retreatment data"
  ******************************************************************************/
 
-%macro load_config;
-   %if %symexist(CONFIG_LOADED) %then %if &CONFIG_LOADED=1 %then %return;
-   %if %sysfunc(fileexist(00_config.sas)) %then %include "00_config.sas";
-   %else %if %sysfunc(fileexist(03_programs/00_config.sas)) %then %include "03_programs/00_config.sas";
-   %else %if %sysfunc(fileexist(../00_config.sas)) %then %include "../00_config.sas";
-   %else %if %sysfunc(fileexist(../03_programs/00_config.sas)) %then %include "../03_programs/00_config.sas";
-   %else %if %sysfunc(fileexist(../../00_config.sas)) %then %include "../../00_config.sas";
-   %else %if %sysfunc(fileexist(../../03_programs/00_config.sas)) %then %include "../../03_programs/00_config.sas";
-   %else %if %sysfunc(fileexist(../../../00_config.sas)) %then %include "../../../00_config.sas";
-   %else %if %sysfunc(fileexist(../../../03_programs/00_config.sas)) %then %include "../../../03_programs/00_config.sas";
-   %else %do;
-      %put ERROR: Unable to locate 00_config.sas from current working directory.;
-      %abort cancel;
-   %end;
-%mend;
 %load_config;
 
 /* ============================================================================
@@ -103,7 +88,7 @@ run;
 
 /* 2. Create Swimmer Plot using SGPLOT */
 ods graphics on / reset=all imagename="f_swimmer" imagefmt=png width=10in height=8in;
-ods listing gpath="&OUT_FIGURES";
+ods listing image_dpi=300 gpath="&OUT_FIGURES";
 
 proc sgplot data=swimmer_plot;
     /* Horizontal bars for duration */

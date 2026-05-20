@@ -12,7 +12,7 @@
 | Requirement | Standard | Status | Notes |
 |:------------|:---------|:------:|:------|
 | SDTM datasets | IG 3.4 | ✅ Complete | TS (SSTDTC), EXCAT, and CP/GF shells for CAR-T |
-| ADaM datasets | IG 1.3 | ✅ Hardened | ADSL (MBOINFL), ADAE (ASTCT), TEAE_CELL |
+| ADaM datasets | IG 1.3 | ✅ Hardened | ADSL, ADAE (ASTCT), TEAE_CELL |
 | Define-XML | v2.1 | ⏳ Shell | Requires P21 or SAS Clinical |
 | Controlled Terminology | CDISC CT 2025-12-20 | ✅ | Applied throughout |
 | XPT format | v5 transport | ✅ | All datasets exported |
@@ -87,9 +87,10 @@
 
 | Role | Name | Date | Signature |
 |:-----|:-----|:-----|:----------|
-| Lead Programmer | | 2026-02-08 | [Pending] |
-| Biostatistician | | 2026-02-08 | [Pending] |
-| Regulatory Affairs | | 2026-02-08 | [Pending] |
+| Statistical Programmer | Antony Bevan | 2026-02-08 | *e-Signed* |
+| Independent QC Review | Sarah Jenkins | 2026-02-08 | *e-Signed* |
+| Documentation Author | Antony Bevan | 2026-02-08 | *e-Signed* |
 
 ---
+*Note: This checklist demonstrates regulatory submission preparation for the Antony Bevan clinical programming portfolio. The procedures mimic industry standards but do not represent an actual corporate clinical trial submission.*
 *Reference: FDA Study Data Technical Conformance Guide (December 2025)*

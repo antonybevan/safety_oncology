@@ -1,6 +1,6 @@
 # Programming Standards Checklist
 **Study**: BV-CAR20-P1  
-**Prepared By**: Clinical Programming Lead  
+**Prepared By**: Antony Bevan  
 **Date**: 2026-02-08
 
 ---
@@ -58,5 +58,5 @@
 ## Certification
 All programs and datasets in this repository meet or exceed the standards defined above, with noted exceptions for external validation pending.
 
-**Certified By**: Clinical Programming Lead  
+**Certified By**: Antony Bevan  
 **Date**: 2026-02-08

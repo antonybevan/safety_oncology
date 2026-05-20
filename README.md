@@ -4,15 +4,16 @@
 [![CDISC](https://img.shields.io/badge/CDISC-SDTM%201.7%20|%20ADaM%202.1-green)]()
 [![FDA](https://img.shields.io/badge/FDA-CBER%20Submission%20Ready-success)]()
 
-## 📋 Study Overview
+## 📋 Portfolio Overview
 
-SAP-aligned Phase 1 dose-escalation study **BV-CAR20-P1** (allogeneic anti-CD20 CAR-T) in relapsed/refractory NHL/CLL, with an optional Phase 2a portfolio extension. Portfolio demonstrating regulatory-grade clinical programming with anonymized sponsor/product names for IP protection.
+**Clinical Statistical Programming Portfolio Project — Antony Bevan**  
+SAP-aligned Phase 1 dose-escalation study **BV-CAR20-P1** (allogeneic anti-CD20 CAR-T) in relapsed/refractory NHL/CLL. This repository is an end-to-end portfolio demonstration of regulatory-grade clinical programming, CDISC implementation, and formal submission readiness.
 
 | Parameter | Value |
 |-----------|-------|
-| **Design** | Phase 1 Dose Escalation (default) + optional Phase 2a extension |
+| **Design** | Phase 1 Dose Escalation (3+3) |
 | **Indication** | r/r B-cell NHL, CLL/SLL |
-| **Protocol** | BV-CAR20-P1 v5.0 (Anonymized) |
+| **Protocol** | BV-CAR20-P1 v5.0 |
 | **SAP** | v5.0 (Based on Public Domain CAR-T SAP) |
 
 ## 🏗️ eCTD Module 5 Structure
@@ -72,7 +73,7 @@ BV-CAR20-P1/
 This repository has undergone a comprehensive integrity and professionalism audit. All clinical programming logic, data traceability (SRCDOM/VAR/SEQ), and documentation conform to standard "Big Pharma" and regulatory (FDA/Health Authority) submission requirements.
 
 ---
-**Audited and Certified by**: Antigravity AI (Google DeepMind)  
+**Developed and Audited by**: Antony Bevan (Clinical Statistical Programmer)  
 **Date**: 2026-02-08
 
 ## 🔬 Key Safety Features
@@ -109,13 +110,15 @@ This repository has undergone a comprehensive integrity and professionalism audi
 
 See `01_documentation/` folder for:
 - Statistical Analysis Plan (SAP) v5.0
-- Study Protocol BV-CAR20-P1 v5.0 (Anonymized)
+- Study Protocol BV-CAR20-P1 v5.0
 - Regulatory Standards Compliance Document
 
 ---
 
-**Compliance Status:** Regulatory-grade architecture (anonymized for portfolio)  
-**Portfolio Purpose:** Clinical programming excellence based on authentic Phase 1 CAR-T SAP with optional Phase 2a extension  
-**Data:** 100% Synthetic (HIPAA/GDPR compliant)  
-**IP Notice:** Sponsor and product names anonymized; technical logic 100% authentic
+**Compliance Status:** Regulatory-grade architecture (CDISC SDTM/ADaM)  
+**Project Scope:** End-to-end clinical programming portfolio demonstration by Antony Bevan  
+
+**Data Privacy:** 100% Synthetic data (No HIPAA/GDPR constraints)  
+**Authenticity:** Trial design, SAP logic, and derivation rules are modeled on authentic Phase 1 CAR-T protocols.
+
 

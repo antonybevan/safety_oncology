@@ -2,7 +2,7 @@
  * Program:      ae.sas
  * Protocol:     BV-CAR20-P1
  * Purpose:      Create SDTM Adverse Events (AE) domain from raw EDC extract
- * Author:       Clinical Programming Lead
+ * Author:       Statistical Programmer
  * Date:         2026-01-31
  * SAS Version:  9.4
  * SDTM Version: 1.7 / IG v3.4
@@ -73,7 +73,7 @@ data ae;
     else if AETOXGR in ('3', '4') then AESEV = 'SEVERE';
     else if AETOXGR in ('5') then AESEV = 'DEATH';
 
-    /* Action taken with study treatment is not captured in source synthetic EDC */
+    /* Action taken with study treatment is not captured in source EDC */
     AEACN = "";
     
     /* Study Days Calculation */
@@ -99,17 +99,13 @@ data sdtm.ae;
     set ae;
     by USUBJID;
     
-    retain AESEQ 0;
-    if first.USUBJID then AESEQ = 1;
-    else AESEQ + 1;
+    retain AESEQ;
+    if first.USUBJID then AESEQ = 0;
+    AESEQ + 1;
 run;
 
 /* Create XPT */
-libname xpt xport "&SDTM_PATH/ae.xpt";
-data xpt.ae;
-    set sdtm.ae;
-run;
-libname xpt clear;
+%xpt_export(ds=sdtm.ae, xptpath=&SDTM_PATH/ae.xpt, outname=ae);
 
 proc freq data=sdtm.ae;
     tables AEDECOD*AETOXGR / nocum;

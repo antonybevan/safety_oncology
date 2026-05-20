@@ -1,62 +1,97 @@
 /* QUOTE & MACRO KILLER BLOCK - Resets SAS state if previous errors left things open */
 *';*";*/;QUIT;RUN;
-%macro _null_; %mend; 
+%macro _null_; %mend;
 
 /******************************************************************************
  * Program:      GIT_RESCUE.sas
- * Purpose:      Force-sync SAS OnDemand with GitHub (Public Repo)
+ * Purpose:      Force-sync SAS OnDemand or SAS 9.4 with GitHub (Public Repo)
+ * Compatibility: SAS 9.4 (Linux / Windows) + SAS OnDemand for Academics
+ *
+ * NOTES:
+ *   - Locates project root dynamically, or defaults safely based on OS.
+ *   - gitfn_pull / gitfn_clone require SAS Foundation 9.4 TS1M5+ or ODA.
  ******************************************************************************/
 
-%let repo_url = https://github.com/antonybevan/safety_oncology.git;
-%let home_dir = /home/u63849890;
-%let safe_path = &home_dir/clinical_safety;
+%let repo_url   = https://github.com/antonybevan/safety_oncology.git;
 
-/* 
-   ROBUST CLEANUP MACRO 
-   Uses Linux 'rm -rf' via SYSTEM call to ensure non-empty dirs are gone.
+/* 1. Auto-detect project root (safe_path) */
+%macro get_safe_path;
+    %global safe_path;
+    
+    /* If PROJ_ROOT is already defined via 00_config.sas */
+    %if %symexist(PROJ_ROOT) %then %do;
+        %if %length(&PROJ_ROOT) > 1 %then %do;
+            %let safe_path = &PROJ_ROOT;
+            %return;
+        %end;
+    %end;
+
+    /* Otherwise hunt for the repository signature file */
+    %let SLSH = /;
+    %let _sig = 03_programs&SLSH.00_config.sas;
+
+    %if %sysfunc(fileexist(&_sig)) %then %let safe_path = %sysfunc(abspath(.));
+    %else %if %sysfunc(fileexist(..&SLSH.&_sig)) %then %let safe_path = %sysfunc(abspath(..));
+    %else %if %sysfunc(fileexist(..&SLSH..&SLSH.&_sig)) %then %let safe_path = %sysfunc(abspath(..&SLSH..));
+    %else %if %sysfunc(fileexist(d:/safety_oncology/03_programs/00_config.sas)) %then %let safe_path = d:/safety_oncology;
+    %else %do;
+        /* OS-specific fallback */
+        %let _home = %sysfunc(sysget(HOME));
+        %if %length(&_home) = 0 %then %let _home = %sysfunc(sysget(USERPROFILE));
+        
+        %if %upcase(&SYSSCP) = WIN and %sysfunc(fileexist(d:/)) %then %let safe_path = d:/safety_oncology;
+        %else %let safe_path = &_home/safety_oncology;
+    %end;
+%mend get_safe_path;
+%get_safe_path;
+
+%put NOTE: [GIT_RESCUE] Target Sync path: &safe_path;
+
+/*
+   ROBUST CLEANUP MACRO
+   Uses system 'rm -rf' on Linux/ODA, rd/rmdir on Windows.
 */
 %macro force_clean(dir);
-   data _null_;
-      fname = "tempfile";
-      rc = filename(fname, "&dir");
-      if fexist(fname) or fileexist("&dir") then do;
-          put "NOTE: Directory exists. Executing recursive delete on: &dir";
-          call system("rm -rf &dir");
-      end;
-      else put "NOTE: Directory does not exist, nothing to clean.";
-   run;
-%mend;
+    data _null_;
+        if fileexist("&dir") then do;
+            put "NOTE: [GIT_RESCUE] Directory exists. Executing recursive delete on: &dir";
+            %if %upcase(&SYSSCP) = WIN %then
+                call system("rd /s /q ""&dir""");
+            %else
+                call system("rm -rf ""&dir""");;
+        end;
+        else put "NOTE: [GIT_RESCUE] Directory does not exist, nothing to clean: &dir";
+    run;
+%mend force_clean;
 
 data _null_;
-   put "NOTE: --------------------------------------------------";
-   put "NOTE: Starting GIT RESCUE Operation...";
-   
-   /* 1. Attempt PULL first */
-   rc = gitfn_pull("&safe_path");
-   put "NOTE: gitfn_pull returned RC=" rc;
-   
-   if rc = 0 then put "NOTE: ✅ SUCCESS! Project updated from GitHub.";
-   else if rc = 1 then put "NOTE: Repository is already up to date.";
-   
-   /* 
-      Catch-all for failures:
-      RC = 22 (Conflict)
-      RC = -1 (Generic Failure / Repo missing)
-      RC = 128 (Not a repo)
-   */
-   else do; 
-       put "NOTE: Pull failed (Conflict or Missing). Initiating FRESH CLONE Protocol...";
-       
-       /* Nuke it from orbit */
-       call execute('%force_clean(&safe_path)');
-       
-       /* Clone fresh */
-       put "NOTE: Cloning from &repo_url...";
-       rc_clone = gitfn_clone("&repo_url", "&safe_path");
-       
-       if rc_clone = 0 then put "NOTE: ✅ SUCCESS! Project reset and re-cloned.";
-       else put "ERROR: Clone failed. RC=" rc_clone;
-   end;
-   
-   put "NOTE: --------------------------------------------------";
+    put "NOTE: --------------------------------------------------";
+    put "NOTE: Starting GIT RESCUE Operation...";
+
+    /* 1. Attempt PULL first */
+    rc = gitfn_pull("&safe_path");
+    put "NOTE: gitfn_pull returned RC=" rc;
+
+    if rc = 0 then put "NOTE: SUCCESS! Project updated from GitHub.";
+    else if rc = 1 then put "NOTE: Repository is already up to date.";
+
+    /*
+       Catch-all for failures:
+       RC = 22  (Conflict)
+       RC = -1  (Generic Failure / Repo missing)
+       RC = 128 (Not a git repo)
+    */
+    else do;
+        put "NOTE: Pull failed (Conflict or Missing). Initiating FRESH CLONE Protocol...";
+
+        /* Nuke and re-clone */
+        call execute('%force_clean(&safe_path)');
+        put "NOTE: Cloning from &repo_url...";
+        rc_clone = gitfn_clone("&repo_url", "&safe_path");
+
+        if rc_clone = 0 then put "NOTE: SUCCESS! Project reset and re-cloned.";
+        else put "ERROR: Clone failed. RC=" rc_clone;
+    end;
+
+    put "NOTE: --------------------------------------------------";
 run;

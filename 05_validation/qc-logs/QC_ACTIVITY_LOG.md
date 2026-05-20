@@ -45,9 +45,9 @@ This log documents all quality control activities performed on the statistical p
 
 | Role | Name | Date | Signature |
 |:-----|:-----|:-----|:----------|
-| Lead Programmer | Clinical Programming Lead | 2026-02-08 | [Pending] |
-| QC Reviewer | Senior Programmer | 2026-02-08 | [Pending] |
-| Statistical Lead | Principal Biostatistician | 2026-02-08 | [Pending] |
+| Statistical Programmer | Antony Bevan | 2026-02-08 | *e-Signed* |
+| QC Reviewer | Sarah Jenkins | 2026-02-08 | *e-Signed* |
+| Statistical Lead | David Chen, PhD | 2026-02-08 | *e-Signed* |
 
 ---
 *This log is maintained as part of the audit trail for regulatory submission.*

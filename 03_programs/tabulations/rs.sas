@@ -2,7 +2,7 @@
  * Program:      rs.sas
  * Protocol:     BV-CAR20-P1
  * Purpose:      Create SDTM Disease Response (RS) domain from raw EDC extract
- * Author:       Clinical Programming Lead
+ * Author:       Statistical Programmer
  * Date:         2026-01-31
  * SAS Version:  9.4
  ******************************************************************************/
@@ -85,9 +85,5 @@ data sdtm.rs;
 run;
 
 /* Create XPT */
-libname xpt xport "&SDTM_PATH/rs.xpt";
-data xpt.rs;
-    set sdtm.rs;
-run;
-libname xpt clear;
+%xpt_export(ds=sdtm.rs, xptpath=&SDTM_PATH/rs.xpt, outname=rs);
 

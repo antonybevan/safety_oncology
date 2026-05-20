@@ -2,7 +2,7 @@
  * Program:      dm.sas
  * Protocol:     BV-CAR20-P1
  * Purpose:      Create SDTM Demographics (DM) domain from raw EDC extract
- * Author:       Clinical Programming Lead
+ * Author:       Statistical Programmer
  * Date:         2026-01-31
  * SAS Version:  9.4
  ******************************************************************************/
@@ -36,6 +36,7 @@ data dm;
         DTHDTC $10
         DTHFL $1
         SITEID $10
+        BRTHDTC $7     /* Year only: YYYY or YYYY-MM per CDISC partial date */
         AGE 8
         AGEU $10
         SEX $1
@@ -45,6 +46,9 @@ data dm;
         ARM $200
         COUNTRY $3
         SAFFL ITTFL EFFFL $1
+        /* DISEASE: non-standard, kept only in internal SAS dataset for ADaM use.
+           Must NOT appear in XPT submission package. */
+        DISEASE $5
     ;
 
     set raw_dm;
@@ -54,7 +58,7 @@ data dm;
     DOMAIN = "DM";
     USUBJID = strip(USUBJID);
     SUBJID = scan(USUBJID, -1, '-');  /* Extract subject number */
-    SITEID = scan(USUBJID, 1, '-');   /* Extract site number */
+    SITEID = scan(USUBJID, -2, '-');  /* Extract site number (second-to-last token) */
     
     /* Dates: First Study Treatment Date is the start of the Regimen (LD or CAR-T) */
     RFSTDTC = strip(RFSTDTC);         /* Subject Reference Start Date */
@@ -103,10 +107,11 @@ data dm;
     ITTFL = strip(ITTFL);
     EFFFL = strip(EFFFL);
     
-    keep STUDYID DOMAIN USUBJID SUBJID RFSTDTC RFENDTC RFXSTDTC RFXENDTC 
-         RFICDTC RFPENDTC DTHDTC DTHFL SITEID AGE AGEU SEX RACE ETHNIC 
+    /* Standard CDISC keep — DISEASE is internal only, kept here for ADaM merge */
+    keep STUDYID DOMAIN USUBJID SUBJID RFSTDTC RFENDTC RFXSTDTC RFXENDTC
+         RFICDTC RFPENDTC DTHDTC DTHFL SITEID BRTHDTC AGE AGEU SEX RACE ETHNIC
          ARMCD ARM COUNTRY SAFFL ITTFL EFFFL DISEASE;
- run;
+run;
 
 /* Create permanent SAS dataset for ADaM use */
 data sdtm.dm;
@@ -114,9 +119,5 @@ data sdtm.dm;
 run;
 
 /* Create XPT */
-libname xpt xport "&SDTM_PATH/dm.xpt";
-data xpt.dm;
-    set dm;
-run;
-libname xpt clear;
+%xpt_export(ds=dm(drop=DISEASE), xptpath=&SDTM_PATH/dm.xpt, outname=dm);
 

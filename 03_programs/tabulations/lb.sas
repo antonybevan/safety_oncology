@@ -2,7 +2,7 @@
  * Program:      lb.sas
  * Protocol:     BV-CAR20-P1
  * Purpose:      Create SDTM Laboratory (LB) domain from raw EDC extract
- * Author:       Clinical Programming Lead
+ * Author:       Statistical Programmer
  * Date:         2026-01-31
  * SAS Version:  9.4
  ******************************************************************************/
@@ -29,6 +29,7 @@ data lb;
         USUBJID $40
         LBTESTCD $8
         LBTEST $40
+        LBCAT $20
         LBORRES $20
         LBORRESU $20
         LBSTRESC $20
@@ -55,6 +56,11 @@ data lb;
     LBTESTCD = strip(LBTESTCD);
     LBTEST = strip(_LBTEST);
     LBORRES = strip(LBORRES);
+    
+    /* Assign Lab Category */
+    if LBTESTCD in ('NEUT', 'PLAT') then LBCAT = "HEMATOLOGY";
+    else if LBTESTCD = 'FERR' then LBCAT = "CHEMISTRY";
+    else LBCAT = "OTHER";
     
     /* Units and Ranges */
     if LBTESTCD = 'NEUT' then LBORRESU = '10^9/L';
@@ -89,7 +95,7 @@ data lb;
         else LBNRIND = 'NORMAL';
     end;
     
-    keep STUDYID DOMAIN USUBJID LBTESTCD LBTEST LBORRES LBORRESU LBSTRESC LBSTRESN LBSTRESU
+    keep STUDYID DOMAIN USUBJID LBTESTCD LBTEST LBCAT LBORRES LBORRESU LBSTRESC LBSTRESN LBSTRESU
          LBORNRLO LBORNRHI LBDTC LBDY VISIT LBNRIND;
 run;
 
@@ -108,9 +114,5 @@ data sdtm.lb;
 run;
 
 /* Create XPT */
-libname xpt xport "&SDTM_PATH/lb.xpt";
-data xpt.lb;
-    set sdtm.lb;
-run;
-libname xpt clear;
+%xpt_export(ds=sdtm.lb, xptpath=&SDTM_PATH/lb.xpt, outname=lb);
 

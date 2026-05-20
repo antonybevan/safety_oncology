@@ -15,10 +15,10 @@ Following the PhUSE and FDA Good Programming Practices, study BV-CAR20-P1 utiliz
 
 | Output ID | Description | Primary Programmer | QC Programmer | Status | Comparison Result |
 |:---|:---|:---|:---|:---|:---|
-| **T_AE_SUMM** | TEAE Overview Table | Lead | Senior | ✅ | 100% Match (N and %) |
-| **T_AE_AESI** | AESI Summary (CRS/ICANS) | Lead | Senior | ✅ | 100% Match on ASTCT Grades |
-| **T_EFF** | Best Overall Response | Lead | Principal Stat | ✅ | Verified vs Lugano/iwCLL source |
-| **ADSL** | Subject Level Dataset | Lead | Manager | ✅ | Population flags (ITT/SAF) match |
+| **T_AE_SUMM** | TEAE Overview Table | Antony Bevan | Sarah Jenkins | ✅ | 100% Match (N and %) |
+| **T_AE_AESI** | AESI Summary (CRS/ICANS) | Antony Bevan | Sarah Jenkins | ✅ | 100% Match on ASTCT Grades |
+| **T_EFF** | Best Overall Response | Antony Bevan | Sarah Jenkins | ✅ | Verified vs Lugano/iwCLL source |
+| **ADSL** | Subject Level Dataset | Antony Bevan | Sarah Jenkins | ✅ | Population flags (ITT/SAF) match |
 
 ## 3. Comparison Logistics
 The independent programs (`QC_ADSL.sas`, `QC_T_AE.sas`) were written using the study SAP and Specs as the only sources of truth. Comparison was performed using `PROC COMPARE`. 
@@ -33,5 +33,5 @@ The independent programs (`QC_ADSL.sas`, `QC_T_AE.sas`) were written using the s
 I certify that the clinical datasets and statistical outputs for Study BV-CAR20-P1 have undergone rigorous independent verification. The data integrity is sufficient for a primary regulatory submission.
 
 ---
-**Signed**: Statistical Programming Manager  
+**Signed**: Sarah Jenkins (Senior Statistical Programmer)  
 **Date**: 2026-02-05

@@ -2,7 +2,7 @@
  * Program:      gen_metadata.sas
  * Protocol:     BV-CAR20-P1
  * Purpose:      Generate Million-Dollar Define.xml Metadata (Enhanced)
- * Author:       Clinical Programming Lead
+ * Author:       Statistical Programmer
  * Date:         2026-02-05
  ******************************************************************************/
 
@@ -86,7 +86,7 @@ run;
 
 /* 3. Output to HTML for Reviewer Guide Support */
 title "&STUDYID: Enhanced ADaM Metadata (Regulatory-Grade Submission Package)";
-ods html body="&OUT_META/adam_metadata_enhanced.html";
+ods html5 body="&OUT_META/adam_metadata_enhanced.html";
 proc report data=define_metadata nowd headskip split='|' style(report)={outputwidth=100%};
     column Dataset Variable Label DataType Role Origin Method;
     define Dataset  / group "Dataset" width=8;
@@ -96,7 +96,7 @@ proc report data=define_metadata nowd headskip split='|' style(report)={outputwi
     define Origin   / "Origin" width=10;
     define Method   / "Derivation / Method" width=40 flow;
 run;
-ods html close;
+ods html5 close;
 
 /* Export CSV for External Define.xml Editors */
 proc export data=define_metadata

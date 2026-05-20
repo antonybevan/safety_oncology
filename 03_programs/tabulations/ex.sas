@@ -2,7 +2,7 @@
  * Program:      ex.sas
  * Protocol:     BV-CAR20-P1
  * Purpose:      Create SDTM Exposure (EX) domain from raw EDC extract
- * Author:       Clinical Programming Lead
+ * Author:       Statistical Programmer
  * Date:         2026-01-31
  * SAS Version:  9.4
  ******************************************************************************/
@@ -39,6 +39,21 @@ data ex;
 
     set raw_ex;
 
+    STUDYID = "&STUDYID";
+    DOMAIN = "EX";
+    
+    /* Convert character TRTSDT to numeric for study day calculations */
+    TRTSDT_NUM = input(TRTSDT, yymmdd10.);
+
+    /* Derive EXCAT based on drug type — per CDISC EX domain specification */
+    if upcase(EXTRT) in ('FLUDARABINE','CYCLOPHOSPHAMIDE') then EXCAT = 'LYMPHODEPLETION';
+    else if upcase(EXTRT) = 'BV-CAR20' then EXCAT = 'CAR-T INFUSION';
+    else EXCAT = 'STUDY DRUG';
+
+    /* SDTM standard exposure route and dosage form */
+    EXDOSFRM = "SOLUTION";
+    EXROUTE = "INTRAVENOUS";
+
     if not missing(EXSTDTC) and not missing(TRTSDT_NUM) then do;
         _stdt = input(EXSTDTC, yymmdd10.);
         EXSTDY = _stdt - TRTSDT_NUM + (_stdt >= TRTSDT_NUM);
@@ -71,9 +86,5 @@ data sdtm.ex;
 run;
 
 /* Create XPT */
-libname xpt xport "&SDTM_PATH/ex.xpt";
-data xpt.ex;
-    set sdtm.ex;
-run;
-libname xpt clear;
+%xpt_export(ds=sdtm.ex, xptpath=&SDTM_PATH/ex.xpt, outname=ex);
 
