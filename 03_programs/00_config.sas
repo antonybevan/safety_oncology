@@ -111,7 +111,7 @@ OPTIONS VALIDVARNAME=ANY    /* Allow special characters in variable names  */
             %if %length(&_parent) > 0 %then %do;
                 %if not %sysfunc(fileexist(&_parent)) %then %_mkdir(&_parent);
                 %let _rc = %sysfunc(dcreate(&_child, &_parent));
-                %if &_rc = 0 %then %put WARNING: [CONFIG] Could not create directory: &fullpath;
+                %if %length(&_rc) = 0 %then %put WARNING: [CONFIG] Could not create directory: &fullpath;
                 %else %put NOTE: [CONFIG] Created directory: &fullpath;
             %end;
         %end;
@@ -182,7 +182,7 @@ options mautosource sasautos=(SASAUTOS _mclib);
    ============================================================================ */
 filename _tables  "&OUT_TABLES";
 filename _figures "&OUT_FIGURES";
-filename _listings "&OUT_LISTINGS";
+filename _lstngs "&OUT_LISTINGS";
 
 
 %let CONFIG_LOADED = 1;
