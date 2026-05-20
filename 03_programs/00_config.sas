@@ -171,9 +171,13 @@ run;
    NOTE: sasautos appended — does not override existing SAS autocall library.
          Forward slash used in path — works on both Windows and Linux.
    ============================================================================ */
-options sasautos=(SASAUTOS);  /* Temporarily clear sasautos to release locks on _mclib for re-runs */
-filename _mclib "&PROG_PATH/macros";
-options mautosource sasautos=(SASAUTOS _mclib);
+%macro _setup_mautos;
+    %if %sysfunc(fileref(_mclib)) ne 0 %then %do;
+        filename _mclib "&PROG_PATH/macros";
+        options mautosource sasautos=(SASAUTOS _mclib);
+    %end;
+%mend _setup_mautos;
+%_setup_mautos;
 
 
 /* ============================================================================
