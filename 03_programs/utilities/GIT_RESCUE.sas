@@ -111,8 +111,15 @@
     %put NOTE: --------------------------------------------------;
     %put NOTE: Starting GIT RESCUE Operation...;
 
-    /* 1. Only attempt pull if local directory is an initialized Git repo (.git exists) */
-    %if %sysfunc(fileexist(&safe_path/.git)) %then %do;
+    /* Release any active library or file locks to avoid in-use errors during cleanup */
+    libname sdtm clear;
+    libname adam clear;
+    libname raw clear;
+    libname legacy clear;
+    filename _mclib clear;
+
+    /* 1. Only attempt pull if local directory is an initialized Git repo (.git/config exists) */
+    %if %sysfunc(fileexist(&safe_path/.git/config)) %then %do;
         %put NOTE: Local repository detected. Attempting gitfn_pull...;
         %let rc = %sysfunc(gitfn_pull(&safe_path));
         %put NOTE: gitfn_pull returned RC=&rc;
@@ -120,7 +127,7 @@
         %if &rc = 0 %then %do;
             %put NOTE: SUCCESS! Project updated from GitHub.;
         %end;
-        %else %if &rc = 1 %then %do;
+            %else %if &rc = 1 %then %do;
             %put NOTE: Repository is already up to date.;
         %end;
         %else %do;
