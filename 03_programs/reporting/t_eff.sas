@@ -133,7 +133,7 @@ footnote3 "95% CI calculated using Clopper-Pearson Exact binomial method (SAP §
 
 proc report data=bor_final_report nowd headskip split='|' style(report)={outputwidth=100%};
     column AVALC ARMCD, (COUNT);
-    define AVALC / "Response Category" width=30;
+    define AVALC / group "Response Category" width=30;
     define ARMCD / across "Dose Level";
     define COUNT / "n" center;
 run;

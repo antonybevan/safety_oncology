@@ -85,13 +85,13 @@
             select count(*) into :adrs_has_aval trimmed
             from dictionary.columns
             where libname='ADAM'
-              and memname=%upcase("%scan(&adrs_src,2,.)")
+              and memname=upcase(scan("&adrs_src", 2, "."))
               and upcase(name)='AVAL';
 
             select count(*) into :adrs_has_paramcd trimmed
             from dictionary.columns
             where libname='ADAM'
-              and memname=%upcase("%scan(&adrs_src,2,.)")
+              and memname=upcase(scan("&adrs_src", 2, "."))
               and upcase(name)='PARAMCD';
         quit;
 

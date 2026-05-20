@@ -46,7 +46,7 @@ run;
 /* 4. Subject Level Flags (Robust SQL Approach) */
 proc sql;
     create table subj_flags as
-    select a.USUBJID, a.TRT01AN,
+    select a.USUBJID, a.ARMCD,
            max(case when ae.USUBJID is not null then 1 else 0 end) as any_teae,
            max(case when ae.AETOXGRN >= 3 then 1 else 0 end) as any_g34,
            max(case when ae.AESER = 'Y' then 1 else 0 end) as any_ser,
@@ -55,11 +55,11 @@ proc sql;
     from adam.adsl a
     left join ae_data ae on a.USUBJID = ae.USUBJID
     where a.SAFFL = 'Y'
-    group by a.USUBJID, a.TRT01AN;
+    group by a.USUBJID, a.ARMCD;
 quit;
 
 proc transpose data=subj_flags out=trans_flags;
-    by USUBJID TRT01AN;
+    by USUBJID ARMCD;
     var any_teae any_g34 any_ser any_crs any_icans;
 run;
 
@@ -77,28 +77,28 @@ run;
 
 proc sql;
     create table table_out as
-    select row, row_label, TRT01AN, sum(COL1) as count
+    select row, row_label, ARMCD, sum(COL1) as count
     from final_counts
-    group by row, row_label, TRT01AN;
+    group by row, row_label, ARMCD;
 quit;
 
 /* Create shell to guarantee all rows and treatment columns exist */
 data shell;
-    length row_label $100;
+    length row_label $100 ARMCD $20;
     do row = 1 to 5;
         row_label = put(row, row_fmt.);
-        do TRT01AN = 1 to 3;
+        do ARMCD = 'DL1', 'DL2', 'DL3';
             count = 0;
             output;
         end;
     end;
 run;
 
-proc sort data=table_out; by row TRT01AN; run;
+proc sort data=table_out; by row ARMCD; run;
 
 data report_all;
     merge shell(in=s) table_out(in=a);
-    by row TRT01AN;
+    by row ARMCD;
     if count = . then count = 0;
 run;
 
@@ -107,9 +107,9 @@ data report;
     set report_all;
     length result $20;
     
-    if TRT01AN = 1 then denom = input("&n_dl1", 8.);
-    else if TRT01AN = 2 then denom = input("&n_dl2", 8.);
-    else if TRT01AN = 3 then denom = input("&n_dl3", 8.);
+    if ARMCD = 'DL1' then denom = input("&n_dl1", 8.);
+    else if ARMCD = 'DL2' then denom = input("&n_dl2", 8.);
+    else if ARMCD = 'DL3' then denom = input("&n_dl3", 8.);
     else denom = 0;
     
     if not missing(denom) and denom > 0 then pct = (count / denom) * 100;
@@ -120,7 +120,7 @@ run;
 
 proc transpose data=report out=final_report(drop=_NAME_);
     by row row_label;
-    id TRT01AN;
+    id ARMCD;
     var result;
 run;
 
@@ -136,11 +136,11 @@ footnote2 "TEAE: Treatment-Emergent Adverse Event. CRS: Cytokine Release Syndrom
 %ods_setup(type=RTF, outpath=&OUT_TABLES/t_ae_summ.rtf);
 
 proc report data=final_report nowd headline headskip split='|' style(report)={outputwidth=100%};
-    column row_label ("Dose Level 1|(N=&n_dl1)" _1) ("Dose Level 2|(N=&n_dl2)" _2) ("Dose Level 3|(N=&n_dl3)" _3);
+    column row_label ("Dose Level 1|(N=&n_dl1)" DL1) ("Dose Level 2|(N=&n_dl2)" DL2) ("Dose Level 3|(N=&n_dl3)" DL3);
     define row_label / "Adverse Event Category" width=50;
-    define _1 / "n (%)" center width=15;
-    define _2 / "n (%)" center width=15;
-    define _3 / "n (%)" center width=15;
+    define DL1 / "n (%)" center width=15;
+    define DL2 / "n (%)" center width=15;
+    define DL3 / "n (%)" center width=15;
 run;
 
 %ods_close(type=RTF);

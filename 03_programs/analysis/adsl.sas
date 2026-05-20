@@ -98,6 +98,47 @@ data sdtm_dlts;
 run;
 
 /* ============================================================================
+   4.5. DERIVE MAXIMUM ALIVE DATE (LSTALVDT) ACROSS ALL ACTIVE DOMAINS
+   ============================================================================ */
+data all_dates_raw;
+    set 
+        sdtm.dm(keep=USUBJID RFSTDTC RFENDTC DTHDTC)
+        sdtm.ex(keep=USUBJID EXSTDTC EXENDTC)
+        sdtm.lb(keep=USUBJID LBDTC)
+        sdtm.rs(keep=USUBJID RSDTC)
+        sdtm.ae(keep=USUBJID AESTDTC AEENDTC);
+    
+    length dt_char $19;
+    format dt_sas date9.;
+    
+    /* Collect all dates into dt_char */
+    array dates[9] $19 RFSTDTC RFENDTC DTHDTC EXSTDTC EXENDTC LBDTC RSDTC AESTDTC AEENDTC;
+    do i = 1 to 9;
+        if not missing(dates[i]) then do;
+            dt_char = dates[i];
+            /* Convert to SAS date */
+            %iso_to_sas(iso_var=dt_char, sas_var=dt_sas);
+            if not missing(dt_sas) then do;
+                output;
+            end;
+        end;
+    end;
+    keep USUBJID dt_sas;
+run;
+
+proc sort data=all_dates_raw out=all_dates_sorted;
+    by USUBJID dt_sas;
+run;
+
+data max_alive_dates;
+    set all_dates_sorted;
+    by USUBJID;
+    if last.USUBJID;
+    rename dt_sas = MAX_ALVDT;
+    keep USUBJID dt_sas;
+run;
+
+/* ============================================================================
    5. BUILD ADSL
    ============================================================================ */
 data adsl;
@@ -127,6 +168,12 @@ data adsl;
         dlt.defineKey('USUBJID');
         dlt.defineData('_dlt_dtc');
         dlt.defineDone();
+
+        /* Max alive dates */
+        declare hash ma(dataset:'max_alive_dates');
+        ma.defineKey('USUBJID');
+        ma.defineData('MAX_ALVDT');
+        ma.defineDone();
     end;
 
     if h.find() ne 0 then do;
@@ -134,8 +181,8 @@ data adsl;
     end;
 
     /* Initialize intermediate lookup variables to prevent uninitialized notes */
-    length _DEATHDTC $10 _DEATHDECOD $100 _DLTDTC $10 _dlt_dt 8;
-    call missing(_dth_dtc, _dth_decod, _dlt_dtc, _DEATHDTC, _DEATHDECOD, _DLTDTC, _dlt_dt);
+    length _DEATHDTC $10 _DEATHDECOD $100 _DLTDTC $10 _dlt_dt MAX_ALVDT 8;
+    call missing(_dth_dtc, _dth_decod, _dlt_dtc, _DEATHDTC, _DEATHDECOD, _DLTDTC, _dlt_dt, MAX_ALVDT);
 
     /* ---- Death Derivation ---- */
     if d.find() = 0 then do;
@@ -162,9 +209,13 @@ data adsl;
     end;
     else DLTEV_FL = 'N';
 
+    /* Find max alive date */
+    if ma.find() ne 0 then MAX_ALVDT = .;
+
     /* ---- Last Known Alive Date ---- */
-    if      not missing(TRTEDT) then LSTALVDT = TRTEDT;
-    else if not missing(TRTSDT) then LSTALVDT = TRTSDT;
+    if      not missing(MAX_ALVDT)  then LSTALVDT = MAX_ALVDT;
+    else if not missing(TRTEDT)     then LSTALVDT = TRTEDT;
+    else if not missing(TRTSDT)     then LSTALVDT = TRTSDT;
     else                             LSTALVDT = .;
 
     /* ---- Population Flags (CDISC ADaM IG §3.3) ----
@@ -265,7 +316,7 @@ data adsl;
     ;
 
     /* Drop internal intermediate variables */
-    drop _dth_dtc _dth_decod _dlt_dtc _DEATHDTC _DEATHDECOD _DLTDTC _dlt_dt DISEASE;
+    drop _dth_dtc _dth_decod _dlt_dtc _DEATHDTC _DEATHDECOD _DLTDTC _dlt_dt MAX_ALVDT DISEASE;
 run;
 
 /* ============================================================================
