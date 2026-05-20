@@ -134,7 +134,7 @@ data adsl;
     end;
 
     /* Initialize intermediate lookup variables to prevent uninitialized notes */
-    length _DEATHDTC $10 _DEATHDECOD $100 _DLTDTC $10;
+    length _DEATHDTC $10 _DEATHDECOD $100 _DLTDTC $10 _dlt_dt 8;
     call missing(_dth_dtc, _dth_decod, _dlt_dtc, _DEATHDTC, _DEATHDECOD, _DLTDTC, _dlt_dt);
 
     /* ---- Death Derivation ---- */

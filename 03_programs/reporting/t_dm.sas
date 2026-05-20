@@ -60,7 +60,7 @@ run;
 
 proc sql;
     create table cat_counts as
-    select Category, Level, ARMCD, strip(put(count(*), 6.)) as ValueC length=20
+    select Category, Level, ARMCD, strip(put(count(*), 6.)) length=20 as ValueC
     from cat_long
     group by Category, Level, ARMCD;
 quit;
