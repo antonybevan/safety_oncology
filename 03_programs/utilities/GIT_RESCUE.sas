@@ -111,7 +111,12 @@
     %put NOTE: --------------------------------------------------;
     %put NOTE: Starting GIT RESCUE Operation...;
 
-    /* Release any active library or file locks to avoid in-use errors during cleanup */
+    /* Release any active library, file, and ODS locks to avoid in-use errors during cleanup */
+    ods _all_ close;
+
+    /* Remove _mclib from the sasautos autocall path list to release system-level directory locks */
+    options sasautos=(SASAUTOS);
+
     libname sdtm clear;
     libname adam clear;
     libname raw clear;
