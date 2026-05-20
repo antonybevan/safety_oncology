@@ -94,10 +94,13 @@ proc report data=summary_long nowd headskip split='|' style(report)={outputwidth
     
     compute after _page_;
         line @1 "--------------------------------------------------------------------------------";
-        %if &N_DL2 = 0 %then %do;
-        line @1 "Note: Dose Level 2 (3x10^6 cells/kg; ~240x10^6 flat equivalent) was skipped per SAP Section 1.1;";
-        line @1 "directly from Level 1 to Level 3 based on SRC recommendation.";
-        %end;
+        %macro _show_skipped_note;
+            %if &N_DL2 = 0 %then %do;
+                line @1 "Note: Dose Level 2 (3x10^6 cells/kg; ~240x10^6 flat equivalent) was skipped per SAP Section 1.1;";
+                line @1 "directly from Level 1 to Level 3 based on SRC recommendation.";
+            %end;
+        %mend _show_skipped_note;
+        %_show_skipped_note;
     endcomp;
 run;
 

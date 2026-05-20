@@ -28,8 +28,10 @@
 
 /* 1. Get AESI data with onset/duration */
 data aesi_detail;
+    length ONGOING_FL $1;
     set adam.adae;
     where AESIFL = 'Y' and TRTEMFL = 'Y';
+    ONGOING_FL = 'N';
     
     /* Calculate onset from CAR-T infusion (Day 0) */
     if not missing(ASTDT) and not missing(CARTDT) then

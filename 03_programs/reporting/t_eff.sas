@@ -42,7 +42,7 @@ proc freq data=t_bor_data noprint;
 run;
 
 data bor_shell;
-    length AVALC $2;
+    length AVALC $20 ARMCD $20;
     do AVALC = 'CR', 'PR', 'SD', 'PD', 'NE';
         do ARMCD = 'DL1', 'DL2', 'DL3';
             count = 0;
@@ -76,7 +76,7 @@ quit;
 
 /* Ensure all arms are in summary */
 data arm_shell;
-    length ARMCD $3;
+    length ARMCD $20;
     do ARMCD = 'DL1', 'DL2', 'DL3';
         orr_count = 0;
         n_subj = 0;

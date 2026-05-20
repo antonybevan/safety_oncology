@@ -63,7 +63,7 @@ proc sort data=trans_aesi;
 run;
 
 data shell;
-    length _NAME_ $32 ARMCD $10;
+    length _NAME_ $32 ARMCD $20;
     do _NAME_ = 'crs_count', 'icans_count', 'gvhd_count', 'inf_count';
         do ARMCD = 'DL1', 'DL2', 'DL3';
             COL1 = 0;

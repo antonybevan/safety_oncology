@@ -11,11 +11,8 @@
 
 %load_config;
 
-%let rs_src = sdtm.rs;
-%if %sysfunc(exist(sdtm.rs_phase2a_full)) %then %let rs_src = sdtm.rs sdtm.rs_phase2a_full;
-
-%let adsl_src = adam.adsl;
-%if %sysfunc(exist(adam.adsl_expanded)) %then %let adsl_src = adam.adsl_expanded;
+%let rs_src = %sysfunc(ifc(%sysfunc(exist(sdtm.rs_phase2a_full)), sdtm.rs sdtm.rs_phase2a_full, sdtm.rs));
+%let adsl_src = %sysfunc(ifc(%sysfunc(exist(adam.adsl_expanded)), adam.adsl_expanded, adam.adsl));
 
 /* ============================================================================
    DURATION OF RESPONSE BY PHASE 2A ARM (Protocol Section 2.2.2)
@@ -134,7 +131,7 @@ quit;
             title1 "Figure F-EFF4: Duration of Response by Phase 2a Arm";
             title2 "Kaplan-Meier Curves - Responders (CR/PR)";
         run;
-        ods output close;
+        ods output clear;
 
         data dor_summary;
             set dor_median_arm;

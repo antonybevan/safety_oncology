@@ -68,11 +68,11 @@ data swimmer_plot;
     
     /* Response color coding */
     length Response_Color $20;
-    select(BOR);
-        when('CR', 'CRi') Response_Color = 'Green';
-        when('PR') Response_Color = 'Blue';
-        when('SD') Response_Color = 'Orange';
-        when('PD') Response_Color = 'Red';
+    select;
+        when(BOR in ('CR', 'CRi')) Response_Color = 'Green';
+        when(BOR = 'PR') Response_Color = 'Blue';
+        when(BOR = 'SD') Response_Color = 'Orange';
+        when(BOR = 'PD') Response_Color = 'Red';
         otherwise Response_Color = 'Gray';
     end;
     

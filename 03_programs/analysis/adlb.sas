@@ -112,9 +112,11 @@ run;
    4. FINAL ADLB — Merge Baseline, Derive CHG, PCHG, Toxicity Grade
    ============================================================================ */
 data adam.adlb;
+    length DTYPE $8 ABLFL $1;
     set lb_adsl;
 
     /* Merge baseline record */
+    call missing(BASEDT, BASE, DTYPE, ABLFL);
     if _n_ = 1 then do;
         declare hash b(dataset:'lb_base_records');
         b.defineKey('USUBJID','PARAMCD');

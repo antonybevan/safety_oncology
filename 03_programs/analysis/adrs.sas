@@ -26,6 +26,7 @@
    1. OVERALL RESPONSE (OVR) PARAMETER
    ============================================================================ */
 data adrs;
+    length PARCAT1 $40;
     set sdtm.rs;
 
     /* Merge analysis variables from ADSL */
@@ -148,6 +149,7 @@ run;
 
 /* 2e. Build PFS records from ADSL */
 data adrs_pfs;
+    length PARCAT1 $40;
     /* Retain TRTSDT for downstream traceability (ADaM IG §4.1.4) */
     set adam.adsl(keep=USUBJID TRTSDT CARTDT ITTFL SAFFL EFFFL EVALCRIT TRTEDT TRT01A TRT01AN ARMCD);
 
@@ -287,6 +289,7 @@ run;
    same PCHG value (reproducible across runs).
    ============================================================================ */
 data adrs_pchg;
+    length PARCAT1 $40;
     set adrs_bor_final(where=(AVALC not in ('NE','')));
     PARAMCD = 'PCHG';
     PARAM   = 'Best Percent Change in Target Lesions';

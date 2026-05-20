@@ -21,11 +21,8 @@
 %let has_adrs_expanded = %sysfunc(exist(adam.adrs_expanded));
 %let has_adsl_expanded = %sysfunc(exist(adam.adsl_expanded));
 %let src_ready = 0;
-%let adsl_src = adam.adsl;
-%let adrs_src = adam.adrs;
-
-%if &has_adsl_expanded %then %let adsl_src = adam.adsl_expanded;
-%if &has_adrs_expanded %then %let adrs_src = adam.adrs_expanded;
+%let adsl_src = %sysfunc(ifc(&has_adsl_expanded, adam.adsl_expanded, adam.adsl));
+%let adrs_src = %sysfunc(ifc(&has_adrs_expanded, adam.adrs_expanded, adam.adrs));
 
 %macro resolve_waterfall_source;
     %if &has_adtr %then %do;

@@ -84,6 +84,7 @@ quit;
 
 /* Create shell to guarantee all rows and treatment columns exist */
 data shell;
+    length row_label $100;
     do row = 1 to 5;
         row_label = put(row, row_fmt.);
         do TRT01AN = 1 to 3;

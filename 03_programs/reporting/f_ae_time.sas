@@ -15,11 +15,12 @@ data ae_timeline;
     where AESIFL = 'Y' and not missing(CARTDT);
     
     /* Days post-infusion */
-    REL_START = ASTDT - CARTDT;
-    REL_END = AENDT - CARTDT;
-    
-    /* Handle ongoing events for plotting */
-    if missing(REL_END) then REL_END = 30; /* Representative end of window */
+    if not missing(ASTDT) and not missing(CARTDT) then REL_START = ASTDT - CARTDT;
+    else REL_START = .;
+
+    if not missing(AENDT) and not missing(CARTDT) then REL_END = AENDT - CARTDT;
+    else if not missing(CARTDT) then REL_END = 30; /* Representative end of window for ongoing */
+    else REL_END = .;
     
     length SUBJID_LBL $20;
     SUBJID_LBL = scan(USUBJID, -1, '-');

@@ -46,7 +46,7 @@ proc lifetest data=pfs_data method=KM plots=survival(atrisk=0 to 12 by 3);
     time AVAL_MONTHS * CNSR(1);
     strata ARMCD / test=logrank;
 run;
-ods output close;
+ods output clear;
 
 /* 3. Extract Median PFS with 95% CI */
 data km_median;

@@ -101,7 +101,7 @@ run;
    5. BUILD ADSL
    ============================================================================ */
 data adsl;
-    length DTHCAUS $100 COHORT $10 EVALCRIT $25 DLTEV_FL $1 AESTDTC $10 AEDECOD $100;
+    length DTHCAUS $100 COHORT $10 EVALCRIT $25 DLTEV_FL $1 _dth_dtc $10 _dth_decod $100 _dlt_dtc $10;
     set sdtm.dm;
 
     /* ---- Merge Treatment Dates (Hash) ---- */
@@ -117,15 +117,15 @@ data adsl;
         e.defineDone();
 
         /* Death info */
-        declare hash d(dataset:'ae_death_first');
+        declare hash d(dataset:'ae_death_first(rename=(AESTDTC=_dth_dtc AEDECOD=_dth_decod))');
         d.defineKey('USUBJID');
-        d.defineData('AESTDTC','AEDECOD');
+        d.defineData('_dth_dtc','_dth_decod');
         d.defineDone();
 
         /* DLT events */
-        declare hash dlt(dataset:'sdtm_dlts');
+        declare hash dlt(dataset:'sdtm_dlts(rename=(AESTDTC=_dlt_dtc))');
         dlt.defineKey('USUBJID');
-        dlt.defineData('AESTDTC');
+        dlt.defineData('_dlt_dtc');
         dlt.defineDone();
     end;
 
@@ -133,11 +133,14 @@ data adsl;
         TRTSDT = .; TRTEDT = .; CARTDT = .; LDSTDT = .;
     end;
 
+    /* Initialize intermediate lookup variables to prevent uninitialized notes */
+    length _DEATHDTC $10 _DEATHDECOD $100 _DLTDTC $10;
+    call missing(_dth_dtc, _dth_decod, _dlt_dtc, _DEATHDTC, _DEATHDECOD, _DLTDTC, _dlt_dt);
+
     /* ---- Death Derivation ---- */
-    length _DEATHDTC $10 _DEATHDECOD $100;
     if d.find() = 0 then do;
-        _DEATHDTC   = AESTDTC;
-        _DEATHDECOD = AEDECOD;
+        _DEATHDTC   = _dth_dtc;
+        _DEATHDECOD = _dth_decod;
         %iso_to_sas(iso_var=_DEATHDTC, sas_var=DTHDT);
         DTHDTC = _DEATHDTC;
         DTHCAUS = _DEATHDECOD;
@@ -148,9 +151,8 @@ data adsl;
     end;
 
     /* ---- DLT Evaluability (within 28 days of CAR-T) ---- */
-    length _DLTDTC $10;
     if dlt.find() = 0 then do;
-        _DLTDTC = AESTDTC;
+        _DLTDTC = _dlt_dtc;
         %iso_to_sas(iso_var=_DLTDTC, sas_var=_dlt_dt);
         if not missing(_dlt_dt) and not missing(CARTDT) then do;
             if 0 <= (_dlt_dt - CARTDT) <= 28 then DLTEV_FL = 'Y';
@@ -187,6 +189,7 @@ data adsl;
     length TRT01P TRT01A $200;
     TRT01P = ARM;
     TRT01A = ARM;
+    TRT01PN = .;
     if ARMCD = 'DL1' then TRT01PN = 1;
     else if ARMCD = 'DL2' then TRT01PN = 2;
     else if ARMCD = 'DL3' then TRT01PN = 3;
@@ -262,7 +265,7 @@ data adsl;
     ;
 
     /* Drop internal intermediate variables */
-    drop _DEATHDTC _DEATHDECOD _DLTDTC _dlt_dt DISEASE;
+    drop _dth_dtc _dth_decod _dlt_dtc _DEATHDTC _DEATHDECOD _DLTDTC _dlt_dt DISEASE;
 run;
 
 /* ============================================================================

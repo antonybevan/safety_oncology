@@ -42,10 +42,11 @@ run;
 
 /* 2. Setup ADAE */
 data adae;
-    length AEOUT AECONTRT $100;
+    length AEOUT AECONTRT $100 ASTCTGR $200;
     set sdtm.ae(drop=LDSTDT);
     
     /* Join ADSL variables */
+    call missing(ASTCTGR);
     length TRT01A $200;
     if _n_ = 1 then do;
         if 0 then set adam.adsl(keep=USUBJID TRTSDT CARTDT LDSTDT TRT01A TRT01AN ARM ARMCD);

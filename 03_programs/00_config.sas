@@ -184,6 +184,7 @@ run;
 %include "&PROG_PATH/macros/iso_to_sas.sas";
 %include "&PROG_PATH/macros/load_config.sas";
 %include "&PROG_PATH/macros/ods_setup.sas";
+%include "&PROG_PATH/macros/trim.sas";
 %include "&PROG_PATH/macros/xpt_export.sas";
 
 

@@ -46,7 +46,7 @@ proc lifetest data=os_data method=KM plots=survival(atrisk=0 to 24 by 6);
     time OS_MONTHS * OS_CNSR(1);
     strata ARMCD / test=logrank;
 run;
-ods output close;
+ods output clear;
 
 /* 3. Extract Median OS with 95% CI */
 data os_median;
