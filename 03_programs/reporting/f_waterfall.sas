@@ -22,8 +22,11 @@
 
 %macro resolve_waterfall_source;
 
-    /* ---- Source 1 & 2: ADTR ---- */
+    /* Declare ALL local variables at macro top to avoid scoping issues in nested %do blocks */
     %local has_adtr adtr_has_chg adtr_has_aval adtr_has_paramcd dsid rc;
+    %local has_adrs _pchg_cnt has_work_pchg _wpchg_cnt;
+
+    /* ---- Source 1 & 2: ADTR ---- */
     %let has_adtr = %sysfunc(exist(adam.adtr));
 
     %if &has_adtr %then %do;
@@ -65,7 +68,6 @@
 
     /* ---- Source 3: adam.adrs PCHG parameter ---- */
     %if &src_ready = 0 %then %do;
-        %local has_adrs _pchg_cnt;
         %let has_adrs  = %sysfunc(exist(adam.adrs));
         %let _pchg_cnt = 0;
         %if &has_adrs %then %do;
@@ -92,7 +94,6 @@
 
     /* ---- Source 4: WORK.adrs_pchg (same-session intermediate from adrs.sas) ---- */
     %if &src_ready = 0 %then %do;
-        %local has_work_pchg _wpchg_cnt;
         %let has_work_pchg = %sysfunc(exist(work.adrs_pchg));
         %let _wpchg_cnt    = 0;
         %if &has_work_pchg %then %do;
