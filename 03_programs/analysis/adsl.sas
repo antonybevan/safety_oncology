@@ -138,7 +138,7 @@ data adsl;
     if d.find() = 0 then do;
         _DEATHDTC   = AESTDTC;
         _DEATHDECOD = AEDECOD;
-        DTHDT  = input(_DEATHDTC, yymmdd10.);
+        %iso_to_sas(iso_var=_DEATHDTC, sas_var=DTHDT);
         DTHDTC = _DEATHDTC;
         DTHCAUS = _DEATHDECOD;
         DTHFL = 'Y';
@@ -151,7 +151,7 @@ data adsl;
     length _DLTDTC $10;
     if dlt.find() = 0 then do;
         _DLTDTC = AESTDTC;
-        _dlt_dt = input(_DLTDTC, yymmdd10.);
+        %iso_to_sas(iso_var=_DLTDTC, sas_var=_dlt_dt);
         if not missing(_dlt_dt) and not missing(CARTDT)
             and 0 <= (_dlt_dt - CARTDT) <= 28 then DLTEV_FL = 'Y';
         else DLTEV_FL = 'N';
