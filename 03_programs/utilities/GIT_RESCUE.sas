@@ -8,10 +8,13 @@ ods _all_ close;
 /* Remove _mclib from the sasautos autocall path list to release system-level directory locks */
 options sasautos=(SASAUTOS);
 
-libname sdtm clear;
-libname adam clear;
-libname raw clear;
-libname legacy clear;
+%macro _clear_libs;
+    %if %sysfunc(libref(sdtm)) = 0 %then libname sdtm clear;
+    %if %sysfunc(libref(adam)) = 0 %then libname adam clear;
+    %if %sysfunc(libref(raw)) = 0 %then libname raw clear;
+    %if %sysfunc(libref(legacy)) = 0 %then libname legacy clear;
+%mend _clear_libs;
+%_clear_libs;
 /* Silently deassign _mclib — SAS holds an internal lock on the fileref even after removing it
    from sasautos, so using %sysfunc(filename()) avoids the "still in use" ERROR in the log.   */
 %let _rc = %sysfunc(filename(_mclib));
