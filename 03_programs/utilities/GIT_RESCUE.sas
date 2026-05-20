@@ -48,21 +48,57 @@
 %put NOTE: [GIT_RESCUE] Target Sync path: &safe_path;
 
 /*
-   ROBUST CLEANUP MACRO
-   Uses system 'rm -rf' on Linux/ODA, rd/rmdir on Windows.
+   NATIVE RECURSIVE DIRECTORY CLEANUP MACRO
+   Does NOT use system shell escape (call system / 'rm -rf'), 
+   making it 100% compatible with locked-down SAS OnDemand sessions.
 */
-%macro force_clean(dir);
-    data _null_;
-        if fileexist("&dir") then do;
-            put "NOTE: [GIT_RESCUE] Directory exists. Executing recursive delete on: &dir";
-            %if %upcase(&SYSSCP) = WIN %then
-                call system("rd /s /q ""&dir""");
-            %else
-                call system("rm -rf ""&dir""");;
-        end;
-        else put "NOTE: [GIT_RESCUE] Directory does not exist, nothing to clean: &dir";
-    run;
-%mend force_clean;
+%macro clean_dir_native(dir);
+    %macro _rmdir_rec(path);
+        %local d_id rc member subpath fileref num_members i sub_fref is_dir f_delete dir_delete;
+        
+        %let rc = %sysfunc(filename(fileref, &path));
+        %let d_id = %sysfunc(dopen(&fileref));
+        
+        %if &d_id > 0 %then %do;
+            %let num_members = %sysfunc(dnum(&d_id));
+            %do i = 1 %to &num_members;
+                %let member = %sysfunc(dread(&d_id, &i));
+                %let subpath = &path/&member;
+                
+                /* Check if subdirectory or file */
+                %let rc = %sysfunc(filename(sub_fref, &subpath));
+                %let is_dir = %sysfunc(dopen(&sub_fref));
+                
+                %if &is_dir > 0 %then %do;
+                    %let rc = %sysfunc(dclose(&is_dir));
+                    %let rc = %sysfunc(filename(sub_fref));
+                    %_rmdir_rec(&subpath);
+                %end;
+                %else %do;
+                    %let rc = %sysfunc(filename(sub_fref));
+                    %let rc = %sysfunc(filename(f_delete, &subpath));
+                    %let rc = %sysfunc(fdelete(&f_delete));
+                    %let rc = %sysfunc(filename(f_delete));
+                %end;
+            %end;
+            %let rc = %sysfunc(dclose(&d_id));
+        %end;
+        %let rc = %sysfunc(filename(fileref));
+        
+        /* Delete current empty directory */
+        %let rc = %sysfunc(filename(dir_delete, &path));
+        %let rc = %sysfunc(fdelete(&dir_delete));
+        %let rc = %sysfunc(filename(dir_delete));
+    %mend _rmdir_rec;
+
+    %if %sysfunc(fileexist(&dir)) %then %do;
+        %put NOTE: [GIT_RESCUE] Directory exists. Executing native recursive delete: &dir;
+        %_rmdir_rec(&dir);
+    %end;
+    %else %do;
+        %put NOTE: [GIT_RESCUE] Directory does not exist: &dir;
+    %end;
+%mend clean_dir_native;
 
 data _null_;
     put "NOTE: --------------------------------------------------";
@@ -85,7 +121,7 @@ data _null_;
         put "NOTE: Pull failed (Conflict or Missing). Initiating FRESH CLONE Protocol...";
 
         /* Nuke and re-clone */
-        call execute('%force_clean(&safe_path)');
+        call execute('%clean_dir_native(&safe_path)');
         put "NOTE: Cloning from &repo_url...";
         rc_clone = gitfn_clone("&repo_url", "&safe_path");
 
