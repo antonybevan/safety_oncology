@@ -14,8 +14,8 @@
 proc sql;
     create table screen_fail as
     select d.USUBJID, d.SITEID, d.AGE, d.SEX, d.RACE, d.RFSTDTC as SCREEN_DATE,
-           cast("Screen Failure" as char(50)) as DISPOSITION,
-           cast("Inclusion/Exclusion Criteria Not Met" as char(100)) as FAILURE_REASON
+           "Screen Failure" length=50 as DISPOSITION,
+           "Inclusion/Exclusion Criteria Not Met" length=100 as FAILURE_REASON
     from sdtm.dm d
     where d.USUBJID not in (select USUBJID from sdtm.ex);
 quit;
