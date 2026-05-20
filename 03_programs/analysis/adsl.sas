@@ -101,7 +101,7 @@ run;
    5. BUILD ADSL
    ============================================================================ */
 data adsl;
-    length DTHCAUS $100 COHORT $10 EVALCRIT $25 DLTEV_FL $1;
+    length DTHCAUS $100 COHORT $10 EVALCRIT $25 DLTEV_FL $1 AESTDTC $10 AEDECOD $100;
     set sdtm.dm;
 
     /* ---- Merge Treatment Dates (Hash) ---- */
@@ -152,8 +152,10 @@ data adsl;
     if dlt.find() = 0 then do;
         _DLTDTC = AESTDTC;
         %iso_to_sas(iso_var=_DLTDTC, sas_var=_dlt_dt);
-        if not missing(_dlt_dt) and not missing(CARTDT)
-            and 0 <= (_dlt_dt - CARTDT) <= 28 then DLTEV_FL = 'Y';
+        if not missing(_dlt_dt) and not missing(CARTDT) then do;
+            if 0 <= (_dlt_dt - CARTDT) <= 28 then DLTEV_FL = 'Y';
+            else DLTEV_FL = 'N';
+        end;
         else DLTEV_FL = 'N';
     end;
     else DLTEV_FL = 'N';

@@ -29,7 +29,7 @@
     /* Verify source dataset exists before attempting export.
        We strip any dataset options (e.g. ds(drop=...)) using %scan to get the base dataset name. */
     %local base_ds;
-    %let base_ds = %scan(&ds, 1, %str(()));
+    %let base_ds = %scan(&ds, 1, %str(%(%)));
 
     %if not %sysfunc(exist(&base_ds)) %then %do;
         %put WARNING: [XPT_EXPORT] Source dataset &base_ds (from &ds) does not exist. Skipping XPT export.;

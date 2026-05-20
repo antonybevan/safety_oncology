@@ -18,6 +18,7 @@ data gf_structure;
         GFORRES $20 GFORRESU $20 GFSTRESC $20 GFSTRESN 8 GFSTRESU $20 
         GFSPEC $40 GFMETHOD $40 GFDTC $10 GFDY 8 VISIT $40
     ;
+    call missing(of _all_);
     stop;
 run;
 

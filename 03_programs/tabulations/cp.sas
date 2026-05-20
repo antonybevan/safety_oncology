@@ -18,6 +18,7 @@ data cp_structure;
         CPORRES $20 CPORRESU $20 CPSTRESC $20 CPSTRESN 8 CPSTRESU $20 
         CPSPEC $40 CPMETHOD $40 CPDTC $10 CPDY 8 VISIT $40
     ;
+    call missing(of _all_);
     stop;
 run;
 
