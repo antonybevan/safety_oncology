@@ -68,21 +68,17 @@ data swimmer_plot;
     
     /* Response color coding */
     length Response_Color $20;
-    select;
-        when(BOR in ('CR', 'CRi')) Response_Color = 'Green';
-        when(BOR = 'PR') Response_Color = 'Blue';
-        when(BOR = 'SD') Response_Color = 'Orange';
-        when(BOR = 'PD') Response_Color = 'Red';
-        otherwise Response_Color = 'Gray';
-    end;
+    if BOR in ('CR', 'CRi') then Response_Color = 'Green';
+    else if BOR = 'PR' then Response_Color = 'Blue';
+    else if BOR = 'SD' then Response_Color = 'Orange';
+    else if BOR = 'PD' then Response_Color = 'Red';
+    else Response_Color = 'Gray';
     
     /* Status marker */
     length Status_Symbol $10;
-    select(STATUS);
-        when('Death') Status_Symbol = 'X';
-        when('Progressed') Status_Symbol = 'P';
-        otherwise Status_Symbol = '>';
-    end;
+    if STATUS = 'Death' then Status_Symbol = 'X';
+    else if STATUS = 'Progressed' then Status_Symbol = 'P';
+    else Status_Symbol = '>';
     drop _end;
 run;
 

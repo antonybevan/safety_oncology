@@ -16,9 +16,9 @@ proc sql noprint;
     select count(*) into :N_DL3 from adam.adsl where SAFFL = 'Y' and ARMCD = 'DL3';
 quit;
 
-%let N_DL1 = %trim(&N_DL1);
-%let N_DL2 = %trim(&N_DL2);
-%let N_DL3 = %trim(&N_DL3);
+%let N_DL1 = %sysfunc(strip(&N_DL1));
+%let N_DL2 = %sysfunc(strip(&N_DL2));
+%let N_DL3 = %sysfunc(strip(&N_DL3));
 
 /* 2. Process AESI Data */
 data aesi_data;

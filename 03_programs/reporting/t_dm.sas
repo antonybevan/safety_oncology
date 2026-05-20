@@ -23,9 +23,9 @@ proc sql noprint;
     select count(*) into :N_TOT from t_dm_data;
 quit;
 
-%let N_DL1 = %trim(&N_DL1);
-%let N_DL2 = %trim(&N_DL2);
-%let N_DL3 = %trim(&N_DL3);
+%let N_DL1 = %sysfunc(strip(&N_DL1));
+%let N_DL2 = %sysfunc(strip(&N_DL2));
+%let N_DL3 = %sysfunc(strip(&N_DL3));
 
 /* 3. Age Summary */
 proc means data=t_dm_data n mean std median min max noprint;
@@ -60,7 +60,7 @@ run;
 
 proc sql;
     create table cat_counts as
-    select Category, Level, ARMCD, strip(put(count(*), 6.)) length=20 as ValueC
+    select Category, Level, ARMCD, cast(strip(put(count(*), 6.)) as char(20)) as ValueC
     from cat_long
     group by Category, Level, ARMCD;
 quit;

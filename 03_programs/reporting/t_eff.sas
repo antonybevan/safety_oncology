@@ -11,12 +11,14 @@
 
 /* 1. Prepare Efficacy Data (Response Evaluable Population) */
 data t_eff_data;
+    length AVALC $20 ARMCD $20;
     set adam.adrs;
     where EFFFL = 'Y' and PARAMCD = 'OVR'; /* Longitudinal overall responses */
 run;
 
 /* Get the derived BOR from adrs */
 data t_bor_data;
+    length AVALC $20 ARMCD $20;
     set adam.adrs;
     where EFFFL = 'Y' and PARAMCD = 'BOR';
 run;
@@ -32,9 +34,9 @@ proc sql noprint;
     select count(*) into :N_DL3 from adam.adsl where EFFFL = 'Y' and ARMCD = 'DL3';
 quit;
 
-%let N_DL1 = %trim(&N_DL1);
-%let N_DL2 = %trim(&N_DL2);
-%let N_DL3 = %trim(&N_DL3);
+%let N_DL1 = %sysfunc(strip(&N_DL1));
+%let N_DL2 = %sysfunc(strip(&N_DL2));
+%let N_DL3 = %sysfunc(strip(&N_DL3));
 
 /* 3. Summarize BOR Counts */
 proc freq data=t_bor_data noprint;
@@ -55,6 +57,7 @@ proc sort data=bor_counts; by AVALC ARMCD; run;
 proc sort data=bor_shell; by AVALC ARMCD; run;
 
 data bor_final_report;
+    length AVALC $20 ARMCD $20;
     merge bor_shell(in=s) bor_counts(in=c);
     by AVALC ARMCD;
     if count = . then count = 0;

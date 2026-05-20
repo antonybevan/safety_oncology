@@ -21,7 +21,7 @@ proc sql;
     create table deaths_from_ae as
     select distinct a.USUBJID, a.ARMCD, b.AGE, b.SEX, b.COHORT,
            a.AENDT as DTHDT format=date9.,
-           a.AEDECOD length=100 as DTHCAUS
+           cast(a.AEDECOD as char(100)) as DTHCAUS
     from adam.adae a
     inner join adam.adsl b on a.USUBJID = b.USUBJID
     where upcase(a.AEOUT) = 'FATAL'

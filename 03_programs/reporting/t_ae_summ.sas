@@ -21,10 +21,10 @@ proc sql noprint;
     select count(*) into :n_dl3 from adam.adsl where SAFFL='Y' and TRT01AN=3;
 quit;
 
-%let n_total = %trim(&n_total);
-%let n_dl1 = %trim(&n_dl1);
-%let n_dl2 = %trim(&n_dl2);
-%let n_dl3 = %trim(&n_dl3);
+%let n_total = %sysfunc(strip(&n_total));
+%let n_dl1 = %sysfunc(strip(&n_dl1));
+%let n_dl2 = %sysfunc(strip(&n_dl2));
+%let n_dl3 = %sysfunc(strip(&n_dl3));
 
 /* 2. Process AE Data */
 data ae_data;
