@@ -7,7 +7,30 @@
  ******************************************************************************/
 
 /* 1. Environment Setup */
-%include "00_config.sas";
+%macro _include_config;
+    %local path;
+    %if %symexist(_SASPROGRAMFILE) %then %do;
+        %if %length(&_SASPROGRAMFILE) > 1 %then %do;
+            /* Extract the folder path containing the current program file, supporting both Linux and Windows separators */
+            %let path = %sysfunc(substr(&_SASPROGRAMFILE, 1, %sysfunc(findc(&_SASPROGRAMFILE, %str(/\), -200))));
+            %if %sysfunc(fileexist(&path.00_config.sas)) %then %do;
+                %include "&path.00_config.sas";
+                %return;
+            %end;
+        %end;
+    %end;
+    /* Fallback: try relative or absolute defaults */
+    %if %sysfunc(fileexist(00_config.sas)) %then %include "00_config.sas";
+    %else %if %sysfunc(fileexist(03_programs/00_config.sas)) %then %include "03_programs/00_config.sas";
+    %else %if %sysfunc(fileexist(/home/u63849890/safety_oncology/03_programs/00_config.sas)) %then %include "/home/u63849890/safety_oncology/03_programs/00_config.sas";
+    %else %if %sysfunc(fileexist(d:/safety_oncology/03_programs/00_config.sas)) %then %include "d:/safety_oncology/03_programs/00_config.sas";
+    %else %do;
+        %put ERROR: [MAIN] Cannot locate 00_config.sas!;
+        %abort cancel;
+    %end;
+%mend _include_config;
+%_include_config;
+
 
 %put NOTE: [MAIN] Starting Phase 1 Pipeline Execution...;
 

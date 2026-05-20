@@ -31,11 +31,11 @@ data adrs;
     /* Merge analysis variables from ADSL */
     if _n_ = 1 then do;
         if 0 then set adam.adsl(keep=USUBJID TRTSDT TRT01A TRT01AN ITTFL SAFFL EFFFL
-                                     DISEASE ARMCD ARM EVALCRIT);
+                                     COHORT ARMCD ARM EVALCRIT);
         declare hash b(dataset:'adam.adsl');
         b.defineKey('USUBJID');
         b.defineData('TRTSDT','TRT01A','TRT01AN','ITTFL','SAFFL','EFFFL',
-                     'DISEASE','ARMCD','ARM','EVALCRIT');
+                     'COHORT','ARMCD','ARM','EVALCRIT');
         b.defineDone();
     end;
 
@@ -47,8 +47,8 @@ data adrs;
 
     /* Evaluation criteria by disease per SAP §6.1 */
     length CRIT1 PARCAT3 $100;
-    if DISEASE = 'NHL' then CRIT1 = 'Lugano 2016 (Metabolic)';
-    else if DISEASE in ('CLL','SLL') then CRIT1 = 'iwCLL 2018';
+    if COHORT = 'NHL' then CRIT1 = 'Lugano 2016 (Metabolic)';
+    else if COHORT = 'CLL' then CRIT1 = 'iwCLL 2018';
     PARCAT3 = coalescec(EVALCRIT, CRIT1);
 
     /* SDTM traceability */
@@ -256,10 +256,10 @@ run;
 /* Scaffold NE BOR for subjects with no evaluable responses */
 data adrs_ne;
     set adam.adsl(keep=USUBJID TRTSDT TRT01A TRT01AN ITTFL SAFFL EFFFL
-                       DISEASE ARMCD ARM EVALCRIT);
+                       COHORT ARMCD ARM EVALCRIT);
     length CRIT1 PARCAT3 $100;
-    if      DISEASE = 'NHL'             then CRIT1 = 'Lugano 2016 (Metabolic)';
-    else if DISEASE in ('CLL','SLL')    then CRIT1 = 'iwCLL 2018';
+    if      COHORT = 'NHL'              then CRIT1 = 'Lugano 2016 (Metabolic)';
+    else if COHORT = 'CLL'              then CRIT1 = 'iwCLL 2018';
     PARCAT3  = coalescec(EVALCRIT, CRIT1);
     PARCAT1  = 'EFFICACY';
     PARAMCD  = 'BOR';

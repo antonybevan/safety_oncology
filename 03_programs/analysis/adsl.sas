@@ -84,7 +84,7 @@ run;
    4. DLT EVENTS (Grades 3-5, treatment-related, for evaluability flag)
    ============================================================================ */
 proc sort data=sdtm.ae(where=(
-    input(AETOXGR, ?? 8.) >= 3
+    AETOXGR in ('3','4','5')
     and upcase(AEREL) not in ('NOT RELATED','NONE','UNRELATED')
     and not missing(AESTDTC)
 )) out=ae_dlts;

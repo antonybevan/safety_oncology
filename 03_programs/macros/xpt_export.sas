@@ -26,11 +26,16 @@
         %return;
     %end;
 
-    /* Verify source dataset exists before attempting export */
-    %if not %sysfunc(exist(&ds)) %then %do;
-        %put WARNING: [XPT_EXPORT] Source dataset &ds does not exist. Skipping XPT export.;
+    /* Verify source dataset exists before attempting export.
+       We strip any dataset options (e.g. ds(drop=...)) using %scan to get the base dataset name. */
+    %local base_ds;
+    %let base_ds = %scan(&ds, 1, %str(()));
+
+    %if not %sysfunc(exist(&base_ds)) %then %do;
+        %put WARNING: [XPT_EXPORT] Source dataset &base_ds (from &ds) does not exist. Skipping XPT export.;
         %return;
     %end;
+
 
     libname _xpt_ xport "&xptpath";
     data _xpt_.&outname;
