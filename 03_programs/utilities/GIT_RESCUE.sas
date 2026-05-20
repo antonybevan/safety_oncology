@@ -100,34 +100,44 @@
     %end;
 %mend clean_dir_native;
 
-data _null_;
-    put "NOTE: --------------------------------------------------";
-    put "NOTE: Starting GIT RESCUE Operation...";
+/*
+   SYNCHRONOUS GIT RESCUE ENGINE
+   Executes rescue steps sequentially within the macro compiler,
+   preventing DATA step asynchronous queuing issues.
+*/
+%macro git_rescue;
+    %local rc rc_clone;
+
+    %put NOTE: --------------------------------------------------;
+    %put NOTE: Starting GIT RESCUE Operation...;
 
     /* 1. Attempt PULL first */
-    rc = gitfn_pull("&safe_path");
-    put "NOTE: gitfn_pull returned RC=" rc;
+    %let rc = %sysfunc(gitfn_pull(&safe_path));
+    %put NOTE: gitfn_pull returned RC=&rc;
 
-    if rc = 0 then put "NOTE: SUCCESS! Project updated from GitHub.";
-    else if rc = 1 then put "NOTE: Repository is already up to date.";
+    %if &rc = 0 %then %do;
+        %put NOTE: SUCCESS! Project updated from GitHub.;
+    %end;
+    %else %if &rc = 1 %then %do;
+        %put NOTE: Repository is already up to date.;
+    %end;
+    %else %do;
+        %put NOTE: Pull failed (Conflict or Missing). Initiating FRESH CLONE Protocol...;
 
-    /*
-       Catch-all for failures:
-       RC = 22  (Conflict)
-       RC = -1  (Generic Failure / Repo missing)
-       RC = 128 (Not a git repo)
-    */
-    else do;
-        put "NOTE: Pull failed (Conflict or Missing). Initiating FRESH CLONE Protocol...";
+        /* Native recursive delete executes synchronously */
+        %clean_dir_native(&safe_path);
 
-        /* Nuke and re-clone */
-        call execute('%clean_dir_native(&safe_path)');
-        put "NOTE: Cloning from &repo_url...";
-        rc_clone = gitfn_clone("&repo_url", "&safe_path");
+        %put NOTE: Cloning from &repo_url...;
+        %let rc_clone = %sysfunc(gitfn_clone(&repo_url, &safe_path));
 
-        if rc_clone = 0 then put "NOTE: SUCCESS! Project reset and re-cloned.";
-        else put "ERROR: Clone failed. RC=" rc_clone;
-    end;
+        %if &rc_clone = 0 %then %do;
+            %put NOTE: SUCCESS! Project reset and re-cloned.;
+        %end;
+        %else %do;
+            %put ERROR: Clone failed. RC=&rc_clone;
+        %end;
+    %end;
 
-    put "NOTE: --------------------------------------------------";
-run;
+    %put NOTE: --------------------------------------------------;
+%mend git_rescue;
+%git_rescue;
