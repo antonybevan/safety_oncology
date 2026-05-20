@@ -82,12 +82,17 @@
 
 %macro ods_close(type=RTF);
     %let type = %upcase(&type);
-    %if &type = RTF              %then ods rtf   close;;
-    %else %if &type = HTML
-           or &type = HTML5      %then ods html5 close;;
-    %else %if &type = GRAPH      %then %do;
+    %if &type = RTF %then %do;
+        ods rtf close;
+    %end;
+    %else %if &type = HTML or &type = HTML5 %then %do;
+        ods html5 close;
+    %end;
+    %else %if &type = GRAPH %then %do;
         ods graphics off;
         ods listing close;
     %end;
-    %else %if &type = LISTING    %then ods listing close;;
+    %else %if &type = LISTING %then %do;
+        ods listing close;
+    %end;
 %mend ods_close;
