@@ -218,10 +218,12 @@ data adrs_pfs;
     end;
 
     /* Missed visit rule: if >90d gap between last assessment and claimed event, censor */
-    if CNSR = 0 and not missing(LST_DT) and (ADT - LST_DT > 90) then do;
-        ADT      = LST_DT;
-        CNSR     = 1;
-        EVNTDESC = 'Censored: Missed Visit (>90d gap)';
+    if CNSR = 0 and not missing(LST_DT) then do;
+        if (ADT - LST_DT > 90) then do;
+            ADT      = LST_DT;
+            CNSR     = 1;
+            EVNTDESC = 'Censored: Missed Visit (>90d gap)';
+        end;
     end;
 
     /* AVAL in days from randomization/infusion */
