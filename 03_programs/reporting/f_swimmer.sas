@@ -89,7 +89,7 @@ proc sgplot data=swimmer_plot;
     /* Horizontal bars for duration */
     hbar Subject_Order / response=Duration_Weeks 
                          group=BOR
-                         categoryorder=respdesc
+                         categoryorder=data
                          barwidth=0.7
                          datalabel=BOR
                          datalabelpos=right;

@@ -196,11 +196,17 @@ data adrs_pfs;
     else                                                   EVNT_DT = .;
 
     /* PFS Censoring Priority (SAP Table 6):
-       1. Censor at new anti-cancer therapy if before event
-       2. Event (PD or Death)
-       3. Censor at last assessment
+       1. Censor Screen Failures / Untreated subjects (explicit guard)
+       2. Censor at new anti-cancer therapy if before event
+       3. Event (PD or Death)
+       4. Censor at last assessment
     */
-    if not missing(NACT_DT) and (missing(EVNT_DT) or NACT_DT <= EVNT_DT) then do;
+    if missing(TRTSDT) then do;
+        ADT      = .;
+        CNSR     = 1;
+        EVNTDESC = 'Screen Failure / Not Treated';
+    end;
+    else if not missing(NACT_DT) and (missing(EVNT_DT) or NACT_DT <= EVNT_DT) then do;
         ADT      = min(coalesce(LST_DT, NACT_DT), NACT_DT);
         if missing(ADT) then ADT = TRTSDT;
         CNSR     = 1;

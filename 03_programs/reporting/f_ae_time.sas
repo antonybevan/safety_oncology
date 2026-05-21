@@ -19,7 +19,10 @@ data ae_timeline;
     else REL_START = .;
 
     if not missing(AENDT) and not missing(CARTDT) then REL_END = AENDT - CARTDT;
-    else if not missing(CARTDT) then REL_END = 30; /* Representative end of window for ongoing */
+    else if not missing(CARTDT) then do;
+        /* Dynamic cutoff-relative window end for ongoing events, capped at plot maximum (30 days) */
+        REL_END = min(30, input("&DATA_CUTOFF", yymmdd10.) - CARTDT);
+    end;
     else REL_END = .;
     
     length SUBJID_LBL $20;
@@ -35,7 +38,7 @@ run;
 proc sgplot data=ae_timeline;
     highlow y=SUBJID_LBL low=REL_START high=REL_END / group=AEDECOD type=bar;
     xaxis label="Days Since CAR-T Infusion" min=-1 max=30;
-    yaxis label="Subject ID";
+    yaxis label="Subject ID" type=discrete discreteorder=data;
     keylegend / title="Adverse Event (PT)";
 run;
 

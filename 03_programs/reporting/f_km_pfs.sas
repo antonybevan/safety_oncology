@@ -100,33 +100,70 @@ quit;
         title "Median PFS by Dose Level";
     run;
 
-    /* Landmark survival rates at 3, 6, 12 months */
-    proc sql;
-        create table pfs_landmarks as
-        select ARMCD,
-               sum(case when CNSR = 0 and AVAL_MONTHS <= 3  then 1 else 0 end) as Evnt_3mo,
-               sum(case when CNSR = 0 and AVAL_MONTHS <= 6  then 1 else 0 end) as Evnt_6mo,
-               sum(case when CNSR = 0 and AVAL_MONTHS <= 12 then 1 else 0 end) as Evnt_12mo,
-               count(*) as N_Total
-        from pfs_data
-        group by ARMCD;
-    quit;
+    /* Carry forward survival estimates for censoring times (which have missing Survival values in ODS) */
+    data km_pfs_est_cf;
+        set km_pfs_est;
+        by Stratum;
+        retain _survival _stderr;
+        if first.Stratum then do;
+            _survival = 1.0;
+            _stderr = 0.0;
+        end;
+        if Survival ne . then _survival = Survival;
+        if StdErr ne . then _stderr = StdErr;
+        
+        if Survival = . then Survival = _survival;
+        if StdErr = . then StdErr = _stderr;
+    run;
+
+    /* Landmark survival rates at 3, 6, and 12 months (Step-Function Robust Approach) */
+    data pfs_landmarks_3;
+        set km_pfs_est_cf;
+        where AVAL_MONTHS <= 3;
+    run;
+    proc sort data=pfs_landmarks_3; by Stratum descending AVAL_MONTHS; run;
+    data pfs_landmark_3;
+        set pfs_landmarks_3;
+        by Stratum;
+        if first.Stratum;
+        Landmark_Time = 3;
+    run;
+
+    data pfs_landmarks_6;
+        set km_pfs_est_cf;
+        where AVAL_MONTHS <= 6;
+    run;
+    proc sort data=pfs_landmarks_6; by Stratum descending AVAL_MONTHS; run;
+    data pfs_landmark_6;
+        set pfs_landmarks_6;
+        by Stratum;
+        if first.Stratum;
+        Landmark_Time = 6;
+    run;
+
+    data pfs_landmarks_12;
+        set km_pfs_est_cf;
+        where AVAL_MONTHS <= 12;
+    run;
+    proc sort data=pfs_landmarks_12; by Stratum descending AVAL_MONTHS; run;
+    data pfs_landmark_12;
+        set pfs_landmarks_12;
+        by Stratum;
+        if first.Stratum;
+        Landmark_Time = 12;
+    run;
 
     data pfs_landmarks;
-        set pfs_landmarks;
-        Surv_3mo  = max(0, (N_Total - Evnt_3mo)  / N_Total * 100);
-        Surv_6mo  = max(0, (N_Total - Evnt_6mo)  / N_Total * 100);
-        Surv_12mo = max(0, (N_Total - Evnt_12mo) / N_Total * 100);
-        format Surv_3mo Surv_6mo Surv_12mo 5.1;
-        label ARMCD     = "Dose Level"
-              Surv_3mo  = "3-Month Survival (%)"
-              Surv_6mo  = "6-Month Survival (%)"
-              Surv_12mo = "12-Month Survival (%)";
+        set pfs_landmark_3 pfs_landmark_6 pfs_landmark_12;
+        Survival_Pct = put(Survival * 100, 5.1) || '%';
+        label Stratum       = "Dose Level"
+              Landmark_Time = "Landmark Month"
+              Survival_Pct  = "PFS Rate (%)";
     run;
 
     proc print data=pfs_landmarks noobs label;
-        var ARMCD Surv_3mo Surv_6mo Surv_12mo;
-        title "PFS Landmark Survival Rates";
+        var Stratum Landmark_Time Survival_Pct;
+        title "PFS Landmark Survival Rates (Kaplan-Meier Step-Function)";
     run;
 
 %end;
