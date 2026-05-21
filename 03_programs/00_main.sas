@@ -100,6 +100,9 @@
 %include "&PROG_PATH/analysis/adrs.sas";
 %check_err(adrs.sas);
 
+%include "&PROG_PATH/analysis/gen_metadata.sas";
+%check_err(gen_metadata.sas);
+
 /* 4. Reporting & Figures Suite */
 %put NOTE: [MAIN] Step 4: Generating Clinical Tables & Figures (TFLs)...;
 
