@@ -257,6 +257,7 @@ run;
 
 /* Scaffold NE BOR for subjects with no evaluable responses */
 data adrs_ne;
+    length AVALC $10;
     set adam.adsl(keep=USUBJID TRTSDT TRT01A TRT01AN ITTFL SAFFL EFFFL
                        COHORT ARMCD ARM EVALCRIT);
     length CRIT1 PARCAT3 $100;

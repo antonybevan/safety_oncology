@@ -36,7 +36,7 @@ run;
 
 data age_long;
     set age_stats;
-    length Category $30 Statistic $20 ValueC $20;
+    length Category $30 Statistic $40 ValueC $20;
     Category  = 'Age (Years)';
     Statistic = 'N';       ValueC = strip(put(N,      6.  )); output;
     Statistic = 'Mean';    ValueC = strip(put(Mean,   6.1 )); output;
@@ -86,6 +86,7 @@ run;
 /* ============================================================================
    5. Produce Table
    ============================================================================ */
+%macro generate_t_dm;
 %ods_setup(type=RTF, outpath=&OUT_TABLES/t_dm.rtf);
 
 title  "Table 1.3: Summary of Demographics and Baseline Characteristics";
@@ -109,3 +110,6 @@ run;
 
 title; footnote;
 %ods_close(type=RTF);
+%mend generate_t_dm;
+%generate_t_dm;
+
