@@ -316,7 +316,7 @@ data adsl;
     ;
 
     /* Drop internal intermediate variables */
-    drop _dth_dtc _dth_decod _dlt_dtc _DEATHDTC _DEATHDECOD _DLTDTC _dlt_dt MAX_ALVDT DISEASE;
+    drop _dth_dtc _dth_decod _dlt_dtc _DEATHDTC _DEATHDECOD _DLTDTC _dlt_dt MAX_ALVDT;
 run;
 
 /* ============================================================================

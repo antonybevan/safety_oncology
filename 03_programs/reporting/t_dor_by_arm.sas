@@ -131,12 +131,15 @@ quit;
             title1 "Figure F-EFF4: Duration of Response by Phase 2a Arm";
             title2 "Kaplan-Meier Curves - Responders (CR/PR)";
         run;
-        ods output clear;
+        ods output close;
 
+        %local has_dor_q;
+        %let has_dor_q = %sysfunc(exist(work.dor_median_arm));
+
+        %if &has_dor_q %then %do;
         data dor_summary;
             set dor_median_arm;
             where Percent = 50;
-
             length Median_DoR $50;
             if Estimate ne . then
                 Median_DoR = catx(' ', put(Estimate, 5.1),
@@ -148,6 +151,7 @@ quit;
             var Stratum Median_DoR;
             title "Median Duration of Response by Arm";
         run;
+        %end;
 
         proc sql;
             create table dor_arm_summary as

@@ -201,7 +201,7 @@ data adrs_pfs;
        3. Censor at last assessment
     */
     if not missing(NACT_DT) and (missing(EVNT_DT) or NACT_DT <= EVNT_DT) then do;
-        ADT      = min(coalescen(LST_DT, NACT_DT), NACT_DT);
+        ADT      = min(coalesce(LST_DT, NACT_DT), NACT_DT);
         if missing(ADT) then ADT = TRTSDT;
         CNSR     = 1;
         EVNTDESC = 'Censored at New Anti-Cancer Therapy';
@@ -212,7 +212,7 @@ data adrs_pfs;
         EVNTDESC = 'Event (Progression or Death)';
     end;
     else do;
-        ADT      = coalescen(LST_DT, TRTSDT);
+        ADT      = coalesce(LST_DT, TRTSDT);
         CNSR     = 1;
         EVNTDESC = 'Censored at Last Assessment';
     end;

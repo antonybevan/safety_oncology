@@ -14,13 +14,13 @@ proc sql;
     create table t_ae_cm_data as
     select a.USUBJID,
            b.ARMCD,
-           upcase(strip(a.AECONTRT)) length=40 as CMTRT,
+           upcase(strip(a.AECONTRT)) as CMTRT,
            (case
                when index(upcase(a.AECONTRT), 'TOCILIZUMAB') > 0 then 'IL-6 RECEPTOR ANTAG'
                when index(upcase(a.AECONTRT), 'DEXAMETHASONE') > 0 then 'CORTICOSTEROID'
                when index(upcase(a.AECONTRT), 'ACETAMINOPHEN') > 0 then 'ANTIPYRETIC'
                else 'THERAPEUTIC INTERVENTION'
-           end) length=30 as CMCAT
+           end) as CMCAT
     from adam.adae a
     inner join adam.adsl b
         on a.USUBJID = b.USUBJID

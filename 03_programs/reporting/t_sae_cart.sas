@@ -73,33 +73,38 @@ proc sql;
     group by a.ARMCD, a.AEDECOD, d.N;
 quit;
 
-/* 5. Format for report */
-data sae_report;
-    set sae_counts;
-    length Result $50;
-    Result = catx(' ', put(TOTAL, 3.), cats('(', put(PCT, 5.1), '%)'));
-run;
+/* 6. Pre-pivot for readable table layout */
+proc sql;
+    create table sae_report_wide as
+    select a.AEDECOD,
+           a.ARMCD,
+           a.GR1, a.GR2, a.GR3, a.GR4, a.GR5,
+           a.TOTAL,
+           a.PCT,
+           catx(' ', put(a.TOTAL, 3.), cats('(', put(a.PCT, 5.1), '%)')) as Result
+    from sae_counts a
+    order by a.ARMCD, a.AEDECOD;
+quit;
 
-/* 6. Generate Table */
 %ods_setup(type=RTF, outpath=&OUT_TABLES/t_sae_cart.rtf);
 
-proc report data=sae_report nowd split='*';
-    column AEDECOD ARMCD, (GR1 GR2 GR3 GR4 GR5 Result);
-    define AEDECOD / group "Preferred Term" left;
-    define ARMCD / across "Dose Level";
-    define GR1 / "Gr 1" center;
-    define GR2 / "Gr 2" center;
-    define GR3 / "Gr 3" center;
-    define GR4 / "Gr 4" center;
-    define GR5 / "Gr 5" center;
-    define Result / "n (%)" center;
-    
+proc print data=sae_report_wide noobs label;
+    var ARMCD AEDECOD GR1 GR2 GR3 GR4 GR5 Result;
+    label ARMCD   = "Dose Level"
+          AEDECOD = "Preferred Term"
+          GR1     = "Grade 1"
+          GR2     = "Grade 2"
+          GR3     = "Grade 3"
+          GR4     = "Grade 4"
+          GR5     = "Grade 5"
+          Result  = "Total n (%)";
     title1 "Table 3.7: Summary of PBCAR20A-Related Serious Adverse Events";
     title2 "By Maximum Toxicity Grade — Safety Population (CAR-T Recipients)";
     footnote1 "Includes SAEs occurring on/after CAR-T infusion attributed to PBCAR20A.";
     footnote2 "Percentages based on number of subjects receiving CAR-T at each dose level.";
     footnote3 "Subjects may be counted in multiple PTs but only once per PT at max grade.";
 run;
+
 
 /* 7. Overall Summary */
 proc sql;
