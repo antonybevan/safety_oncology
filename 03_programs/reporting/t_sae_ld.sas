@@ -27,14 +27,16 @@
 /* 1. Get Lymphodepletion-related SAEs */
 proc sql;
     create table sae_ld as
-    select a.*, 
+    select a.USUBJID, a.AEDECOD, a.AETERM, a.AETOXGR, a.AETOXGRN,
+           a.AESOC, a.AEREL, a.AESER, a.AESIFL, a.TRTEMFL,
+           a.ASTDT, a.AENDT, a.AEOUT, a.AESEQ, a.AECONTRT,
            b.ARMCD, b.ARM, b.SAFFL,
            b.TRTSDT as LD_START,
            b.CARTDT
     from adam.adae a
     inner join adam.adsl b on a.USUBJID = b.USUBJID
-    where a.AESER = 'Y'                      /* Serious */
-      and a.TRTEMFL = 'Y'                    /* Treatment-emergent */
+    where a.AESER = 'Y'                       /* Serious */
+      and a.TRTEMFL = 'Y'                     /* Treatment-emergent */
       and (
           /* Occurring during LD period */
           (a.ASTDT >= b.TRTSDT and a.ASTDT < coalesce(b.CARTDT, b.TRTSDT + 5))

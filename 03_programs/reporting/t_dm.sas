@@ -1,7 +1,7 @@
 /******************************************************************************
  * Program:      t_dm.sas
  * Protocol:     BV-CAR20-P1
- * Purpose:      Generate Table 1.3 - Summary of Demographics and Baseline Characteristics
+ * Purpose:      Table 1.3 — Demographics and Baseline Characteristics
  * Author:       Statistical Programmer
  * Date:         2026-02-01
  * SAS Version:  9.4
@@ -9,100 +9,103 @@
 
 %load_config;
 
-/* 1. Prepare Data */
+/* ============================================================================
+   1. Safety Population
+   ============================================================================ */
 data t_dm_data;
     set adam.adsl;
     where SAFFL = 'Y';
 run;
 
-/* 2. Calculate Big N */
+/* Big N by arm */
 proc sql noprint;
-    select count(*) into :N_DL1 from t_dm_data where ARMCD = 'DL1';
-    select count(*) into :N_DL2 from t_dm_data where ARMCD = 'DL2';
-    select count(*) into :N_DL3 from t_dm_data where ARMCD = 'DL3';
-    select count(*) into :N_TOT from t_dm_data;
+    select count(*) into :N_DL1 trimmed from t_dm_data where ARMCD = 'DL1';
+    select count(*) into :N_DL2 trimmed from t_dm_data where ARMCD = 'DL2';
+    select count(*) into :N_DL3 trimmed from t_dm_data where ARMCD = 'DL3';
+    select count(*) into :N_TOT trimmed from t_dm_data;
 quit;
 
-%let N_DL1 = %sysfunc(strip(&N_DL1));
-%let N_DL2 = %sysfunc(strip(&N_DL2));
-%let N_DL3 = %sysfunc(strip(&N_DL3));
-
-/* 3. Age Summary */
+/* ============================================================================
+   2. Age Summary by Arm
+   ============================================================================ */
 proc means data=t_dm_data n mean std median min max noprint;
     class ARMCD;
     var AGE;
-    output out=age_stats n=N mean=Mean std=Std median=Median min=Min max=Max;
+    output out=age_stats(where=(_TYPE_>0)) n=N mean=Mean std=Std median=Median min=Min max=Max;
 run;
 
 data age_long;
     set age_stats;
-    where _TYPE_ > 0;
-    length Category $20 Level $40 ValueC $20;
-    Category = "Age (Years)";
-    Level = "N";      ValueC = strip(put(N, 6.));   output;
-    Level = "Mean";   ValueC = strip(put(Mean, 6.1)); output;
-    Level = "SD";     ValueC = strip(put(Std, 6.1));  output;
-    Level = "Median"; ValueC = strip(put(Median, 6.1)); output;
-    Level = "Min";    ValueC = strip(put(Min, 6.1)); output;
-    Level = "Max";    ValueC = strip(put(Max, 6.1)); output;
-    keep Category Level ARMCD ValueC;
+    length Category $30 Statistic $20 ValueC $20;
+    Category  = 'Age (Years)';
+    Statistic = 'N';       ValueC = strip(put(N,      6.  )); output;
+    Statistic = 'Mean';    ValueC = strip(put(Mean,   6.1 )); output;
+    Statistic = 'SD';      ValueC = strip(put(Std,    6.1 )); output;
+    Statistic = 'Median';  ValueC = strip(put(Median, 6.1 )); output;
+    Statistic = 'Min';     ValueC = strip(put(Min,    6.1 )); output;
+    Statistic = 'Max';     ValueC = strip(put(Max,    6.1 )); output;
+    keep Category Statistic ARMCD ValueC;
 run;
 
-/* 4. Categorical Summaries */
-data cat_long;
+/* ============================================================================
+   3. Categorical Counts by Arm
+   ============================================================================ */
+data cat_input;
     set t_dm_data;
-    length Category $20 Level $40 ValueC $20;
-    Category = "Sex";       Level = coalescec(SEX, "");    ValueC = "1"; output;
-    Category = "Race";      Level = coalescec(RACE, "");   ValueC = "1"; output;
-    Category = "Age Group"; Level = coalescec(AGEGR1, ""); ValueC = "1"; output;
-    keep Category Level ARMCD ValueC;
+    length Category $30 Statistic $40;
+    Category = 'Sex';       Statistic = coalescec(strip(SEX),    'Unknown'); output;
+    Category = 'Race';      Statistic = coalescec(strip(RACE),   'Unknown'); output;
+    Category = 'Age Group'; Statistic = coalescec(strip(AGEGR1), 'Unknown'); output;
+    keep Category Statistic ARMCD;
 run;
 
 proc sql;
     create table cat_counts as
-    select Category, Level, ARMCD, strip(put(count(*), 6.)) as ValueC
-    from cat_long
-    group by Category, Level, ARMCD;
+    select Category, Statistic, ARMCD,
+           strip(put(count(*), 6.)) as ValueC
+    from cat_input
+    group by Category, Statistic, ARMCD;
 quit;
 
-data summary_long;
+/* ============================================================================
+   4. Combine and Transpose to Wide Format (one column per arm)
+   ============================================================================ */
+data all_stats;
     set age_long cat_counts;
 run;
 
-proc sort data=summary_long;
-    by Category Level;
+proc sort data=all_stats; by Category Statistic; run;
+
+/* Transpose: one row per Category/Statistic, columns DL1 DL2 DL3 */
+proc transpose data=all_stats out=dm_wide(drop=_NAME_) prefix=ARM_;
+    by Category Statistic;
+    id ARMCD;
+    var ValueC;
 run;
 
-/* 5. Production Table */
-title "Table 1.3: Summary of Demographics and Baseline Characteristics";
-title2 "Safety Population";
-
-/* Handle the DL2 "Skipped" note per SAP Section 1.1 when intermediate level is absent */
-%macro check_dl2;
-    %if &N_DL2 = 0 %then %do;
-        %put NOTE: Dose Level 2 (3x10^6 cells/kg; ~240x10^6 flat equivalent) was SKIPPED per Protocol V4 amendments.;
-    %end;
-%mend;
-%check_dl2;
-
+/* ============================================================================
+   5. Produce Table
+   ============================================================================ */
 %ods_setup(type=RTF, outpath=&OUT_TABLES/t_dm.rtf);
 
-proc report data=summary_long nowd headskip split='|' style(report)={outputwidth=100%};
-    column Category Level ARMCD, ValueC;
-    define Category / group "Characteristic";
-    define Level / group "Category/Statistic";
-    define ARMCD / across "Dose Level";
-    define ValueC / display "Value" center;
-    
-    compute after _page_;
-        line @1 "--------------------------------------------------------------------------------";
-        if &N_DL2. = 0 then do;
-            line @1 "Note: Dose Level 2 (3x10^6 cells/kg; ~240x10^6 flat equivalent) was skipped per SAP Section 1.1;";
-            line @1 "directly from Level 1 to Level 3 based on SRC recommendation.";
-        end;
-    endcomp;
+title  "Table 1.3: Summary of Demographics and Baseline Characteristics";
+title2 "Safety Population";
+%if &N_DL2 = 0 %then %do;
+footnote1 "Note: Dose Level 2 (3x10^6 cells/kg) was skipped per Protocol V4; escalation proceeded DL1 -> DL3.";
+%end;
+
+proc print data=dm_wide noobs label;
+    var Category Statistic
+        %if &N_DL1 > 0 %then ARM_DL1;
+        %if &N_DL2 > 0 %then ARM_DL2;
+        %if &N_DL3 > 0 %then ARM_DL3;
+    ;
+    label Category  = "Characteristic"
+          Statistic = "Category / Statistic"
+          ARM_DL1   = "DL1 (N=&N_DL1)"
+          ARM_DL2   = "DL2 (N=&N_DL2)"
+          ARM_DL3   = "DL3 (N=&N_DL3)";
 run;
 
+title; footnote;
 %ods_close(type=RTF);
-
-

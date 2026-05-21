@@ -316,6 +316,9 @@ run;
    5. COMBINE AND FINALIZE ADRS
    ============================================================================ */
 data adam.adrs;
+    /* Standardize lengths across all four source datasets to prevent truncation warnings */
+    length AVALC $10 PARAM $80 PARAMCD $8 PARCAT1 $40 PARCAT3 $100
+           SRCDOM $20 SRCVAR $40 EVNTDESC $60;
     set adrs(in=a)
         adrs_bor_final(in=b)
         adrs_pchg(in=c)

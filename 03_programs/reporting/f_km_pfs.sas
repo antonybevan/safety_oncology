@@ -77,6 +77,7 @@ quit;
        4. KM Figure
        ============================================================================ */
     %ods_setup(type=GRAPH, imgname=f_km_pfs);
+    ods graphics on / width=8in height=5in;
 
     proc lifetest data=pfs_data method=KM
         plots=survival(atrisk=0 to 12 by 3 outside(0.15) cb=hw test);

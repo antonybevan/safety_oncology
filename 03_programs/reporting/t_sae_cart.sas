@@ -26,15 +26,16 @@
 /* 1. Get PBCAR20A-related SAEs */
 proc sql;
     create table sae_cart as
-    select a.*, 
-           b.ARMCD, b.ARM, b.SAFFL,
-           b.CARTDT
+    select a.USUBJID, a.AEDECOD, a.AETERM, a.AETOXGR, a.AETOXGRN,
+           a.AESOC, a.AEREL, a.AESER, a.AESIFL, a.TRTEMFL,
+           a.ASTDT, a.AENDT, a.AEOUT, a.AESEQ,
+           b.ARMCD, b.ARM, b.SAFFL, b.CARTDT
     from adam.adae a
     inner join adam.adsl b on a.USUBJID = b.USUBJID
-    where a.AESER = 'Y'                      /* Serious */
-      and a.TRTEMFL = 'Y'                    /* Treatment-emergent */
-      and a.AEREL in ('RELATED', 'POSSIBLY RELATED', 'PROBABLY RELATED')  /* Related */
-      and a.ASTDT >= b.CARTDT                /* On/after CAR-T infusion */
+    where a.AESER = 'Y'                       /* Serious */
+      and a.TRTEMFL = 'Y'                     /* Treatment-emergent */
+      and a.AEREL in ('RELATED', 'POSSIBLY RELATED', 'PROBABLY RELATED')
+      and a.ASTDT >= b.CARTDT                 /* On/after CAR-T infusion */
       and b.SAFFL = 'Y';
 quit;
 
