@@ -89,7 +89,6 @@ proc sgplot data=swimmer_plot;
     /* Horizontal bars for duration */
     hbar Subject_Order / response=Duration_Weeks 
                          group=BOR
-                         categoryorder=data
                          barwidth=0.7
                          datalabel=BOR
                          datalabelpos=right;
@@ -102,7 +101,7 @@ proc sgplot data=swimmer_plot;
     
     /* Axis settings */
     xaxis label="Duration (Weeks)" values=(0 to 52 by 4);
-    yaxis label="Subject" display=(nolabel noticks);
+    yaxis label="Subject" display=(nolabel noticks) type=discrete discreteorder=data;
     
     /* Legend */
     keylegend / title="Best Overall Response" position=bottom;
