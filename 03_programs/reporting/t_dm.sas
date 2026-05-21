@@ -108,9 +108,10 @@ proc print data=dm_wide noobs label;
     ;
     label Category  = "Characteristic"
           Statistic = "Category / Statistic"
-          ARM_DL1   = "DL1 (N=&N_DL1)"
-          ARM_DL2   = "DL2 (N=&N_DL2)"
-          ARM_DL3   = "DL3 (N=&N_DL3)";
+          %if &N_DL1 > 0 %then ARM_DL1   = "DL1 (N=&N_DL1)";
+          %if &N_DL2 > 0 %then ARM_DL2   = "DL2 (N=&N_DL2)";
+          %if &N_DL3 > 0 %then ARM_DL3   = "DL3 (N=&N_DL3)";
+    ;
 run;
 
 title; footnote;

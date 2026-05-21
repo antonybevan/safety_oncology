@@ -127,7 +127,7 @@ quit;
         ods output ProductLimitEstimates=dor_km_arm Quartiles=dor_median_arm;
         proc lifetest data=dor_by_arm method=KM plots=survival(atrisk=0 to 24 by 6);
             time DOR_MONTHS * CNSR(1);
-            strata COHORT / test=logrank;
+            strata COHORT / notest;
             title1 "Figure F-EFF4: Duration of Response by Phase 2a Arm";
             title2 "Kaplan-Meier Curves - Responders (CR/PR)";
         run;

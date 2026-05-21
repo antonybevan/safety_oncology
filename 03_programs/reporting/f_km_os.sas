@@ -44,7 +44,7 @@ run;
 ods output ProductLimitEstimates=os_km_est_raw Quartiles=os_km_quartiles;
 proc lifetest data=os_data method=KM;
     time OS_MONTHS * OS_CNSR(1);
-    strata ARMCD;
+    strata ARMCD / notest;
 run;
 ods output clear;
 
@@ -84,7 +84,7 @@ run;
 proc lifetest data=os_data method=KM 
     plots=survival(atrisk=0 to 24 by 6 outside(0.15) cb=hw);
     time OS_MONTHS * OS_CNSR(1);
-    strata ARMCD / order=internal;
+    strata ARMCD / order=internal notest;
     title1 "Figure F-EFF2: Kaplan-Meier Curve for Overall Survival";
     title2 "&STUDYID Phase 1 - Safety Population";
     footnote1 "OS defined as time from Day 0 to death from any cause.";
