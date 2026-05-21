@@ -40,9 +40,9 @@ quit;
        ============================================================================ */
     ods output ProductLimitEstimates = km_pfs_est
                Quartiles             = km_pfs_quartiles;
-    proc lifetest data=pfs_data method=KM plots=none;
+    proc lifetest data=pfs_data method=KM;
         time AVAL_MONTHS * CNSR(1);
-        strata ARMCD / test=logrank;
+        strata ARMCD;
     run;
     ods output close;
 

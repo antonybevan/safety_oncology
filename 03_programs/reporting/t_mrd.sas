@@ -64,6 +64,7 @@
     %if &mrd_src_ready = 0 %then %do;
         data mrd_raw;
             length DISEASE $10 TIMEPOINT $30 MRDRESULT $20 MRDNEG 8 USUBJID $40;
+            call missing(of _all_);
             stop;
         run;
         %put NOTE: No MRD source data found. MRD table will display placeholder.;

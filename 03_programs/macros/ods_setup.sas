@@ -69,7 +69,7 @@
             imagename="&imgname"
             width=&imgw
             height=&imgh;
-        ods listing image_dpi=300 gpath="&_gpath";
+        ods listing image_dpi=200 gpath="&_gpath";
     %end;
     %else %if &type = LISTING %then %do;
         ods listing;

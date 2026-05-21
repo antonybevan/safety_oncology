@@ -26,7 +26,7 @@
    1. OVERALL RESPONSE (OVR) PARAMETER
    ============================================================================ */
 data adrs;
-    length PARCAT1 $40;
+    length AVALC $10 PARCAT1 $40;
     set sdtm.rs;
 
     /* Merge analysis variables from ADSL */

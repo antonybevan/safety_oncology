@@ -19,7 +19,7 @@ run;
 
 /* 2. Format for Submission Readiness with Origin/Method/Role */
 data define_metadata;
-    length Variable $8 Label $40 Dataset $8 DataType $4 Origin $15 Method $200 Role $15;
+    length Variable $8 Label $256 Dataset $8 DataType $4 Origin $15 Method $200 Role $15;
     set adam_meta;
     
     Variable = NAME;

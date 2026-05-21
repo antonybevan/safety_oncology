@@ -35,9 +35,10 @@
         data dv_data;
             length STUDYID $20 DOMAIN $2 USUBJID $40 DVSEQ 8 
                    DVTERM $200 DVCAT $50 DVSCAT $50 DVDTC $20 DVSTDTC $20;
+            call missing(of _all_);
             stop;
         run;
-        %put WARNING: SDTM.DV not found. Protocol deviation outputs will be blank.;
+        %put NOTE: [PROTOCOL DEVIATION] SDTM.DV not found. Protocol deviation outputs will be blank.;
     %end;
 %mend;
 %check_dv;

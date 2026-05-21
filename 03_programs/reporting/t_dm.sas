@@ -9,6 +9,11 @@
 
 %load_config;
 
+/* Initialize dose counter macro variables to prevent uninitialized string resolution */
+%let N_DL1 = 0;
+%let N_DL2 = 0;
+%let N_DL3 = 0;
+
 /* ============================================================================
    1. Safety Population
    ============================================================================ */

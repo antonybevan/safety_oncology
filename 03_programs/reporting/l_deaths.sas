@@ -30,6 +30,7 @@ quit;
 
 /* Combine sources */
 data all_deaths;
+    length DTHCAUS $200;
     set deaths_listing deaths_from_ae;
 run;
 

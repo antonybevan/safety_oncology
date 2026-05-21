@@ -42,9 +42,9 @@ run;
 
 /* 2. Kaplan-Meier Analysis */
 ods output ProductLimitEstimates=os_km_est_raw Quartiles=os_km_quartiles;
-proc lifetest data=os_data method=KM plots=survival(atrisk=0 to 24 by 6);
+proc lifetest data=os_data method=KM;
     time OS_MONTHS * OS_CNSR(1);
-    strata ARMCD / test=logrank;
+    strata ARMCD;
 run;
 ods output clear;
 
