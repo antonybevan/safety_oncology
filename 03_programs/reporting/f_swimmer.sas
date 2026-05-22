@@ -69,6 +69,7 @@ data swimmer_plot;
     
     /* Convert duration to weeks for display */
     Duration_Weeks = DURATION / 7;
+    Start_Weeks = 0;
     
     /* Response color coding */
     length Response_Color $20;
@@ -90,10 +91,11 @@ run;
 %ods_setup(type=GRAPH, imgname=f_swimmer, imgw=10in, imgh=8in);
 
 proc sgplot data=swimmer_plot;
-    /* Horizontal bars for duration */
-    hbar SUBJID_LBL / response=Duration_Weeks 
-                      group=BOR
-                      barwidth=0.7;
+    /* Horizontal bars for duration using highlow to allow scatter overlay */
+    highlow y=SUBJID_LBL low=Start_Weeks high=Duration_Weeks / 
+            group=BOR 
+            type=bar 
+            barwidth=0.7;
     
     /* Overlay status markers at the end of each bar */
     scatter y=SUBJID_LBL x=Duration_Weeks / markerchar=Status_Symbol
