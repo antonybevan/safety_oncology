@@ -68,9 +68,9 @@ BV-CAR20-P1/
 
 ## 🛡️ Professional Certification
 
-**Status**: 💎 **DIAMOND GRADE | ZERO-DEFECT | SUBMISSION READY**
+**Status**: **COMPLIANT | SUBMISSION READY**
 
-This repository has undergone a comprehensive integrity and professionalism audit. All clinical programming logic, data traceability (SRCDOM/VAR/SEQ), and documentation conform to standard "Big Pharma" and regulatory (FDA/Health Authority) submission requirements.
+This repository has undergone a comprehensive integrity and professionalism audit. All clinical programming logic, data traceability (SRCDOM/VAR/SEQ), and documentation conform to standard clinical trial and regulatory (FDA/Health Authority) submission requirements.
 
 ---
 **Developed and Audited by**: Antony Bevan (Clinical Statistical Programmer)  
@@ -120,5 +120,3 @@ See `01_documentation/` folder for:
 
 **Data Privacy:** 100% Synthetic data (No HIPAA/GDPR constraints)  
 **Authenticity:** Trial design, SAP logic, and derivation rules are modeled on authentic Phase 1 CAR-T protocols.
-
-

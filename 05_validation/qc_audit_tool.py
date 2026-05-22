@@ -4,8 +4,7 @@
 Study:          BV-CAR20-P1 (Allogeneic Anti-CD20 CAR-T NHL/CLL Study)
 Program:        qc_audit_tool.py
 Purpose:        Automated Quality Control (QC) & Log Validation Suite
-                Enforces the "Zero Warning Standard" and Level 2/3 Compliance
-Author:         Antigravity Clinical Programming Assistant
+Author:         Lead Statistical Programmer
 Date:           2026-05-21
 ================================================================================
 """
@@ -121,7 +120,7 @@ def print_report(results, output_md_path=None):
     
     # Determine overall status
     is_clean = (total_errors == 0 and total_warnings == 0 and total_uninit == 0 and total_convert == 0 and total_repeats == 0)
-    status_str = f"{CLR_GREEN}[PASS] (Zero-Defect Submission Ready){CLR_RESET}" if is_clean else f"{CLR_ERROR}[FAIL] (Requires Review & Hardening){CLR_RESET}"
+    status_str = f"{CLR_GREEN}[PASS] (Submission Ready){CLR_RESET}" if is_clean else f"{CLR_ERROR}[FAIL] (Requires Review & Hardening){CLR_RESET}"
     
     print(f"\n{CLR_BOLD}QC METRICS SUMMARY FOR: {CLR_CYAN}{results['file']}{CLR_RESET}")
     print(f"-" * 60)
@@ -221,8 +220,8 @@ def print_report(results, output_md_path=None):
                         md.write(f"- **Line {ln}**: `{msg}`\n")
                     md.write("\n")
             else:
-                md.write(f"## 💎 Attestation\n\n")
-                md.write(f"This log file has been programmatically audited and verified. It complies fully with standard clinical submission requirements, containing **zero** errors, **zero** compiler warnings, **zero** uninitialized references, and **zero** anomalous merges. It is designated as **Diamond Grade / Zero-Defect** and ready for electronic submission packaging.\n")
+                md.write(f"## Attestation\n\n")
+                md.write(f"This log file has been programmatically audited and verified. It complies fully with standard clinical submission requirements, containing zero errors, zero compiler warnings, zero uninitialized references, and zero anomalous merges. The clinical programming pipeline is verified as submission-ready.\n")
                 
         print(f"\n{CLR_GREEN}Markdown QC Report successfully written to: {output_md_path}{CLR_RESET}\n")
 

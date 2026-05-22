@@ -20,9 +20,11 @@
         %end;
     %end;
     /* Fallback: try relative or absolute defaults */
+    %local home;
+    %let home = %sysfunc(sysget(HOME));
     %if %sysfunc(fileexist(00_config.sas)) %then %include "00_config.sas";
     %else %if %sysfunc(fileexist(03_programs/00_config.sas)) %then %include "03_programs/00_config.sas";
-    %else %if %sysfunc(fileexist(/home/u63849890/safety_oncology/03_programs/00_config.sas)) %then %include "/home/u63849890/safety_oncology/03_programs/00_config.sas";
+    %else %if %length(&home) > 1 and %sysfunc(fileexist(&home/safety_oncology/03_programs/00_config.sas)) %then %include "&home/safety_oncology/03_programs/00_config.sas";
     %else %if %sysfunc(fileexist(d:/safety_oncology/03_programs/00_config.sas)) %then %include "d:/safety_oncology/03_programs/00_config.sas";
     %else %do;
         %put ERROR: [MAIN] Cannot locate 00_config.sas!;

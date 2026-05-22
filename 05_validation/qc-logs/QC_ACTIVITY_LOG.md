@@ -15,29 +15,29 @@ This log documents all quality control activities performed on the statistical p
 ### 2026-02-08: Program Review - Phase 1 ADaM
 | Program | Reviewer | Result | Comments |
 |:--------|:---------|:------:|:---------|
-| adsl.sas | QC Lead | ✅ PASS | Population flags verified |
-| adae.sas | QC Lead | ✅ PASS | DLT logic reviewed |
-| adrs.sas | QC Lead | ✅ PASS | PFS censoring logic correct |
-| adlb.sas | QC Lead | ✅ PASS | Baseline flagging verified |
-| adex.sas | QC Lead | ✅ PASS | Exposure logic verified |
+| adsl.sas | QC Lead | Pass | Population flags verified |
+| adae.sas | QC Lead | Pass | DLT logic reviewed |
+| adrs.sas | QC Lead | Pass | PFS censoring logic correct |
+| adlb.sas | QC Lead | Pass | Baseline flagging verified |
+| adex.sas | QC Lead | Pass | Exposure logic verified |
 
 ### 2026-02-08: Log Review - Zero Warnings Standard
 | Program | Warnings | Errors | Status |
 |:--------|:--------:|:------:|:------:|
-| 00_main.sas | 0 | 0 | ✅ |
-| 00_config.sas | 0 | 0 | ✅ |
-| All tabulations/*.sas | 0 | 0 | ✅ |
-| All analysis/*.sas | 0 | 0 | ✅ |
-| All reporting/*.sas | 0 | 0 | ✅ |
+| 00_main.sas | 0 | 0 | Pass |
+| 00_config.sas | 0 | 0 | Pass |
+| All tabulations/*.sas | 0 | 0 | Pass |
+| All analysis/*.sas | 0 | 0 | Pass |
+| All reporting/*.sas | 0 | 0 | Pass |
 
 ### 2026-02-08: Output Review - TLF Verification
 | Output ID | Description | SAP Ref | Status |
 |:----------|:------------|:--------|:------:|
-| T1.1 | Subject Disposition | §11.1 | ✅ Verified |
-| T2.1 | Overall Response Rate | §11.2 | ✅ Verified |
-| T3.4 | AESI Summary | §11.3 | ✅ Verified |
-| F-SW | Swimmer Plot | §11.4 | ✅ Verified |
-| F-WF | Waterfall Plot | §11.4 | ✅ Verified |
+| T1.1 | Subject Disposition | §11.1 | Verified |
+| T2.1 | Overall Response Rate | §11.2 | Verified |
+| T3.4 | AESI Summary | §11.3 | Verified |
+| F-SW | Swimmer Plot | §11.4 | Verified |
+| F-WF | Waterfall Plot | §11.4 | Verified |
 
 ---
 

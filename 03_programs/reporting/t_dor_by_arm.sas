@@ -125,13 +125,13 @@ quit;
 %macro run_dor;
     %if %sysevalf(&N_RESP > 0) %then %do;
         ods output ProductLimitEstimates=dor_km_arm Quartiles=dor_median_arm;
-        proc lifetest data=dor_by_arm method=KM plots=survival(atrisk=0 to 24 by 6);
+        proc lifetest data=dor_by_arm method=KM maxtime=6 plots=survival(atrisk=0 to 6 by 1);
             time DOR_MONTHS * CNSR(1);
             strata COHORT / notest;
             title1 "Figure F-EFF4: Duration of Response by Phase 2a Arm";
             title2 "Kaplan-Meier Curves - Responders (CR/PR)";
         run;
-        ods output close;
+        ods output clear;
 
         %local has_dor_q;
         %let has_dor_q = %sysfunc(exist(work.dor_median_arm));

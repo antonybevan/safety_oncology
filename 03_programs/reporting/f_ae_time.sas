@@ -40,6 +40,10 @@ proc sgplot data=ae_timeline;
     xaxis label="Days Since CAR-T Infusion" min=-1 max=30;
     yaxis label="Subject ID" type=discrete discreteorder=data;
     keylegend / title="Adverse Event (PT)";
+    title1 "Figure F-SAF1: Timeline of Adverse Events of Special Interest (AESI)";
+    title2 "&STUDYID Phase 1 - Safety Population";
+    footnote1 "AESIs are defined based on preferred terms for CRS, ICANS, and GVHD.";
+    footnote2 "Ongoing events at data cutoff are capped at the maximum timeline window of 30 days.";
 run;
 
 %ods_close(type=GRAPH);

@@ -44,7 +44,7 @@ quit;
         time AVAL_MONTHS * CNSR(1);
         strata ARMCD / notest;
     run;
-    ods output close;
+    ods output clear;
 
     /* ============================================================================
        3. Median PFS with 95% CI — guard against missing km_pfs_quartiles
@@ -79,8 +79,8 @@ quit;
     %ods_setup(type=GRAPH, imgname=f_km_pfs);
     ods graphics on / width=8in height=5in;
 
-    proc lifetest data=pfs_data method=KM
-        plots=survival(atrisk=0 to 12 by 3 outside(0.15) cb=hw);
+    proc lifetest data=pfs_data method=KM maxtime=6
+        plots=survival(atrisk=0 to 6 by 1 outside(0.15) cb=hw);
         time AVAL_MONTHS * CNSR(1);
         strata ARMCD / order=internal notest;
         title1 "Figure F-EFF1: Kaplan-Meier Curve for Progression-Free Survival";

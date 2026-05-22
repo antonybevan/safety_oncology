@@ -35,8 +35,10 @@ proc sql;
            a.TRTSDT,
            a.TRTEDT,
            a.CARTDT,
+           a.DTHDT,
+           a.LSTALVDT,
            input("&DATA_CUTOFF", yymmdd10.) as DATA_CUTOFF,
-           coalesce(a.TRTEDT, input("&DATA_CUTOFF", yymmdd10.)) - a.TRTSDT + 1 as DURATION,
+           coalesce(a.DTHDT, a.LSTALVDT, input("&DATA_CUTOFF", yymmdd10.)) - a.TRTSDT + 1 as DURATION,
            b.AVALC as BOR,
            case when b.AVALC in ('CR', 'CRi') then 1
                 when b.AVALC = 'PR' then 2
@@ -56,9 +58,9 @@ quit;
 /* Assign subject order for plot */
 data swimmer_plot;
     set swimmer_base;
-    if missing(DATA_CUTOFF) then DATA_CUTOFF = coalesce(TRTEDT, TRTSDT);
-    _end = coalesce(TRTEDT, DATA_CUTOFF);
-    if not missing(DATA_CUTOFF) and not missing(TRTEDT) then _end = min(TRTEDT, DATA_CUTOFF);
+    if missing(DATA_CUTOFF) then DATA_CUTOFF = coalesce(LSTALVDT, TRTEDT, TRTSDT);
+    _end = coalesce(DTHDT, LSTALVDT, DATA_CUTOFF);
+    if not missing(DATA_CUTOFF) and not missing(_end) then _end = min(_end, DATA_CUTOFF);
     if not missing(TRTSDT) then DURATION = _end - TRTSDT + 1;
     if DURATION <= 0 then DURATION = 1;
     Subject_Order = _N_;
@@ -87,21 +89,23 @@ run;
 
 proc sgplot data=swimmer_plot;
     /* Horizontal bars for duration */
-    hbar Subject_Order / response=Duration_Weeks 
-                         group=BOR
-                         barwidth=0.7
-                         datalabel=BOR
-                         datalabelpos=right;
+    hbar SUBJID_LBL / response=Duration_Weeks 
+                      group=BOR
+                      barwidth=0.7;
+    
+    /* Overlay status markers at the end of each bar */
+    scatter y=SUBJID_LBL x=Duration_Weeks / markerchar=Status_Symbol
+                                            markerattrs=(weight=bold size=11pt color=black);
     
     /* Reference lines for key timepoints */
     refline 4 / axis=x lineattrs=(pattern=dash color=gray) 
                label="Week 4 (Day 28)";
     refline 12 / axis=x lineattrs=(pattern=dash color=gray)
-                label="Week 12";
+                 label="Week 12";
     
     /* Axis settings */
     xaxis label="Duration (Weeks)" values=(0 to 52 by 4);
-    yaxis label="Subject" display=(nolabel noticks) type=discrete discreteorder=data;
+    yaxis label="Subject ID" type=discrete discreteorder=data;
     
     /* Legend */
     keylegend / title="Best Overall Response" position=bottom;

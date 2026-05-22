@@ -1,7 +1,7 @@
 /******************************************************************************
  * Program:      gen_metadata.sas
  * Protocol:     BV-CAR20-P1
- * Purpose:      Generate Million-Dollar Define.xml Metadata (Enhanced)
+ * Purpose:      Generate Define.xml Metadata for ADaM Library
  * Author:       Statistical Programmer
  * Date:         2026-02-05
  ******************************************************************************/
@@ -85,7 +85,7 @@ data define_metadata;
 run;
 
 /* 3. Output to HTML for Reviewer Guide Support */
-title "&STUDYID: Enhanced ADaM Metadata (Regulatory-Grade Submission Package)";
+title "&STUDYID: ADaM Variable Metadata Specifications";
 ods html5 body="&OUT_META/adam_metadata_enhanced.html";
 proc report data=define_metadata nowd headskip split='|' style(report)={outputwidth=100%};
     column Dataset Variable Label DataType Role Origin Method;

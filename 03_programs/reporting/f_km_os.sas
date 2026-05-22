@@ -81,8 +81,8 @@ run;
 /* 4. Create Publication-Quality KM Figure */
 %ods_setup(type=GRAPH, imgname=f_km_os);
 
-proc lifetest data=os_data method=KM 
-    plots=survival(atrisk=0 to 24 by 6 outside(0.15) cb=hw);
+proc lifetest data=os_data method=KM maxtime=6
+    plots=survival(atrisk=0 to 6 by 1 outside(0.15) cb=hw);
     time OS_MONTHS * OS_CNSR(1);
     strata ARMCD / order=internal notest;
     title1 "Figure F-EFF2: Kaplan-Meier Curve for Overall Survival";
