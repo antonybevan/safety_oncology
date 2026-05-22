@@ -4,7 +4,7 @@
 Study:          BV-CAR20-P1 (Allogeneic Anti-CD20 CAR-T NHL/CLL Study)
 Program:        verify_ectd_structure.py
 Purpose:        Automated FDA eCTD Module 5 Structure & Cleanliness Validator
-Author:         Lead Statistical Programmer
+Author:         Statistical Programmer
 Date:           2026-05-22
 ================================================================================
 """

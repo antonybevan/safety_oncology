@@ -4,7 +4,7 @@
 Study:          BV-CAR20-P1 (Allogeneic Anti-CD20 CAR-T NHL/CLL Study)
 Program:        qc_audit_tool.py
 Purpose:        Automated Quality Control (QC) & Log Validation Suite
-Author:         Lead Statistical Programmer
+Author:         Statistical Programmer
 Date:           2026-05-21
 ================================================================================
 """

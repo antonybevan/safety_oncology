@@ -4,7 +4,7 @@
 Study:          BV-CAR20-P1 (Allogeneic Anti-CD20 CAR-T NHL/CLL Study)
 Program:        compile_ectd_package.py
 Purpose:        FDA eCTD Module 5 Submission Compilation & Archive Suite
-Author:         Lead Statistical Programmer
+Author:         Statistical Programmer
 Date:           2026-05-22
 ================================================================================
 """
