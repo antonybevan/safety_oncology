@@ -7,7 +7,7 @@
 | Standard | Version | Implementation |
 |----------|---------|----------------|
 | **eCTD Specification** | v3.2.2 / v4.0 | Module 5 structure for clinical data |
-| **Study Data Technical Conformance Guide** | Dec 2025 | Folder structure: 02_datasets/tabulations, 02_datasets/analysis |
+| **Study Data Technical Conformance Guide** | Dec 2025 | Folder structure: m5/datasets/tabulations, m5/datasets/analysis |
 | **Define-XML** | v2.1 | Metadata for SDTM and ADaM datasets |
 
 ### 2. CDISC Standards
@@ -38,23 +38,56 @@
 
 ### eCTD Module 5 Alignment
 
-```
-BV-CAR20-P1/
-├── 01_documentation/            # Formal Docs (SAP, Audit, Compliance)
-│   ├── adrg/                   # Analysis Data Reviewer's Guide
-│   ├── cdrg/                   # Clinical Data Reviewer's Guide  
-│   └── sap/                    # Statistical Analysis Plan
-├── 02_datasets/                 # Study Data (FDA SDTCG compliant)
-│   ├── tabulations/            # SDTM datasets (.xpt)
-│   ├── analysis/               # ADaM datasets (.xpt)
-│   ├── define/                 # define.xml v2.1
-│   └── legacy/                 # Source/converted data
-├── 03_programs/                 # SAS/R programs (ASCII text)
-│   ├── tabulations/            # SDTM programs
-│   ├── analysis/               # ADaM programs
-│   └── reporting/              # TFL programs
-├── 04_outputs/                   # RTF/PNG results
-└── 05_validation/               # QC documentation
+```text
+safety_oncology/ (Workspace root)
+├── m5/                                 # === FDA eCTD Module 5 Submission Package ===
+│   └── datasets/
+│       └── bv-car20-p1/
+│           ├── tabulations/
+│           │   └── sdtm/               # SDTM Folder
+│           │       ├── define.xml      # SDTM Metadata Specification (linked to stylesheet)
+│           │       ├── define2-1.xsl   # Interactive SDTM Stylesheet
+│           │       ├── csdrg.md        # Clinical Study Data Reviewer's Guide (SDRG)
+│           │       └── programs/       # SDTM mapping programs (dm.sas, ex.sas, etc.)
+│           │
+│           └── analysis/
+│               └── adam/               # ADaM Folder
+│                   ├── define.xml      # ADaM Metadata Specification (linked to stylesheet)
+│                   ├── define2-1.xsl   # Interactive ADaM Stylesheet
+│                   ├── adrg.md         # Analysis Data Reviewer's Guide (ADRG)
+│                   └── programs/       # ADaM Analytical Programming Suite
+│                       ├── 00_config.sas       # Master Environment Setup & Library Config
+│                       ├── 00_main.sas         # Master Pipeline Build Driver
+│                       ├── adsl.sas            # Subject-Level Analysis Dataset
+│                       ├── adae.sas            # Adverse Event Analysis Dataset
+│                       ├── adlb.sas            # Laboratory Analysis Dataset
+│                       ├── adex.sas            # Exposure Analysis Dataset
+│                       ├── adrs.sas            # Efficacy Response Analysis Dataset
+│                       ├── gen_metadata.sas    # Analysis Metadata Shell generator
+│                       │
+│                       ├── reporting/          # TFL Generation Programs
+│                       └── macros/             # Autocall Utility Macros
+│
+├── 01_documentation/                   # === Sponsor Documentation & Checklists ===
+│   ├── protocol/                       # Protocol synopsis and documentation
+│   ├── sap/                            # Statistical Analysis Plan & Conformance Matrix
+│   └── checklists/                     # Regulatory, programming, and SOP checklists
+│
+├── 04_outputs/                         # === Clinical Output Repository ===
+│   ├── tables/                         # RTF medical tables
+│   ├── figures/                        # PNG oncology figures
+│   └── listings/                       # RTF patient-level listings
+│
+└── 05_validation/                      # === Sponsor Validation & Simulation Environment ===
+    ├── data_gen/                       # [Sponsor] Raw Clinical Data Simulation
+    │   └── generate_data.sas           # Data simulator (moved from m5/ to keep m5/ pristine)
+    ├── independent/                    # Level 3 QC double programming
+    ├── pinnacle21/                     # P21 issue resolution and validation guidelines
+    ├── qc-logs/                        # QC evidence audit logs
+    ├── qc_audit_tool.py                # Automated QC log auditor
+    └── utilities/                      # Sponsor developer utility scripts
+        ├── GIT_PUSH.sas                # Git stage, commit, and push automation
+        └── GIT_RESCUE.sas              # Branch restore and emergency recovery
 ```
 
 ### Key Compliance Points
@@ -70,16 +103,18 @@ BV-CAR20-P1/
 ## Deviation from Initial Structure
 
 ### Original (Development-focused)
-```
+```text
 L1_ingestion/  L2_sdtm/  L3_adam/  L4_reporting/  L5_metadata/
 ```
 
-### Revised (eCTD-compliant)
-```
-02_datasets/  03_programs/  01_documentation/  05_validation/
+### Revised (Submission-ready eCTD-compliant)
+```text
+m5/datasets/bv-car20-p1/
+  ├── tabulations/sdtm/
+  └── analysis/adam/
 ```
 
-**Rationale:** FDA expects Module 5 structure for regulatory review, not internal workflow layers.
+**Rationale:** FDA expects Module 5 structure for regulatory review, not internal development workflow layers. All source programs and utility scripts must be placed directly inside the respective `programs/` subdirectories under tabulations and analysis to comply with the FDA Study Data Technical Conformance Guide (SDTCG) Section 3.7.
 
 ---
 

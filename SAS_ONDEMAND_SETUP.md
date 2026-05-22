@@ -4,42 +4,70 @@ This guide details the procedures for deploying, executing, and synchronizing th
 
 ---
 
-## 🏗️ Repository Architecture (FDA eCTD Compliant)
+## Repository Architecture (FDA eCTD Compliant)
 
 Our statistical programming pipeline is structurally aligned to FDA eCTD Module 5 folder guidelines. The environment relies on this hierarchy to automatically resolve libraries and paths:
 
 ```text
-safety_oncology/
-├── 01_rawdata/                 # Raw/Ingested Clinical Data (SAS format)
-├── 02_datasets/
-│   ├── sdtm/                   # CDISC SDTM Datasets (SAS & XPT format)
-│   └── analysis/               # CDISC ADaM Datasets (SAS & XPT format)
-├── 03_programs/
-│   ├── data_gen/               # Raw Clinical Trial Database Simulator
-│   ├── tabulations/            # SDTM Mapping Scripts (DM, AE, EX, LB, RS, etc.)
-│   ├── analysis/               # ADaM Mapping Scripts (ADSL, ADAE, ADLB, ADRS, etc.)
-│   ├── reporting/              # TFL/RTF Output Generation Suite (proc report/sgplot)
-│   ├── macros/                 # Shared Utilities (load_config, ods_setup, xpt_export)
-│   └── utilities/              # Studio Git Automation scripts
-├── 04_outputs/
-│   ├── tables/                 # Publication-grade RTF Tables (Table 14.x.x)
-│   ├── figures/                # Survival and Toxicity Plots (Kaplan-Meier, SGPLOT)
-│   ├── listings/               # Subject Data Listings (Listing 16.x.x)
-│   └── metadata/               # Automated define-readiness metadata
-├── 05_legacy_data/             # Ingestion CSV sources (EDC and external lab extracts)
-├── 05_validation/              # Validation trace logs, QC, and Pinnacle 21 logs
-├── 00_config.sas               # Master Configuration & Library Allocations
-└── 00_main.sas                 # Master Pipeline Driver (One-click execution)
+safety_oncology/ (Workspace root)
+├── m5/                                 # === FDA eCTD Module 5 Submission Package ===
+│   └── datasets/
+│       └── bv-car20-p1/
+│           ├── tabulations/
+│           │   └── sdtm/               # SDTM Folder
+│           │       ├── define.xml      # SDTM Metadata Specification (linked to stylesheet)
+│           │       ├── define2-1.xsl   # Interactive SDTM Stylesheet
+│           │       ├── csdrg.md        # Clinical Study Data Reviewer's Guide (SDRG)
+│           │       └── programs/       # SDTM mapping programs (dm.sas, ex.sas, etc.)
+│           │
+│           └── analysis/
+│               └── adam/               # ADaM Folder
+│                   ├── define.xml      # ADaM Metadata Specification (linked to stylesheet)
+│                   ├── define2-1.xsl   # Interactive ADaM Stylesheet
+│                   ├── adrg.md         # Analysis Data Reviewer's Guide (ADRG)
+│                   └── programs/       # ADaM Analytical Programming Suite
+│                       ├── 00_config.sas       # Master Environment Setup & Library Config
+│                       ├── 00_main.sas         # Master Pipeline Build Driver
+│                       ├── adsl.sas            # Subject-Level Analysis Dataset
+│                       ├── adae.sas            # Adverse Event Analysis Dataset
+│                       ├── adlb.sas            # Laboratory Analysis Dataset
+│                       ├── adex.sas            # Exposure Analysis Dataset
+│                       ├── adrs.sas            # Efficacy Response Analysis Dataset
+│                       ├── gen_metadata.sas    # Analysis Metadata Shell generator
+│                       │
+│                       ├── reporting/          # TFL Generation Programs (t_*.sas, f_*.sas, etc.)
+│                       └── macros/             # Autocall Utility Macros
+│
+├── 01_documentation/                   # === Sponsor Documentation & Checklists ===
+│   ├── protocol/                       # Protocol synopsis and documentation
+│   ├── sap/                            # Statistical Analysis Plan & Conformance Matrix
+│   └── checklists/                     # Regulatory, programming, and SOP checklists
+│
+├── 04_outputs/                         # === Clinical Output Repository ===
+│   ├── tables/                         # RTF medical tables
+│   ├── figures/                        # PNG oncology figures
+│   └── listings/                       # RTF patient-level listings
+│
+└── 05_validation/                      # === Sponsor Validation & Simulation Environment ===
+    ├── data_gen/                       # [Sponsor] Raw Clinical Data Simulation
+    │   └── generate_data.sas           # Data simulator (moved from m5/ to keep m5/ pristine)
+    ├── independent/                    # Level 3 QC double programming
+    ├── pinnacle21/                     # P21 issue resolution and validation guidelines
+    ├── qc-logs/                        # QC evidence audit logs
+    ├── qc_audit_tool.py                # Automated QC log auditor
+    └── utilities/                      # Sponsor developer utility scripts
+        ├── GIT_PUSH.sas                # Git stage, commit, and push automation
+        └── GIT_RESCUE.sas              # Branch restore and emergency recovery
 ```
 
 ---
 
-## 🚀 Execution Method 1: Master Pipeline (One-Click Run)
+## Execution Method 1: Master Pipeline (One-Click Run)
 
 To compile and execute the complete pipeline, generating all SDTM/ADaM datasets and TFL outputs in one step:
 
 1. **Deploy to ODA**: Clone the repository using **Method 2** (Git option below) or upload the repository structure to SAS OnDemand using the Studio upload utility.
-2. **Open the Driver**: Navigate to `safety_oncology/` and open `00_main.sas`.
+2. **Open the Driver**: Navigate to `safety_oncology/m5/datasets/bv-car20-p1/analysis/adam/programs/` and open `00_main.sas`.
 3. **Execute**: Click the **Run** (Submit) button in SAS Studio.
 4. **Validation Check**: Open the SAS Log and verify there are no `ERROR` or `WARNING` messages.
    * The pipeline will automatically trap errors at each stage using the custom `%check_err` macro.
@@ -51,7 +79,7 @@ To compile and execute the complete pipeline, generating all SDTM/ADaM datasets 
 
 ---
 
-## 💻 Execution Method 2: Standalone Execution
+## Execution Method 2: Standalone Execution
 
 Each program in this repository is designed to be **autonomous and portable**, meaning you can open any mapping or reporting script (e.g., `adsl.sas` or `t_eff.sas`) and run it individually.
 
@@ -61,7 +89,7 @@ Each program in this repository is designed to be **autonomous and portable**, m
 
 ---
 
-## 🔄 Advanced Git Integration (Clone & Push from ODA Studio)
+## Advanced Git Integration (Clone & Push from ODA Studio)
 
 SAS OnDemand for Academics runs on a Linux server and has Git installed. To sync code directly back to your GitHub repository from SAS Studio, follow this procedure:
 
@@ -95,11 +123,11 @@ If you modify or update any SAS script or documentation within SAS Studio:
 
 ---
 
-## 🛠️ Environmental Controls & Troubleshooting
+## Environmental Controls & Troubleshooting
 
 ### Shell Escape Safeguards
 * **Restricted Action**: The SAS command line `X` statement is disabled within the SAS OnDemand hosting environment for security.
-* **Our Solution**: The pipeline avoids any shell command execution. All workspace subfolders (`04_outputs/tables`, `02_datasets/sdtm`, etc.) are created dynamically and safely using native SAS file APIs (`dcreate()` and `fileexist()`) inside the setup macro, requiring no shell-level access.
+* **Our Solution**: The pipeline avoids any shell command execution. All workspace subfolders (`04_outputs/tables`, `m5/datasets/bv-car20-p1/tabulations/sdtm/`, etc.) are created dynamically and safely using native SAS file APIs (`dcreate()` and `fileexist()`) inside the setup macro, requiring no shell-level access.
 
 ### Custom Local overrides (Windows / Linux Platform Divergence)
 The configuration engine automatically reads `&SYSSCP` to detect the host architecture:

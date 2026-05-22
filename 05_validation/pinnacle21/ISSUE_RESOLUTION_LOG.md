@@ -5,10 +5,10 @@
 
 ## Validation Status
 - Validation is **pending execution** in this workspace.
-- Reason: `p21` CLI not currently installed and no current `.xpt` payload is staged under `02_datasets/tabulations` and `02_datasets/analysis`.
+- Reason: `p21` CLI not currently installed and no current `.xpt` payload is staged under `m5/datasets/bv-car20-p1/tabulations/sdtm/` and `m5/datasets/bv-car20-p1/analysis/adam/`.
 
 Use the Pinnacle 21 Community desktop application (or enterprise CLI) to validate the generated `.xpt` transport files against SDTMIG 3.4 and ADaMIG 1.3 standards.
-Select source folder: `02_datasets/tabulations/` and `02_datasets/analysis/` respectively.
+Select source folder: `m5/datasets/bv-car20-p1/tabulations/sdtm/` and `m5/datasets/bv-car20-p1/analysis/adam/` respectively.
 
 ## To Be Completed After Run
 1. Attach SDTM report: `05_validation/pinnacle21/p21_sdtm_report.csv`

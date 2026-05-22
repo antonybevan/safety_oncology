@@ -25,5 +25,6 @@ desktop.ini
 *.swp
 *.swo
 
-# Keep legacy CSV files (these are source data)
-!02_datasets/legacy/*.csv
+# Exclude dynamically generated raw/legacy data directories
+01_rawdata/
+05_legacy_data/

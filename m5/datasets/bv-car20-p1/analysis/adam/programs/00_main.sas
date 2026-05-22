@@ -23,9 +23,9 @@
     %local home;
     %let home = %sysfunc(sysget(HOME));
     %if %sysfunc(fileexist(00_config.sas)) %then %include "00_config.sas";
-    %else %if %sysfunc(fileexist(03_programs/00_config.sas)) %then %include "03_programs/00_config.sas";
-    %else %if %length(&home) > 1 and %sysfunc(fileexist(&home/safety_oncology/03_programs/00_config.sas)) %then %include "&home/safety_oncology/03_programs/00_config.sas";
-    %else %if %sysfunc(fileexist(d:/safety_oncology/03_programs/00_config.sas)) %then %include "d:/safety_oncology/03_programs/00_config.sas";
+    %else %if %sysfunc(fileexist(m5/datasets/bv-car20-p1/analysis/adam/programs/00_config.sas)) %then %include "m5/datasets/bv-car20-p1/analysis/adam/programs/00_config.sas";
+    %else %if %length(&home) > 1 and %sysfunc(fileexist(&home/safety_oncology/m5/datasets/bv-car20-p1/analysis/adam/programs/00_config.sas)) %then %include "&home/safety_oncology/m5/datasets/bv-car20-p1/analysis/adam/programs/00_config.sas";
+    %else %if %sysfunc(fileexist(d:/safety_oncology/m5/datasets/bv-car20-p1/analysis/adam/programs/00_config.sas)) %then %include "d:/safety_oncology/m5/datasets/bv-car20-p1/analysis/adam/programs/00_config.sas";
     %else %do;
         %put ERROR: [MAIN] Cannot locate 00_config.sas!;
         %abort cancel;
@@ -54,55 +54,55 @@
 
 /* 2. Data Preparation Suite */
 %put NOTE: [MAIN] Step 1: Simulating Raw Clinical Data...;
-%include "&PROG_PATH/data_gen/generate_data.sas";
+%include "&PROJ_ROOT/05_validation/data_gen/generate_data.sas";
 %check_err(generate_data.sas);
 
 %put NOTE: [MAIN] Step 2: Mapping SDTM Domains...;
-%include "&PROG_PATH/tabulations/gen_trial_design.sas";
+%include "&SDTM_PATH/programs/gen_trial_design.sas";
 %check_err(gen_trial_design.sas);
 
-%include "&PROG_PATH/tabulations/dm.sas";
+%include "&SDTM_PATH/programs/dm.sas";
 %check_err(dm.sas);
 
-%include "&PROG_PATH/tabulations/ex.sas";
+%include "&SDTM_PATH/programs/ex.sas";
 %check_err(ex.sas);
 
-%include "&PROG_PATH/tabulations/ae.sas";
+%include "&SDTM_PATH/programs/ae.sas";
 %check_err(ae.sas);
 
-%include "&PROG_PATH/tabulations/suppae.sas";
+%include "&SDTM_PATH/programs/suppae.sas";
 %check_err(suppae.sas);
 
-%include "&PROG_PATH/tabulations/lb.sas";
+%include "&SDTM_PATH/programs/lb.sas";
 %check_err(lb.sas);
 
-%include "&PROG_PATH/tabulations/rs.sas";
+%include "&SDTM_PATH/programs/rs.sas";
 %check_err(rs.sas);
 
-%include "&PROG_PATH/tabulations/cp.sas";
+%include "&SDTM_PATH/programs/cp.sas";
 %check_err(cp.sas);
 
-%include "&PROG_PATH/tabulations/gf.sas";
+%include "&SDTM_PATH/programs/gf.sas";
 %check_err(gf.sas);
 
 /* 3. ADaM Analysis Suite */
 %put NOTE: [MAIN] Step 3: Deriving ADaM Analysis Datasets...;
-%include "&PROG_PATH/analysis/adsl.sas";
+%include "&ADAM_PATH/programs/adsl.sas";
 %check_err(adsl.sas);
 
-%include "&PROG_PATH/analysis/adae.sas";
+%include "&ADAM_PATH/programs/adae.sas";
 %check_err(adae.sas);
 
-%include "&PROG_PATH/analysis/adlb.sas";
+%include "&ADAM_PATH/programs/adlb.sas";
 %check_err(adlb.sas);
 
-%include "&PROG_PATH/analysis/adex.sas";
+%include "&ADAM_PATH/programs/adex.sas";
 %check_err(adex.sas);
 
-%include "&PROG_PATH/analysis/adrs.sas";
+%include "&ADAM_PATH/programs/adrs.sas";
 %check_err(adrs.sas);
 
-%include "&PROG_PATH/analysis/gen_metadata.sas";
+%include "&ADAM_PATH/programs/gen_metadata.sas";
 %check_err(gen_metadata.sas);
 
 /* 4. Reporting & Figures Suite */

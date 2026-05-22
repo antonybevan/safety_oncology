@@ -18,7 +18,7 @@ A total of **24 clinical deliverables** (summary tables, listings, and figures) 
 
 ## 2. Analysis Population Mappings (SAP §4)
 
-The subject-level analysis dataset ([adsl.sas](file:///d:/safety_oncology/03_programs/analysis/adsl.sas)) implements the exact clinical and statistical populations defined in the SAP Section 4:
+The subject-level analysis dataset ([adsl.sas](file:///d:/safety_oncology/m5/datasets/bv-car20-p1/analysis/adam/programs/adsl.sas)) implements the exact clinical and statistical populations defined in the SAP Section 4:
 
 | Population Flag | SAP Section | Clinical Definition | ADaM Programmatic Logic |
 |:---|:---:|:---|:---|
@@ -38,7 +38,7 @@ The subject-level analysis dataset ([adsl.sas](file:///d:/safety_oncology/03_pro
 Clinical trials utilizing CAR-T therapies require careful separation of toxicities related to lymphodepletion (chemotherapy) from those related to the cellular therapy itself (CAR-T infusion). This pipeline resolves this with dual temporal axes:
 
 ### 3.1 Standard CDISC Relative Study Days (ADaM Standard)
-Standard relative days (`ASTDY`, `AENDY`, `ADY`) are derived in [adae.sas](file:///d:/safety_oncology/03_programs/analysis/adae.sas) and [adlb.sas](file:///d:/safety_oncology/03_programs/analysis/adlb.sas) relative to the **CAR-T infusion date (`CARTDT`)**, omitting "Day 0" as per standard CDISC conventions:
+Standard relative days (`ASTDY`, `AENDY`, `ADY`) are derived in [adae.sas](file:///d:/safety_oncology/m5/datasets/bv-car20-p1/analysis/adam/programs/adae.sas) and [adlb.sas](file:///d:/safety_oncology/m5/datasets/bv-car20-p1/analysis/adam/programs/adlb.sas) relative to the **CAR-T infusion date (`CARTDT`)**, omitting "Day 0" as per standard CDISC conventions:
 ```sas
 if not missing(ASTDT) and not missing(CARTDT) then do;
     ASTDY = ASTDT - CARTDT + (ASTDT >= CARTDT);
@@ -49,7 +49,7 @@ end;
 * **No Day 0** exists on this standard scale.
 
 ### 3.2 Sponsor-Specific "Study Day 0" Scale (SAP §5.7)
-For DLT window definitions and safety timeline reporting (e.g., [f_ae_time.sas](file:///d:/safety_oncology/03_programs/reporting/f_ae_time.sas)), the SAP mandates a **Study Day 0** scale containing Day 0. This is derived as:
+For DLT window definitions and safety timeline reporting (e.g., [f_ae_time.sas](file:///d:/safety_oncology/m5/datasets/bv-car20-p1/analysis/adam/programs/reporting/f_ae_time.sas)), the SAP mandates a **Study Day 0** scale containing Day 0. This is derived as:
 ```sas
 REL_START = ASTDT - CARTDT;
 ```
@@ -60,7 +60,7 @@ REL_START = ASTDT - CARTDT;
 
 ## 4. Baseline and Re-Baseline Specifications (SAP §5.7)
 
-To isolate cellular toxicity kinetics, bi-directional laboratory grading and baseline calculations are partitioned in [adlb.sas](file:///d:/safety_oncology/03_programs/analysis/adlb.sas):
+To isolate cellular toxicity kinetics, bi-directional laboratory grading and baseline calculations are partitioned in [adlb.sas](file:///d:/safety_oncology/m5/datasets/bv-car20-p1/analysis/adam/programs/adlb.sas):
 
 1. **Standard Baseline (`ABLFL`)**:
    * **Definition**: The last non-missing laboratory or clinical assessment on or before the **first study treatment (`TRTSDT`)**, which represents the start of lymphodepletion chemotherapy.
@@ -87,7 +87,7 @@ Safety monitoring for standard dose-escalation (3+3 design) utilizes rule-based 
 
 ## 6. Efficacy & Censoring Rigidity (RECIST 1.1 / Lugano 2016 / iwCLL 2018)
 
-Efficacy response assessments are derived in [adrs.sas](file:///d:/safety_oncology/03_programs/analysis/adrs.sas) according to disease cohort criteria:
+Efficacy response assessments are derived in [adrs.sas](file:///d:/safety_oncology/m5/datasets/bv-car20-p1/analysis/adam/programs/adrs.sas) according to disease cohort criteria:
 * **Non-Hodgkin Lymphoma (NHL) Cohort**: Lugano 2016 criteria.
 * **Chronic Lymphocytic Leukemia (CLL/SLL) Cohort**: iwCLL 2018 criteria.
 

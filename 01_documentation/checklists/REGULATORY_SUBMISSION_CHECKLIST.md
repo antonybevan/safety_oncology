@@ -41,9 +41,9 @@
 ### 4. Reviewer's Guides
 | Document | Location | Status | FDA Required |
 |:---------|:---------|:------:|:------------:|
-| adrg.pdf | 01_documentation/adrg/ | Complete | Required |
-| csdrg.pdf | 01_documentation/cdrg/ | Complete | Required |
-| Define-XML | 02_datasets/define/ | Shell | Required |
+| adrg.pdf | m5/datasets/bv-car20-p1/analysis/adam/adrg.md | Complete | Required |
+| csdrg.pdf | m5/datasets/bv-car20-p1/tabulations/sdtm/csdrg.md | Complete | Required |
+| Define-XML | m5/datasets/bv-car20-p1/tabulations/sdtm/define.xml <br> m5/datasets/bv-car20-p1/analysis/adam/define.xml | Shell | Required |
 | SAP | 01_documentation/sap/ | Compliant | Recommended |
 | aCRF | N/A | N/A | Required for NDA |
 

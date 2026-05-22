@@ -12,6 +12,7 @@
  *   - VALIDMEMNAME=EXTEND omitted (not supported on SAS OnDemand)
  *   - All directory creation is guarded by fileexist() checks
  *   - ODS graphics output paths use filename fileref (portable, both environments)
+ *   - Non-submitted developmental/simulation assets segregated under 05_validation/
  ******************************************************************************/
 
 /* ============================================================================
@@ -57,8 +58,8 @@ OPTIONS VALIDVARNAME=ANY    /* Allow special characters in variable names  */
         %end;
     %end;
 
-    /* Signature file: 03_programs/00_config.sas exists at project root */
-    %let _sig = 03_programs&SLSH.00_config.sas;
+    /* Signature file: m5/datasets/bv-car20-p1/analysis/adam/programs/00_config.sas exists at project root */
+    %let _sig = m5&SLSH.datasets&SLSH.bv-car20-p1&SLSH.analysis&SLSH.adam&SLSH.programs&SLSH.00_config.sas;
 
     %if %sysfunc(fileexist(&_sig)) %then
         %let PROJ_ROOT = %sysfunc(abspath(.));
@@ -72,7 +73,7 @@ OPTIONS VALIDVARNAME=ANY    /* Allow special characters in variable names  */
         %if %length(&_home) > 1 and %sysfunc(fileexist(&_home/safety_oncology)) %then
             %let PROJ_ROOT = &_home/safety_oncology;
         /* --- SAS 9.4 Windows fallback --- */
-        %else %if %sysfunc(fileexist(d:/safety_oncology/03_programs)) %then
+        %else %if %sysfunc(fileexist(d:/safety_oncology/m5/datasets/bv-car20-p1/analysis/adam/programs)) %then
             %let PROJ_ROOT = d:/safety_oncology;
         %else %do;
             %put ERROR: [CONFIG] Cannot locate project root. Set PROJ_ROOT manually before %nrstr(%include)ing 00_config.sas.;
@@ -87,10 +88,10 @@ OPTIONS VALIDVARNAME=ANY    /* Allow special characters in variable names  */
        Standard Sub-Directory Path Macros (always forward-slash — safe on all platforms)
     ----------------------------------------------------------------------- */
     %paths_done:
-    %let PROG_PATH   = &PROJ_ROOT/03_programs;
+    %let PROG_PATH   = &PROJ_ROOT/m5/datasets/bv-car20-p1/analysis/adam/programs;
     %let RAW_PATH    = &PROJ_ROOT/01_rawdata;
-    %let SDTM_PATH   = &PROJ_ROOT/02_datasets/sdtm;
-    %let ADAM_PATH   = &PROJ_ROOT/02_datasets/analysis;
+    %let SDTM_PATH   = &PROJ_ROOT/m5/datasets/bv-car20-p1/tabulations/sdtm;
+    %let ADAM_PATH   = &PROJ_ROOT/m5/datasets/bv-car20-p1/analysis/adam;
     %let OUTPUT_PATH = &PROJ_ROOT/04_outputs;
     %let LEGACY_PATH = &PROJ_ROOT/05_legacy_data;
 
@@ -103,7 +104,7 @@ OPTIONS VALIDVARNAME=ANY    /* Allow special characters in variable names  */
     /* -----------------------------------------------------------------------
        Directory Creation (guarded — works on SAS 9.4 and ODA)
        dcreate() requires (child_name, parent_path) — use only for leaf dirs
-    ----------------------------------------------------------------------- */
+     ----------------------------------------------------------------------- */
     %macro _mkdir(fullpath);
         %if not %sysfunc(fileexist(&fullpath)) %then %do;
             %let _parent = %sysfunc(substr(&fullpath, 1, %sysfunc(findc(&fullpath, /, -200))-1));

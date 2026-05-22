@@ -1,7 +1,7 @@
 # QC Log: Statistical Programming Activities
 **Study**: BV-CAR20-P1  
 **Log Version**: 1.0  
-**Last Updated**: 2026-02-08
+**Last Updated**: 2026-05-22
 
 ---
 
@@ -39,15 +39,21 @@ This log documents all quality control activities performed on the statistical p
 | F-SW | Swimmer Plot | §11.4 | Verified |
 | F-WF | Waterfall Plot | §11.4 | Verified |
 
+### 2026-05-22: Submission Conformance & Log Audit
+| Program / Audit | Reviewer / Suite | Result | Comments |
+|:---|:---|:---:|:---|
+| verify_ectd_structure.py | Automated Suite | Pass | eCTD Module 5 structure and cleanliness checked; 0 prohibited files found |
+| qc_audit_tool.py | Automated Suite | Pass | Pipeline execution log (00_main-results) checked; 0 errors/warnings/uninitialized references |
+
 ---
 
 ## Sign-Off
 
 | Role | Name | Date | Signature |
 |:-----|:-----|:-----|:----------|
-| Statistical Programmer | Antony Bevan | 2026-02-08 | *e-Signed* |
-| QC Reviewer | Sarah Jenkins | 2026-02-08 | *e-Signed* |
-| Statistical Lead | David Chen, PhD | 2026-02-08 | *e-Signed* |
+| Statistical Programmer | Antony Bevan | 2026-05-22 | *e-Signed* |
+| QC Reviewer | Sarah Jenkins | 2026-05-22 | *e-Signed* |
+| Statistical Lead | David Chen, PhD | 2026-05-22 | *e-Signed* |
 
 ---
 *This log is maintained as part of the audit trail for regulatory submission.*

@@ -18,37 +18,37 @@
 
     /* -----------------------------------------------------------------------
        Search relative paths — covers running from:
-         project root  (./03_programs/00_config.sas)
-         03_programs/  (./00_config.sas)
+         project root  (./m5/datasets/bv-car20-p1/analysis/adam/programs/00_config.sas)
+         programs/     (./00_config.sas)
          sub-folder    (../00_config.sas)
          sub-sub       (../../00_config.sas)
        Forward slashes work on both Windows SAS 9.4 and ODA/Linux.
     ----------------------------------------------------------------------- */
     %if      %sysfunc(fileexist(00_config.sas))
         %then %include "00_config.sas";
-    %else %if %sysfunc(fileexist(03_programs/00_config.sas))
-        %then %include "03_programs/00_config.sas";
+    %else %if %sysfunc(fileexist(m5/datasets/bv-car20-p1/analysis/adam/programs/00_config.sas))
+        %then %include "m5/datasets/bv-car20-p1/analysis/adam/programs/00_config.sas";
+    %else %if %sysfunc(fileexist(../../m5/datasets/bv-car20-p1/analysis/adam/programs/00_config.sas))
+        %then %include "../../m5/datasets/bv-car20-p1/analysis/adam/programs/00_config.sas";
     %else %if %sysfunc(fileexist(../00_config.sas))
         %then %include "../00_config.sas";
-    %else %if %sysfunc(fileexist(../03_programs/00_config.sas))
-        %then %include "../03_programs/00_config.sas";
+    %else %if %sysfunc(fileexist(../../analysis/adam/programs/00_config.sas))
+        %then %include "../../analysis/adam/programs/00_config.sas";
     %else %if %sysfunc(fileexist(../../00_config.sas))
         %then %include "../../00_config.sas";
-    %else %if %sysfunc(fileexist(../../03_programs/00_config.sas))
-        %then %include "../../03_programs/00_config.sas";
+    %else %if %sysfunc(fileexist(../../../analysis/adam/programs/00_config.sas))
+        %then %include "../../../analysis/adam/programs/00_config.sas";
     %else %if %sysfunc(fileexist(../../../00_config.sas))
         %then %include "../../../00_config.sas";
-    %else %if %sysfunc(fileexist(../../../03_programs/00_config.sas))
-        %then %include "../../../03_programs/00_config.sas";
     %else %do;
         /* Last resort: check OS-specific defaults */
         %let _home = %sysfunc(sysget(HOME));
         %if %length(&_home) = 0 %then %let _home = %sysfunc(sysget(USERPROFILE));
 
-        %if %upcase(&SYSSCP) = WIN and %sysfunc(fileexist(d:/safety_oncology/03_programs/00_config.sas)) %then 
-            %include "d:/safety_oncology/03_programs/00_config.sas";
-        %else %if %sysfunc(fileexist(&_home/safety_oncology/03_programs/00_config.sas)) %then 
-            %include "&_home/safety_oncology/03_programs/00_config.sas";
+        %if %upcase(&SYSSCP) = WIN and %sysfunc(fileexist(d:/safety_oncology/m5/datasets/bv-car20-p1/analysis/adam/programs/00_config.sas)) %then 
+            %include "d:/safety_oncology/m5/datasets/bv-car20-p1/analysis/adam/programs/00_config.sas";
+        %else %if %sysfunc(fileexist(&_home/safety_oncology/m5/datasets/bv-car20-p1/analysis/adam/programs/00_config.sas)) %then 
+            %include "&_home/safety_oncology/m5/datasets/bv-car20-p1/analysis/adam/programs/00_config.sas";
         %else %do;
             %put ERROR: [LOAD_CONFIG] Cannot locate 00_config.sas.;
             %put ERROR: [LOAD_CONFIG] Set PROJ_ROOT manually or run from the project root.;

@@ -46,12 +46,12 @@ options sasautos=(SASAUTOS);
 
     /* Otherwise hunt for the repository signature file */
     %let SLSH = /;
-    %let _sig = 03_programs&SLSH.00_config.sas;
+    %let _sig = m5&SLSH.datasets&SLSH.bv-car20-p1&SLSH.analysis&SLSH.adam&SLSH.programs&SLSH.00_config.sas;
 
     %if %sysfunc(fileexist(&_sig)) %then %let safe_path = %sysfunc(abspath(.));
     %else %if %sysfunc(fileexist(..&SLSH.&_sig)) %then %let safe_path = %sysfunc(abspath(..));
     %else %if %sysfunc(fileexist(..&SLSH..&SLSH.&_sig)) %then %let safe_path = %sysfunc(abspath(..&SLSH..));
-    %else %if %sysfunc(fileexist(d:/safety_oncology/03_programs/00_config.sas)) %then %let safe_path = d:/safety_oncology;
+    %else %if %sysfunc(fileexist(d:/safety_oncology/m5/datasets/bv-car20-p1/analysis/adam/programs/00_config.sas)) %then %let safe_path = d:/safety_oncology;
     %else %do;
         /* OS-specific fallback */
         %let _home = %sysfunc(sysget(HOME));

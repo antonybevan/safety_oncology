@@ -10,16 +10,17 @@
     %if %symexist(PROJ_ROOT) %then %return;
     
     %if %sysfunc(fileexist(00_config.sas)) %then %include "00_config.sas";
+    %else %if %sysfunc(fileexist(../../m5/datasets/bv-car20-p1/analysis/adam/programs/00_config.sas)) %then %include "../../m5/datasets/bv-car20-p1/analysis/adam/programs/00_config.sas";
     %else %if %sysfunc(fileexist(../00_config.sas)) %then %include "../00_config.sas";
     %else %if %sysfunc(fileexist(../../00_config.sas)) %then %include "../../00_config.sas";
     %else %if %sysfunc(fileexist(../../../00_config.sas)) %then %include "../../../00_config.sas";
     %else %do;
         %let _home = %sysfunc(sysget(HOME));
         %if %length(&_home) = 0 %then %let _home = %sysfunc(sysget(USERPROFILE));
-        %if %upcase(&SYSSCP) = WIN and %sysfunc(fileexist(d:/safety_oncology/03_programs/00_config.sas)) %then
-            %include "d:/safety_oncology/03_programs/00_config.sas";
-        %else %if %sysfunc(fileexist(&_home/safety_oncology/03_programs/00_config.sas)) %then
-            %include "&_home/safety_oncology/03_programs/00_config.sas";
+        %if %upcase(&SYSSCP) = WIN and %sysfunc(fileexist(d:/safety_oncology/m5/datasets/bv-car20-p1/analysis/adam/programs/00_config.sas)) %then
+            %include "d:/safety_oncology/m5/datasets/bv-car20-p1/analysis/adam/programs/00_config.sas";
+        %else %if %sysfunc(fileexist(&_home/safety_oncology/m5/datasets/bv-car20-p1/analysis/adam/programs/00_config.sas)) %then
+            %include "&_home/safety_oncology/m5/datasets/bv-car20-p1/analysis/adam/programs/00_config.sas";
         %else %put ERROR: Cannot find 00_config.sas;
     %end;
 %mend init_env;

@@ -11,15 +11,18 @@ This document defines the version control and code review procedures for Study B
 ## 2. Version Control
 
 ### 2.1 Repository Structure
-```
-BV-CAR20-P1/
+```text
+safety_oncology/ (Workspace root)
 ├── .git/                    # Version control metadata
-├── .gitignore               # Excludes sensitive/generated files
-├── 01_documentation/        # Versioned documentation
-├── 02_datasets/             # Data storage (large files excluded)
-├── 03_programs/             # All SAS programs (fully versioned)
-├── 04_outputs/              # Generated outputs (selectively versioned)
-└── 05_validation/           # Validation logs and evidence
+├── .gitignore               # Version control exclusion file
+├── m5/                      # FDA eCTD Module 5 submission package
+│   └── datasets/
+│       └── bv-car20-p1/
+│           ├── tabulations/ # SDTM datasets and mapping programs
+│           └── analysis/    # ADaM datasets, derivation programs, and TFL suite
+├── 01_documentation/        # Study protocol, SAP, SOPs, and checklists
+├── 04_outputs/              # Standard medical output destination (RTFs, plots)
+└── 05_validation/           # QC double programming, Pinnacle 21, and log audits
 ```
 
 ### 2.2 Branching Strategy

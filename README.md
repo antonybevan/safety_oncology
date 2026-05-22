@@ -18,36 +18,62 @@ SAP-aligned Phase 1 dose-escalation study **BV-CAR20-P1** (allogeneic anti-CD20 
 
 ## eCTD Module 5 Structure
 
+```text
+safety_oncology/ (Workspace root)
+├── m5/                                 # === FDA eCTD Module 5 Submission Package ===
+│   └── datasets/
+│       └── bv-car20-p1/
+│           ├── tabulations/
+│           │   └── sdtm/               # SDTM Folder
+│           │       ├── define.xml      # SDTM Metadata Specification (linked to stylesheet)
+│           │       ├── define2-1.xsl   # Interactive SDTM Stylesheet
+│           │       ├── csdrg.md        # Clinical Study Data Reviewer's Guide (SDRG)
+│           │       └── programs/       # SDTM mapping programs (dm.sas, ex.sas, etc.)
+│           │
+│           └── analysis/
+│               └── adam/               # ADaM Folder
+│                   ├── define.xml      # ADaM Metadata Specification (linked to stylesheet)
+│                   ├── define2-1.xsl   # Interactive ADaM Stylesheet
+│                   ├── adrg.md         # Analysis Data Reviewer's Guide (ADRG)
+│                   └── programs/       # ADaM Analytical Programming Suite
+│                       ├── 00_config.sas       # Master Environment Setup & Library Config
+│                       ├── 00_main.sas         # Master Pipeline Build Driver
+│                       ├── adsl.sas            # Subject-Level Analysis Dataset
+│                       ├── adae.sas            # Adverse Event Analysis Dataset
+│                       ├── adlb.sas            # Laboratory Analysis Dataset
+│                       ├── adex.sas            # Exposure Analysis Dataset
+│                       ├── adrs.sas            # Efficacy Response Analysis Dataset
+│                       ├── gen_metadata.sas    # Analysis Metadata Shell generator
+│                       │
+│                       ├── reporting/          # TFL Generation Programs (t_*.sas, f_*.sas, etc.)
+│                       └── macros/             # Autocall Utility Macros
+│
+├── 01_documentation/                   # === Sponsor Documentation & Checklists ===
+│   ├── protocol/                       # Protocol synopsis and documentation
+│   ├── sap/                            # Statistical Analysis Plan & Conformance Matrix
+│   └── checklists/                     # Regulatory, programming, and SOP checklists
+│
+├── 04_outputs/                         # === Clinical Output Repository ===
+│   ├── tables/                         # RTF medical tables
+│   ├── figures/                        # PNG oncology figures
+│   └── listings/                       # RTF patient-level listings
+│
+└── 05_validation/                      # === Sponsor Validation & Simulation Environment ===
+    ├── data_gen/                       # [Sponsor] Raw Clinical Data Simulation
+    │   └── generate_data.sas           # Data simulator (moved from m5/ to keep m5/ pristine)
+    ├── independent/                    # Level 3 QC double programming
+    ├── pinnacle21/                     # P21 issue resolution and validation guidelines
+    ├── qc-logs/                        # QC evidence audit logs
+    │   ├── ECTD_CLEANLINESS_REPORT.md  # eCTD structure and cleanliness conformance report
+    │   ├── QC_ACTIVITY_LOG.md          # Log of validation activities
+    │   └── QC_AUTOMATED_AUDIT_REPORT.md # SAS pipeline execution log audit report
+    ├── qc_audit_tool.py                # Automated SAS log and pipeline quality auditor
+    ├── verify_ectd_structure.py        # Automated eCTD structure and cleanliness checker
+    └── utilities/                      # Sponsor developer utility scripts
+        ├── GIT_PUSH.sas                # Git stage, commit, and push automation
+        └── GIT_RESCUE.sas              # Branch restore and emergency recovery
 ```
-BV-CAR20-P1/
-├── 01_documentation/            # Formal Docs (SAP, Audit, Compliance)
-│   ├── adrg/                   # Analysis Data Reviewer's Guide
-│   ├── cdrg/                   # Clinical Data Reviewer's Guide
-│   ├── sap/                    # Statistical Analysis Plan
-│   └── protocol/               # Study protocol
-│
-├── 02_datasets/                 # Study Data (FDA SDTCG compliant)
-│   ├── tabulations/            # SDTM v1.7 datasets (.xpt)
-│   ├── analysis/               # ADaM v2.1 datasets (.xpt)
-│   ├── define/                 # define.xml v2.1
-│   └── legacy/                 # Source/converted data
-│
-├── 03_programs/                 # ASCII text programs
-│   ├── tabulations/            # SDTM mapping programs (SAS)
-│   ├── analysis/               # ADaM derivation programs (SAS)
-│   ├── reporting/              # TFL programs (SAS/R)
-│   └── macros/                 # Reusable utilities
-│
-├── 04_outputs/
-│   ├── tables/                 # Summary tables (RTF)
-│   ├── figures/                # Swimmer plots, KM curves
-│   └── listings/               # Subject-level listings
-│
-└── 05_validation/
-    ├── independent/            # QC Level 3 (double programming)
-    ├── pinnacle21/             # P21 validation results
-    └── qc-logs/                # QC documentation
-```
+
 
 ## Regulatory Compliance
 
@@ -74,7 +100,7 @@ This repository has undergone a comprehensive integrity and professionalism audi
 
 ---
 **Developed and Audited by**: Antony Bevan (Clinical Statistical Programmer)  
-**Date**: 2026-02-08
+**Date**: 2026-05-22
 
 ## Key Safety Features
 

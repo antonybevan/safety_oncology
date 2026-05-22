@@ -6,7 +6,7 @@
 This Study Data Reviewer's Guide (SDRG) documents the SDTM tabulation datasets generated for Study BV-CAR20-P1. The repository includes the formal Phase 1 dose-escalation SDTM package.
 
 ## 2. Data Sources and Generation
-- SDTM domains are derived from raw clinical extracts in `02_datasets` via standard tabulation programs in `03_programs/tabulations`.
+- SDTM domains are derived from raw clinical extracts in `01_rawdata/` via standard tabulation programs in `m5/datasets/bv-car20-p1/tabulations/sdtm/programs/`.
 
 ## 3. Domain-Specific Notes
 
