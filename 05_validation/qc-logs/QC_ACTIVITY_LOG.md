@@ -45,6 +45,7 @@ This log documents all quality control activities performed on the statistical p
 | verify_ectd_structure.py | Automated Suite | Pass | eCTD Module 5 structure and cleanliness checked; 0 prohibited files found |
 | qc_audit_tool.py (Main Log) | Automated Suite | Pass | Audited 00_main-log.html; 0 errors/warnings/uninitialized references |
 | qc_audit_tool.py (Main Results) | Automated Suite | Pass | Audited 00_main-results.html; 0 errors/warnings/uninitialized references |
+| compile_ectd_package.py | Automated Suite | Pass | Pristine m5/ directory compiled to m5.zip; submission checksums generated |
 
 ---
 
