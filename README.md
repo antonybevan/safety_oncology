@@ -131,10 +131,11 @@ This repository has undergone a comprehensive integrity and professionalism audi
 
 ## Tools & Languages
 
-- **SAS 9.4+ (WIN/LIN):** Primary programming language for SDTM tabulation, ADaM analysis, and TFL generation.
-- **R 4.0+:** Independent double-programming validation, oncology visualization (Kaplan-Meier, Swimmer plots).
-- **Pinnacle 21 Community:** CDISC SDTM/ADaM conformance validation and regulatory-readiness checks.
-- **CDISC Define-XML v2.1:** Standards-based metadata specification with interactive browser-rendering integration (`define2-1.xsl`).
+- **SAS 9.4+ (via SAS OnDemand / Local):** Primary programming language for SDTM tabulation, ADaM analysis, and TFL generation (fully dual-compatible across local Windows SAS 9.4 and cloud-based SAS OnDemand for Academics Linux hosts).
+- **Python 3:** Automated sponsor validation suite, including ODS log auditing (`qc_audit_tool.py`), eCTD structural validation (`verify_ectd_structure.py`), and submission package archiving (`compile_ectd_package.py`).
+- **Pinnacle 21 Community:** CDISC conformance checking and validation of SDTM/ADaM metadata structures.
+- **CDISC Define-XML v2.1:** Standards-based submission metadata with interactive browser-rendering stylesheet integration (`define2-1.xsl`).
+
 
 
 ## Reference Documents
