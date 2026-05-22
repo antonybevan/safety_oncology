@@ -99,7 +99,7 @@ proc sgplot data=swimmer_plot;
     
     /* Overlay status markers at the end of each bar */
     scatter y=SUBJID_LBL x=Duration_Weeks / markerchar=Status_Symbol
-                                            markerattrs=(size=11pt color=black);
+                                            markercharattrs=(size=11pt color=black weight=bold);
     
     /* Reference lines for key timepoints */
     refline 4 / axis=x lineattrs=(pattern=dash color=gray) 
