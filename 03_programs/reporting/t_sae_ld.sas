@@ -121,6 +121,6 @@ quit;
 %ods_close(type=RTF);
 
 %put NOTE: ----------------------------------------------------;
-%put NOTE: ✅ LYMPHODEPLETION-RELATED SAE TABLE GENERATED;
+%put NOTE: LYMPHODEPLETION-RELATED SAE TABLE GENERATED;
 %put NOTE: ----------------------------------------------------;
 

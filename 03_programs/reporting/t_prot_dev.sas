@@ -115,5 +115,5 @@ run;
 %ods_close(type=RTF);
 
 %put NOTE: ----------------------------------------------------;
-%put NOTE: ✅ PROTOCOL DEVIATIONS TABLE GENERATED;
+%put NOTE: PROTOCOL DEVIATIONS TABLE GENERATED;
 %put NOTE: ----------------------------------------------------;

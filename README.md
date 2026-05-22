@@ -4,7 +4,7 @@
 [![CDISC](https://img.shields.io/badge/CDISC-SDTM%201.7%20|%20ADaM%202.1-green)]()
 [![FDA](https://img.shields.io/badge/FDA-CBER%20Submission%20Ready-success)]()
 
-## 📋 Portfolio Overview
+## Portfolio Overview
 
 **Clinical Statistical Programming Portfolio Project — Antony Bevan**  
 SAP-aligned Phase 1 dose-escalation study **BV-CAR20-P1** (allogeneic anti-CD20 CAR-T) in relapsed/refractory NHL/CLL. This repository is an end-to-end portfolio demonstration of regulatory-grade clinical programming, CDISC implementation, and formal submission readiness.
@@ -16,7 +16,7 @@ SAP-aligned Phase 1 dose-escalation study **BV-CAR20-P1** (allogeneic anti-CD20 
 | **Protocol** | BV-CAR20-P1 v5.0 |
 | **SAP** | v5.0 (Based on Public Domain CAR-T SAP) |
 
-## 🏗️ eCTD Module 5 Structure
+## eCTD Module 5 Structure
 
 ```
 BV-CAR20-P1/
@@ -49,7 +49,7 @@ BV-CAR20-P1/
     └── qc-logs/                # QC documentation
 ```
 
-## 🛡️ Regulatory Compliance
+## Regulatory Compliance
 
 ### FDA Standards
 - **eCTD v3.2.2:** Module 5 clinical data structure
@@ -66,9 +66,9 @@ BV-CAR20-P1/
 - **QC Levels:** 1 (manual), 2 (review), 3 (double programming)
 - **Analysis Results Metadata (ARM):** Embedded in define.xml
 
-## 🛡️ Professional Certification
+## Professional Certification
 
-**Status**: **COMPLIANT | SUBMISSION READY**
+Status: **COMPLIANT | SUBMISSION READY**
 
 This repository has undergone a comprehensive integrity and professionalism audit. All clinical programming logic, data traceability (SRCDOM/VAR/SEQ), and documentation conform to standard clinical trial and regulatory (FDA/Health Authority) submission requirements.
 
@@ -76,7 +76,7 @@ This repository has undergone a comprehensive integrity and professionalism audi
 **Developed and Audited by**: Antony Bevan (Clinical Statistical Programmer)  
 **Date**: 2026-02-08
 
-## 🔬 Key Safety Features
+## Key Safety Features
 
 | Feature | Implementation |
 |---------|----------------|
@@ -85,7 +85,7 @@ This repository has undergone a comprehensive integrity and professionalism audi
 | **Populations** | Safety (LD recipients), ITT, Response Evaluable |
 | **Hybrid Grading** | ASTCT (CRS/ICANS) + CTCAE v5.0 (all others) |
 
-## 📊 Deliverables
+## Deliverables
 
 ### Tables (per SAP Section 11)
 - **1.1-1.3:** Disposition, Deviations, Demographics
@@ -99,14 +99,14 @@ This repository has undergone a comprehensive integrity and professionalism audi
 ### Listings
 - Screen failures, TEAEs, AESI events, SAEs, Deaths
 
-## 🔧 Tools & Languages
+## Tools & Languages
 
 - **SAS 9.4+:** Primary programming language
 - **R 4.0+:** Independent validation, visualization
 - **Pinnacle 21 Community:** CDISC validation
 - **Define-XML Generator:** Metadata creation
 
-## 📚 Reference Documents
+## Reference Documents
 
 See `01_documentation/` folder for:
 - Statistical Analysis Plan (SAP) v5.0

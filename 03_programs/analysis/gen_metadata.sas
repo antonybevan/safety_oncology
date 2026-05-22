@@ -105,7 +105,7 @@ proc export data=define_metadata
 run;
 
 %put NOTE: --------------------------------------------------;
-%put NOTE: ✅ ENHANCED METADATA GENERATION COMPLETE;
+%put NOTE: [SUCCESS] ENHANCED METADATA GENERATION COMPLETE;
 %put NOTE: --------------------------------------------------;
 
 

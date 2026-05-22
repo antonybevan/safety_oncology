@@ -44,7 +44,7 @@ run;
 %ods_close(type=RTF);
 
 %put NOTE: --------------------------------------------------;
-%put NOTE: ✅ LISTING L-SD1 (Screen Failures) GENERATED;
+%put NOTE: LISTING L-SD1 (Screen Failures) GENERATED;
 %put NOTE: --------------------------------------------------;
 
 

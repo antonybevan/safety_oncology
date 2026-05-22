@@ -350,7 +350,7 @@ run;
 %export_raw(raw_rs);
 
 %put NOTE: ----------------------------------------------------;
-%put NOTE: ✅ ENHANCED CLINICAL TRIAL RAW DATA SIMULATION COMPLETE;
+%put NOTE: [SUCCESS] ENHANCED CLINICAL TRIAL RAW DATA SIMULATION COMPLETE;
 %put NOTE: ----------------------------------------------------;
 %put NOTE: Realism Features:;
 %put NOTE:   - Variable enrollment: DL1=3, DL2=0 (skipped), DL3=6;

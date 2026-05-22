@@ -32,4 +32,4 @@ run;
 /* 3. Export to XPT */
 %xpt_export(ds=sdtm.gf, xptpath=&SDTM_PATH/gf.xpt, outname=gf);
 
-%put NOTE: ✅ SDTM.GF (Genomics Findings) Domain Structure Created;
+%put NOTE: SDTM.GF (Genomics Findings) Domain Structure Created;

@@ -62,7 +62,7 @@ run;
 %ods_close(type=RTF);
 
 %put NOTE: --------------------------------------------------;
-%put NOTE: ✅ LISTING L-SAE2 (All Deaths) GENERATED;
+%put NOTE: LISTING L-SAE2 (All Deaths) GENERATED;
 %put NOTE: --------------------------------------------------;
 
 

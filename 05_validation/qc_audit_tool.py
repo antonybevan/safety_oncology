@@ -184,37 +184,37 @@ def print_report(results, output_md_path=None):
             md.write(f"**Target Log File**: `{results['file']}`  \n")
             md.write(f"**Date Verified**: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}  \n")
             
-            status_emoji = "✅ PASS" if is_clean else "❌ FAIL"
-            md.write(f"**Overall Compliance Status**: **{status_emoji}**  \n\n")
+            status_txt = "PASS" if is_clean else "FAIL"
+            md.write(f"**Overall Compliance Status**: **{status_txt}**  \n\n")
             
-            md.write(f"## 📊 QC Metrics Checklist\n\n")
+            md.write(f"## QC Metrics Checklist\n\n")
             md.write(f"| Quality Parameter | Count | Clinical Threshold | Compliance Status |\n")
             md.write(f"|:---|:---:|:---:|:---:|\n")
-            md.write(f"| **Errors (`ERROR:`)** | {total_errors} | 0 | {'✅ Compliant' if total_errors == 0 else '❌ NON-COMPLIANT'} |\n")
-            md.write(f"| **Warnings (`WARNING:`)** | {total_warnings} | 0 | {'✅ Compliant' if total_warnings == 0 else '❌ NON-COMPLIANT'} |\n")
-            md.write(f"| **Uninitialized Variables** | {total_uninit} | 0 | {'✅ Compliant' if total_uninit == 0 else '❌ NON-COMPLIANT'} |\n")
-            md.write(f"| **Implicit Type Conversions** | {total_convert} | 0 | {'✅ Compliant' if total_convert == 0 else '❌ NON-COMPLIANT'} |\n")
-            md.write(f"| **Merge BY Value Repeats** | {total_repeats} | 0 | {'✅ Compliant' if total_repeats == 0 else '❌ NON-COMPLIANT'} |\n")
-            md.write(f"| **Missing Values Generated** | {total_missing} | Info Only | ℹ️ Informational |\n\n")
+            md.write(f"| **Errors (`ERROR:`)** | {total_errors} | 0 | {'Compliant' if total_errors == 0 else 'NON-COMPLIANT'} |\n")
+            md.write(f"| **Warnings (`WARNING:`)** | {total_warnings} | 0 | {'Compliant' if total_warnings == 0 else 'NON-COMPLIANT'} |\n")
+            md.write(f"| **Uninitialized Variables** | {total_uninit} | 0 | {'Compliant' if total_uninit == 0 else 'NON-COMPLIANT'} |\n")
+            md.write(f"| **Implicit Type Conversions** | {total_convert} | 0 | {'Compliant' if total_convert == 0 else 'NON-COMPLIANT'} |\n")
+            md.write(f"| **Merge BY Value Repeats** | {total_repeats} | 0 | {'Compliant' if total_repeats == 0 else 'NON-COMPLIANT'} |\n")
+            md.write(f"| **Missing Values Generated** | {total_missing} | Info Only | Informational |\n\n")
             
             if not is_clean:
-                md.write(f"## 🛠️ Action Items Required for Submission\n\n")
+                md.write(f"## Action Items Required for Submission\n\n")
                 if total_errors > 0:
-                    md.write(f"### 🔴 Critical Errors ({total_errors})\n")
+                    md.write(f"### Critical Errors ({total_errors})\n")
                     md.write(f"The following compilation or execution errors must be resolved:\n\n")
                     for ln, msg in results["errors"][:50]:
                         md.write(f"- **Line {ln}**: `{msg}`\n")
                     md.write("\n")
                     
                 if total_warnings > 0:
-                    md.write(f"### 🟡 Compiler Warnings ({total_warnings})\n")
+                    md.write(f"### Compiler Warnings ({total_warnings})\n")
                     md.write(f"The following standard warnings must be eliminated to achieve the Zero Warning Standard:\n\n")
                     for ln, msg in results["warnings"][:50]:
                         md.write(f"- **Line {ln}**: `{msg}`\n")
                     md.write("\n")
                     
                 if total_uninit > 0:
-                    md.write(f"### 🟡 Uninitialized Variable Notes ({total_uninit})\n")
+                    md.write(f"### Uninitialized Variable Notes ({total_uninit})\n")
                     md.write(f"Resolve uninitialized variable references (check variable spelling or initialization blocks):\n\n")
                     for ln, msg in results["uninitialized"][:50]:
                         md.write(f"- **Line {ln}**: `{msg}`\n")
@@ -237,7 +237,7 @@ def main():
     log_path = args.log_path
     if not log_path:
         # Fallback to standard locations or standard downloads path
-        dld_path = r"C:\Users\91936\Downloads\00_main-results (2).html"
+        dld_path = r"C:\Users\91936\Downloads\00_main-results (1).html"
         if os.path.exists(dld_path):
             log_path = dld_path
             print(f"Using default target file detected in downloads: {CLR_CYAN}{log_path}{CLR_RESET}")

@@ -2,19 +2,19 @@
 
 **Study**: BV-CAR20-P1  
 **Target Log File**: `00_main-results (1).html`  
-**Date Verified**: 2026-05-22 11:21:46  
-**Overall Compliance Status**: **✅ PASS**  
+**Date Verified**: 2026-05-22 11:39:17  
+**Overall Compliance Status**: **PASS**  
 
-## 📊 QC Metrics Checklist
+## QC Metrics Checklist
 
 | Quality Parameter | Count | Clinical Threshold | Compliance Status |
 |:---|:---:|:---:|:---:|
-| **Errors (`ERROR:`)** | 0 | 0 | ✅ Compliant |
-| **Warnings (`WARNING:`)** | 0 | 0 | ✅ Compliant |
-| **Uninitialized Variables** | 0 | 0 | ✅ Compliant |
-| **Implicit Type Conversions** | 0 | 0 | ✅ Compliant |
-| **Merge BY Value Repeats** | 0 | 0 | ✅ Compliant |
-| **Missing Values Generated** | 0 | Info Only | ℹ️ Informational |
+| **Errors (`ERROR:`)** | 0 | 0 | Compliant |
+| **Warnings (`WARNING:`)** | 0 | 0 | Compliant |
+| **Uninitialized Variables** | 0 | 0 | Compliant |
+| **Implicit Type Conversions** | 0 | 0 | Compliant |
+| **Merge BY Value Repeats** | 0 | 0 | Compliant |
+| **Missing Values Generated** | 0 | Info Only | Informational |
 
 ## Attestation
 

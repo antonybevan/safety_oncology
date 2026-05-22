@@ -48,7 +48,7 @@ run;
 %ods_close(type=RTF);
 
 %put NOTE: --------------------------------------------------;
-%put NOTE: ✅ LISTING L-SAE1 (All TESAEs) GENERATED;
+%put NOTE: LISTING L-SAE1 (All TESAEs) GENERATED;
 %put NOTE: --------------------------------------------------;
 
 

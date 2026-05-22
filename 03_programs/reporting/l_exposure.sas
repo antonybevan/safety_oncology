@@ -111,7 +111,7 @@ run;
 %ods_close(type=RTF);
 
 %put NOTE: ----------------------------------------------------;
-%put NOTE: ✅ EXPOSURE LISTING GENERATED;
+%put NOTE: EXPOSURE LISTING GENERATED;
 %put NOTE: ----------------------------------------------------;
 
 

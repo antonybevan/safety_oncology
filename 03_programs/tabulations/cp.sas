@@ -32,4 +32,4 @@ run;
 /* 3. Export to XPT */
 %xpt_export(ds=sdtm.cp, xptpath=&SDTM_PATH/cp.xpt, outname=cp);
 
-%put NOTE: ✅ SDTM.CP (Cell Phenotype) Domain Structure Created;
+%put NOTE: [SUCCESS] SDTM.CP (Cell Phenotype) Domain Structure Created;

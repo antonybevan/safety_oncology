@@ -12,12 +12,12 @@ This document certifies that all statistical programming activities for Study BV
 ## 2. Applicable SOPs
 | SOP ID | Title | Version | Compliance Status |
 |:-------|:------|:--------|:-----------------:|
-| SOP-PROG-001 | Statistical Programming Standards | 4.2 | ✅ Compliant |
-| SOP-PROG-002 | SAS Programming Best Practices | 3.1 | ✅ Compliant |
-| SOP-PROG-003 | Quality Control and Validation | 5.0 | ✅ Compliant |
-| SOP-DATA-005 | CDISC Standards Implementation | 2.4 | ✅ Compliant |
-| SOP-DATA-006 | Define-XML Generation | 1.3 | ✅ Compliant |
-| SOP-REG-001 | eCTD Submission Preparation | 3.0 | ✅ Compliant |
+| SOP-PROG-001 | Statistical Programming Standards | 4.2 | Compliant |
+| SOP-PROG-002 | SAS Programming Best Practices | 3.1 | Compliant |
+| SOP-PROG-003 | Quality Control and Validation | 5.0 | Compliant |
+| SOP-DATA-005 | CDISC Standards Implementation | 2.4 | Compliant |
+| SOP-DATA-006 | Define-XML Generation | 1.3 | Compliant |
+| SOP-REG-001 | eCTD Submission Preparation | 3.0 | Compliant |
 
 ## 3. Programming Standards Applied
 

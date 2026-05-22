@@ -118,6 +118,6 @@ quit;
 %ods_close(type=RTF);
 
 %put NOTE: ----------------------------------------------------;
-%put NOTE: ✅ CAR-T RELATED SAE TABLE GENERATED;
+%put NOTE: CAR-T RELATED SAE TABLE GENERATED;
 %put NOTE: ----------------------------------------------------;
 

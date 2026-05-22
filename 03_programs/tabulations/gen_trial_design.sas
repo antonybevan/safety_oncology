@@ -69,7 +69,7 @@ data sdtm.ta; set ta; run;
 %xpt_export(ds=ta, xptpath=&SDTM_PATH/ta.xpt, outname=ta);
 
 %put NOTE: --------------------------------------------------;
-%put NOTE: ✅ TRIAL DESIGN DOMAINS (TS, TA, TE) GENERATED;
+%put NOTE: TRIAL DESIGN DOMAINS (TS, TA, TE) GENERATED;
 %put NOTE: --------------------------------------------------;
 
 
