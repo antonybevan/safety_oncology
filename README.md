@@ -1,8 +1,12 @@
 # BV-CAR20-P1: Allogeneic Anti-CD20 CAR-T Clinical Programming
 
-[![eCTD](https://img.shields.io/badge/eCTD-Module%205-blue)]()
-[![CDISC](https://img.shields.io/badge/CDISC-SDTM%201.7%20|%20ADaM%202.1-green)]()
-[![FDA](https://img.shields.io/badge/FDA-CBER%20Submission%20Ready-success)]()
+[![eCTD Module 5](https://img.shields.io/badge/eCTD-Module_5-0284c7?style=flat-square)](file:///d:/safety_oncology/m5/)
+[![CDISC SDTM 1.7](https://img.shields.io/badge/CDISC-SDTM_1.7-10b981?style=flat-square)](file:///d:/safety_oncology/m5/datasets/bv-car20-p1/tabulations/sdtm/define.xml)
+[![CDISC ADaM 2.1](https://img.shields.io/badge/CDISC-ADaM_2.1-059669?style=flat-square)](file:///d:/safety_oncology/m5/datasets/bv-car20-p1/analysis/adam/define.xml)
+[![SAS 9.4 Plus](https://img.shields.io/badge/SAS-9.4_Plus-7f1d1d?style=flat-square)](file:///d:/safety_oncology/m5/datasets/bv-car20-p1/analysis/adam/programs/00_config.sas)
+[![QC Level 3](https://img.shields.io/badge/QC-Level_3_Verified-4f46e5?style=flat-square)](file:///d:/safety_oncology/05_validation/qc-logs/QC_ACTIVITY_LOG.md)
+[![FDA Submission Ready](https://img.shields.io/badge/FDA_CBER-Submission_Ready-1e1b4b?style=flat-square)](file:///d:/safety_oncology/05_validation/qc-logs/ECTD_CLEANLINESS_REPORT.md)
+
 
 ## Portfolio Overview
 
