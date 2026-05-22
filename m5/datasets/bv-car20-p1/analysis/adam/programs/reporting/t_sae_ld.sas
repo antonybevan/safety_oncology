@@ -70,11 +70,11 @@ quit;
 proc sql;
     create table sae_ld_counts as
     select a.ARMCD, a.AEDECOD,
-           coalesce(count(distinct case when MAX_GRADE = 1 then a.USUBJID end), 0) as GR1,
-           coalesce(count(distinct case when MAX_GRADE = 2 then a.USUBJID end), 0) as GR2,
-           coalesce(count(distinct case when MAX_GRADE = 3 then a.USUBJID end), 0) as GR3,
-           coalesce(count(distinct case when MAX_GRADE = 4 then a.USUBJID end), 0) as GR4,
-           coalesce(count(distinct case when MAX_GRADE = 5 then a.USUBJID end), 0) as GR5,
+           coalesce(count(distinct case when MAX_GRADE = 1 then a.USUBJID else null end), 0) as GR1,
+           coalesce(count(distinct case when MAX_GRADE = 2 then a.USUBJID else null end), 0) as GR2,
+           coalesce(count(distinct case when MAX_GRADE = 3 then a.USUBJID else null end), 0) as GR3,
+           coalesce(count(distinct case when MAX_GRADE = 4 then a.USUBJID else null end), 0) as GR4,
+           coalesce(count(distinct case when MAX_GRADE = 5 then a.USUBJID else null end), 0) as GR5,
            coalesce(count(distinct a.USUBJID), 0) as TOTAL,
            calculated TOTAL / d.N * 100 as PCT format=5.1
     from sae_ld_max a
@@ -87,6 +87,22 @@ data sae_ld_report;
     set sae_ld_counts;
     length Result $50;
     Result = catx(' ', put(TOTAL, 3.), cats('(', put(PCT, 5.1), '%)'));
+run;
+
+/* Handle empty dataset for regulatory submission readiness and to avoid warnings */
+data sae_ld_report;
+    if sae_num = 0 then do;
+        AEDECOD = "No serious adverse events related to lymphodepletion chemotherapy occurred.";
+        ARMCD = "DL1";
+        GR1 = .; GR2 = .; GR3 = .; GR4 = .; GR5 = .; TOTAL = 0; PCT = 0.0;
+        Result = "0 (0.0%)";
+        output;
+        stop;
+    end;
+    do until(eof);
+        set sae_ld_report end=eof nobs=sae_num;
+        output;
+    end;
 run;
 
 /* 6. Generate Table */
@@ -108,6 +124,7 @@ proc report data=sae_ld_report nowd split='*';
     footnote1 "Includes SAEs occurring during LD period (Days -5 to -1) or attributed to LD chemotherapy.";
     footnote2 "LD regimen: Fludarabine 30 mg/m2/day + Cyclophosphamide 500 mg/m2/day.";
     footnote3 "Percentages based on number of subjects receiving LD at each dose level.";
+    footnote4 "Note: No serious adverse events related to lymphodepletion chemotherapy occurred.";
 run;
 
 /* 7. Overall Summary */

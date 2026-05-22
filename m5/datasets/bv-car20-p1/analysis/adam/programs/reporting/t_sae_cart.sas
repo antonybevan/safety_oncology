@@ -62,11 +62,11 @@ quit;
 proc sql;
     create table sae_counts as
     select a.ARMCD, a.AEDECOD,
-           coalesce(count(distinct case when MAX_GRADE = 1 then a.USUBJID end), 0) as GR1,
-           coalesce(count(distinct case when MAX_GRADE = 2 then a.USUBJID end), 0) as GR2,
-           coalesce(count(distinct case when MAX_GRADE = 3 then a.USUBJID end), 0) as GR3,
-           coalesce(count(distinct case when MAX_GRADE = 4 then a.USUBJID end), 0) as GR4,
-           coalesce(count(distinct case when MAX_GRADE = 5 then a.USUBJID end), 0) as GR5,
+           coalesce(count(distinct case when MAX_GRADE = 1 then a.USUBJID else null end), 0) as GR1,
+           coalesce(count(distinct case when MAX_GRADE = 2 then a.USUBJID else null end), 0) as GR2,
+           coalesce(count(distinct case when MAX_GRADE = 3 then a.USUBJID else null end), 0) as GR3,
+           coalesce(count(distinct case when MAX_GRADE = 4 then a.USUBJID else null end), 0) as GR4,
+           coalesce(count(distinct case when MAX_GRADE = 5 then a.USUBJID else null end), 0) as GR5,
            coalesce(count(distinct a.USUBJID), 0) as TOTAL,
            calculated TOTAL / d.N * 100 as PCT format=5.1
     from sae_cart_max a

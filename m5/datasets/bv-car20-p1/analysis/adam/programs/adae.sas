@@ -300,12 +300,16 @@ data adae;
     end;
     else AOCCPFL = "N";
     
-    label AOCCPFL = "1st Occurrence of Preferred Term Flag";
+    label AOCCPFL  = "1st Occurrence of Preferred Term Flag"
+          AEOUT    = "Outcome of Adverse Event"
+          AECONTRT = "Concomitant or Additional Therapy Given";
 run;
 
 /* Create permanent SAS dataset */
 data adam.adae;
     set adae;
+    label AEOUT    = "Outcome of Adverse Event"
+          AECONTRT = "Concomitant or Additional Therapy Given";
 run;
 
 /* 4. Export to XPT */

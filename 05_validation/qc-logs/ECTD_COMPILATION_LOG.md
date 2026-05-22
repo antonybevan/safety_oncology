@@ -5,7 +5,7 @@
 - **Study Identification**: BV-CAR20-P1  
 - **Dose Cohorts**: DL1 (1x10^6 cells/kg), DL3 (3x10^6 cells/kg)  
 - **Submission Phase**: Phase 1 Dose Escalation (3+3)  
-- **Date and Time of Compilation**: 2026-05-22 20:05:41 UTC  
+- **Date and Time of Compilation**: 2026-05-22 20:16:58 UTC  
 - **Statistical Programmer**: Antony Bevan  
 - **QC Level Verification**: Level 3 Double-Programmed Conformance  
 
@@ -17,9 +17,9 @@
 | **Archive File Path** | `d:\safety_oncology\m5.zip` |
 | **Zipped Directory Root** | `m5/` |
 | **Total Conformed Files** | 53 |
-| **File Size** | 89759 Bytes (0.086 MB) |
-| **MD5 Checksum** | `dd5a142fdd6d91653a084fdfc9d0e4e5` |
-| **SHA-256 Checksum** | `66b0bc58e55c195c20bf8a3f4880913e94bc8d27f9e044702fd0d9b83dcac111` |
+| **File Size** | 90267 Bytes (0.086 MB) |
+| **MD5 Checksum** | `b2ff78130a77ca18a5ad8111c58c1e19` |
+| **SHA-256 Checksum** | `13ba2adf8b83b496d683ebf390a29ca233efac45431c9a3cf102479421ec1384` |
 | **Compression Method** | DEFLATE |
 | **Submission Gateway Format** | electronic Common Technical Document (eCTD) v3.2.2 |
 

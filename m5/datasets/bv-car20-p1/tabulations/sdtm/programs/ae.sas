@@ -87,6 +87,11 @@ data ae;
         AEENDY = _endt - TRTSDT_NUM + (_endt >= TRTSDT_NUM);
     end;
     
+    label
+        AEOUT    = "Outcome of Adverse Event"
+        AECONTRT = "Concomitant or Additional Therapy Given"
+    ;
+
     keep STUDYID DOMAIN USUBJID AETERM AEDECOD AESTDTC AEENDTC 
          AESTDY AEENDY AETOXGR AESER AESEV AEACN AESID AESOC AEREL LDSTDT AEOUT AECONTRT;
 run;
@@ -103,6 +108,10 @@ data sdtm.ae;
     retain AESEQ;
     if first.USUBJID then AESEQ = 0;
     AESEQ + 1;
+    
+    label AESEQ    = "Sequence Number"
+          AEOUT    = "Outcome of Adverse Event"
+          AECONTRT = "Concomitant or Additional Therapy Given";
 run;
 
 /* Create XPT */

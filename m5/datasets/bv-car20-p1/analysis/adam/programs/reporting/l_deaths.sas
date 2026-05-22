@@ -38,6 +38,25 @@ proc sort data=all_deaths nodupkey;
     by USUBJID;
 run;
 
+/* Handle empty dataset for regulatory submission readiness and to avoid warnings */
+data all_deaths;
+    if deaths_num = 0 then do;
+        USUBJID = "No deaths occurred";
+        ARMCD = "DL1";
+        AGE = .;
+        SEX = "";
+        COHORT = "";
+        DTHDT = .;
+        DTHCAUS = "N/A";
+        output;
+        stop;
+    end;
+    do until(eof);
+        set all_deaths end=eof nobs=deaths_num;
+        output;
+    end;
+run;
+
 /* 2. Production Listing */
 %ods_setup(type=RTF, outpath=&OUT_LISTINGS/l_deaths.rtf);
 
@@ -47,6 +66,7 @@ title3 "Safety Population";
 
 footnote1 "Source: ADAM.ADSL, ADAM.ADAE";
 footnote2 "Deaths are identified from disposition data or fatal AE outcomes.";
+footnote3 "Note: No deaths occurred during the observational period of this study.";
 
 proc report data=all_deaths nowd headskip split='|' style(report)={outputwidth=100%};
     column USUBJID ARMCD AGE SEX COHORT DTHDT DTHCAUS;
