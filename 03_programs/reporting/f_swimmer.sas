@@ -63,6 +63,8 @@ data swimmer_plot;
     if not missing(DATA_CUTOFF) and not missing(_end) then _end = min(_end, DATA_CUTOFF);
     if not missing(TRTSDT) then DURATION = _end - TRTSDT + 1;
     if DURATION <= 0 then DURATION = 1;
+    length SUBJID_LBL $20;
+    SUBJID_LBL = scan(USUBJID, -1, '-');
     Subject_Order = _N_;
     
     /* Convert duration to weeks for display */
@@ -95,7 +97,7 @@ proc sgplot data=swimmer_plot;
     
     /* Overlay status markers at the end of each bar */
     scatter y=SUBJID_LBL x=Duration_Weeks / markerchar=Status_Symbol
-                                            markerattrs=(weight=bold size=11pt color=black);
+                                            markerattrs=(size=11pt color=black);
     
     /* Reference lines for key timepoints */
     refline 4 / axis=x lineattrs=(pattern=dash color=gray) 
