@@ -1,0 +1,2 @@
+# Placeholder to track the raw data directory in Git.
+# Actual raw clinical datasets (*.sas7bdat) are generated dynamically at runtime and are excluded.

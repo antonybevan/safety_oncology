@@ -26,5 +26,7 @@ desktop.ini
 *.swo
 
 # Exclude dynamically generated raw/legacy data directories
-01_rawdata/
-05_legacy_data/
+01_rawdata/**/*
+!01_rawdata/**/.gitkeep
+05_legacy_data/**/*
+!05_legacy_data/**/.gitkeep
