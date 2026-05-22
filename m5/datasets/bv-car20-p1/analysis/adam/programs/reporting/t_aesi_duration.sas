@@ -110,7 +110,7 @@ run;
 
 proc report data=aesi_report nowd split='*';
     column AESI_TYPE ARMCD N_SUBJECTS N_EVENTS MAX_GRADE Onset_Display Duration_Display;
-    define AESI_TYPE / group "AESI Type" left;
+    define AESI_TYPE / order "AESI Type" left;
     define ARMCD / display "Dose*Level" center;
     define N_SUBJECTS / display "N" center;
     define N_EVENTS / display "Events" center;

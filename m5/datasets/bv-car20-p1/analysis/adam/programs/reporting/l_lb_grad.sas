@@ -37,8 +37,8 @@ footnote2 "ATOXGRL/H identifies the direction of the toxicity (Low/High).";
 
 proc report data=lb_grade_listing nowd headskip split='|' style(report)={outputwidth=100%};
     column TRTA USUBJID PARAM ADT AVISIT AVAL TOX_DIR MAX_GRADE;
-    define TRTA     / "Actual Treatment" group width=15;
-    define USUBJID  / "Subject ID" group width=15;
+    define TRTA     / "Actual Treatment" order width=15;
+    define USUBJID  / "Subject ID" order width=15;
     define PARAM    / "Laboratory Parameter" width=30;
     define ADT      / "Analysis Date" format=date9. width=12;
     define AVISIT   / "Visit" width=15;

@@ -35,8 +35,8 @@ footnote2 "ASTCTGR: ASTCT 2019 Consensus Grading for CRS and ICANS.";
 
 proc report data=aesi_listing nowd headskip split='|' style(report)={outputwidth=100%};
     column TRTA USUBJID AEDECOD ASTDT AENDT ADUR ASTCTGR AEREL DLTFL;
-    define TRTA     / "Actual Treatment" group width=15;
-    define USUBJID  / "Subject ID" group width=20;
+    define TRTA     / "Actual Treatment" order width=15;
+    define USUBJID  / "Subject ID" order width=20;
     define AEDECOD  / "Preferred Term" width=30;
     define ASTDT    / "Start Date" format=date9. width=12;
     define AENDT    / "End Date" format=date9. width=12;

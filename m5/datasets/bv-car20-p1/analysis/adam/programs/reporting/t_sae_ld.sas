@@ -70,12 +70,12 @@ quit;
 proc sql;
     create table sae_ld_counts as
     select a.ARMCD, a.AEDECOD,
-           count(distinct case when MAX_GRADE = 1 then a.USUBJID end) as GR1,
-           count(distinct case when MAX_GRADE = 2 then a.USUBJID end) as GR2,
-           count(distinct case when MAX_GRADE = 3 then a.USUBJID end) as GR3,
-           count(distinct case when MAX_GRADE = 4 then a.USUBJID end) as GR4,
-           count(distinct case when MAX_GRADE = 5 then a.USUBJID end) as GR5,
-           count(distinct a.USUBJID) as TOTAL,
+           coalesce(count(distinct case when MAX_GRADE = 1 then a.USUBJID end), 0) as GR1,
+           coalesce(count(distinct case when MAX_GRADE = 2 then a.USUBJID end), 0) as GR2,
+           coalesce(count(distinct case when MAX_GRADE = 3 then a.USUBJID end), 0) as GR3,
+           coalesce(count(distinct case when MAX_GRADE = 4 then a.USUBJID end), 0) as GR4,
+           coalesce(count(distinct case when MAX_GRADE = 5 then a.USUBJID end), 0) as GR5,
+           coalesce(count(distinct a.USUBJID), 0) as TOTAL,
            calculated TOTAL / d.N * 100 as PCT format=5.1
     from sae_ld_max a
     left join denom_ld d on a.ARMCD = d.ARMCD

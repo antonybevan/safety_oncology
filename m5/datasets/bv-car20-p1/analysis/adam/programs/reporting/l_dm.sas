@@ -37,7 +37,7 @@ footnote2 "Status based on completion of Day 28 DLT/Efficacy window.";
 
 proc report data=disposition nowd headskip split='|' style(report)={outputwidth=100%};
     column ARMCD USUBJID RFICDTC TRTSDT CARTDT ITTFL SAFFL EFFFL STATUS;
-    define ARMCD    / "Dose Level" group width=12;
+    define ARMCD    / "Dose Level" order width=12;
     define USUBJID  / "Subject ID" width=15;
     define RFICDTC  / "Informed Consent" width=15;
     define TRTSDT   / "Regimen Start" width=15;

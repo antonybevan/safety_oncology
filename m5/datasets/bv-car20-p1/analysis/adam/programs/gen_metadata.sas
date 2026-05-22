@@ -19,11 +19,11 @@ run;
 
 /* 2. Format for Submission Readiness with Origin/Method/Role */
 data define_metadata;
-    length Variable $8 Label $256 Dataset $8 DataType $4 Origin $15 Method $200 Role $15;
+    length Variable $8 VarLabel $256 Dataset $8 DataType $4 Origin $15 Method $200 Role $15;
     set adam_meta;
     
     Variable = NAME;
-    Label    = LABEL;
+    VarLabel = LABEL;
     Dataset  = MEMNAME;
     if TYPE=1 then DataType="Num"; else DataType="Char";
 
@@ -88,10 +88,10 @@ run;
 title "&STUDYID: ADaM Variable Metadata Specifications";
 ods html5 body="&OUT_META/adam_metadata_enhanced.html";
 proc report data=define_metadata nowd headskip split='|' style(report)={outputwidth=100%};
-    column Dataset Variable Label DataType Role Origin Method;
-    define Dataset  / group "Dataset" width=8;
+    column Dataset Variable VarLabel DataType Role Origin Method;
+    define Dataset  / order "Dataset" width=8;
     define Variable / "Variable" width=8;
-    define Label    / "Label" width=25;
+    define VarLabel / "Label" width=25;
     define Role     / "Role" width=10;
     define Origin   / "Origin" width=10;
     define Method   / "Derivation / Method" width=40 flow;
