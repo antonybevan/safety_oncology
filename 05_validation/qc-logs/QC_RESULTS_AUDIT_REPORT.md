@@ -2,7 +2,7 @@
 
 **Study**: BV-CAR20-P1  
 **Target Log File**: `00_main-results.html`  
-**Date Verified**: 2026-05-22 17:39:57  
+**Date Verified**: 2026-05-22 18:33:08  
 **Overall Compliance Status**: **PASS**  
 
 ## QC Metrics Checklist
