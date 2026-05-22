@@ -117,6 +117,12 @@ def append_qc_activity_log(workspace_root):
     with open(activity_path, 'r', encoding='utf-8') as f:
         lines = f.readlines()
         
+    # Check if compile_ectd_package.py entry already exists to avoid duplication
+    for line in lines:
+        if "| compile_ectd_package.py" in line:
+            print(f"{CLR_BLUE}[INFO] QC Activity Log already has a compile_ectd_package.py entry. Skipping append.{CLR_RESET}")
+            return
+            
     # Let's inspect where to append. We will locate the line containing the last table row
     # and insert our new milestone.
     target_idx = -1
@@ -132,6 +138,7 @@ def append_qc_activity_log(workspace_root):
         with open(activity_path, 'w', encoding='utf-8') as f:
             f.writelines(lines)
         print(f"{CLR_GREEN}[SUCCESS] Programmatically updated QC Activity Log at: {activity_path}{CLR_RESET}")
+
 
 def main():
     workspace_root = r"d:\safety_oncology"

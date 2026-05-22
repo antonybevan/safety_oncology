@@ -131,10 +131,11 @@ This repository has undergone a comprehensive integrity and professionalism audi
 
 ## Tools & Languages
 
-- **SAS 9.4+:** Primary programming language
-- **R 4.0+:** Independent validation, visualization
-- **Pinnacle 21 Community:** CDISC validation
-- **Define-XML Generator:** Metadata creation
+- **SAS 9.4+ (WIN/LIN):** Primary programming language for SDTM tabulation, ADaM analysis, and TFL generation.
+- **R 4.0+:** Independent double-programming validation, oncology visualization (Kaplan-Meier, Swimmer plots).
+- **Pinnacle 21 Community:** CDISC SDTM/ADaM conformance validation and regulatory-readiness checks.
+- **CDISC Define-XML v2.1:** Standards-based metadata specification with interactive browser-rendering integration (`define2-1.xsl`).
+
 
 ## Reference Documents
 
