@@ -32,7 +32,7 @@ title1 "&STUDYID: CAR-T Clinical Review";
 title2 "Listing 16.2.1: Subject Disposition";
 title3 "All Enrolled Subjects";
 
-footnote1 "Note: TRTSDT = Start of Regimen (LD); CARTDT = Infusion of PBCAR20A.";
+footnote1 "Note: TRTSDT = Start of Regimen (LD); CARTDT = Infusion of BVCAR20A.";
 footnote2 "Status based on completion of Day 28 DLT/Efficacy window.";
 
 proc report data=disposition nowd headskip split='|' style(report)={outputwidth=100%};

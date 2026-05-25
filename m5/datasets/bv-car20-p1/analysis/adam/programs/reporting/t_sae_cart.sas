@@ -1,7 +1,7 @@
 /******************************************************************************
  * Program:      t_sae_cart.sas
  * Protocol:     BV-CAR20-P1
- * Purpose:      Table 3.7: Summary of PBCAR20A-related SAEs by Max Toxicity Grade
+ * Purpose:      Table 3.7: Summary of BVCAR20A-related SAEs by Max Toxicity Grade
  * Author:       Statistical Programmer
  * Date:         2026-02-05
  * SAS Version:  9.4
@@ -10,20 +10,20 @@
  * Input:        adam.adae, adam.adsl
  * Output:       Table 3.7 — SAE Summary (CAR-T Related)
  *
- * Note:         Related = events attributed to PBCAR20A (CAR-T) product
+ * Note:         Related = events attributed to BVCAR20A (CAR-T) product
  ******************************************************************************/
 
 %load_config;
 
 /* ============================================================================
-   SAE SUMMARY - PBCAR20A RELATED (SAP Table 12: 3.7)
+   SAE SUMMARY - BVCAR20A RELATED (SAP Table 12: 3.7)
    QC Level: 1
    
-   Subset: SAEs that are related to PBCAR20A (CAR-T infusion)
+   Subset: SAEs that are related to BVCAR20A (CAR-T infusion)
    Excludes: SAEs related only to Lymphodepletion
    ============================================================================ */
 
-/* 1. Get PBCAR20A-related SAEs */
+/* 1. Get BVCAR20A-related SAEs */
 proc sql;
     create table sae_cart as
     select a.USUBJID, a.AEDECOD, a.AETERM, a.AETOXGR, a.AETOXGRN,
@@ -99,9 +99,9 @@ proc print data=sae_report_wide noobs label;
           GR4     = "Grade 4"
           GR5     = "Grade 5"
           Result  = "Total n (%)";
-    title1 "Table 3.7: Summary of PBCAR20A-Related Serious Adverse Events";
+    title1 "Table 3.7: Summary of BVCAR20A-Related Serious Adverse Events";
     title2 "By Maximum Toxicity Grade — Safety Population (CAR-T Recipients)";
-    footnote1 "Includes SAEs occurring on/after CAR-T infusion attributed to PBCAR20A.";
+    footnote1 "Includes SAEs occurring on/after CAR-T infusion attributed to BVCAR20A.";
     footnote2 "Percentages based on number of subjects receiving CAR-T at each dose level.";
     footnote3 "Subjects may be counted in multiple PTs but only once per PT at max grade.";
 run;
@@ -109,7 +109,7 @@ run;
 
 /* 7. Overall Summary */
 proc sql;
-    select 'PBCAR20A-related SAEs' as Category,
+    select 'BVCAR20A-related SAEs' as Category,
            count(distinct USUBJID) as N_Subjects,
            count(*) as N_Events
     from sae_cart;

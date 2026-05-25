@@ -1,7 +1,7 @@
 # Statistical Analysis Plan (SAP) Alignment Report: BV-CAR20-P1
 
 **Study Protocol**: BV-CAR20-P1  
-**Investigational Product**: PBCAR20A (Allogeneic Anti-CD20 CAR-T)  
+**Investigational Product**: BVCAR20A (Allogeneic Anti-CD20 CAR-T)  
 **Target Submission Standard**: FDA CBER / CDISC (SDTM v1.7, ADaM v2.1, TFLs per SAP §11)  
 **Alignment Status**: **100% COMPLIANT / AUDIT READY**  
 **Document Date**: 2026-05-22  
@@ -25,7 +25,7 @@ The subject-level analysis dataset ([adsl.sas](file:///d:/safety_oncology/m5/dat
 | **ITTFL** | §4.1 | All enrolled subjects who signed the informed consent form (ICF). | `if upcase(strip(ITTFL)) ne 'N' then ITTFL = 'Y';` *(Screen failures are pre-flagged as 'N' in SDTM.DM)* |
 | **SAFFL** | §4.2 | All subjects who received any study drug (including lymphodepletion chemotherapy). | `if not missing(TRTSDT) then SAFFL = 'Y'; else SAFFL = 'N';` *(TRTSDT represents lymphodepletion start date)* |
 | **EFFFL** | §4.3 | All Safety subjects who completed at least one post-baseline efficacy response assessment. | `if SAFFL = 'Y' and e.find() = 0 then EFFFL = 'Y'; else EFFFL = 'N';` *(e.find() verifies records exist in SDTM.RS)* |
-| **DLTEVLFL** | §4.4 | Subjects who received PBCAR20A (CAR-T) and completed the 28-day evaluation window OR experienced a Dose-Limiting Toxicity (DLT) within 28 days. | `if DSCLFL = 'Y' and (TRTDUR >= 28 or DLTEV_FL = 'Y') then DLTEVLFL = 'Y'; else DLTEVLFL = 'N';` *(TRTDUR is days to data cutoff; DLTEV_FL is early DLT flag)* |
+| **DLTEVLFL** | §4.4 | Subjects who received BVCAR20A (CAR-T) and completed the 28-day evaluation window OR experienced a Dose-Limiting Toxicity (DLT) within 28 days. | `if DSCLFL = 'Y' and (TRTDUR >= 28 or DLTEV_FL = 'Y') then DLTEVLFL = 'Y'; else DLTEVLFL = 'N';` *(TRTDUR is days to data cutoff; DLTEV_FL is early DLT flag)* |
 
 ### Key Design Implementation: 80% Dose Rule & Protocol Override
 * **80% Compliance Rule**: `DLTEVLFL` logic integrates the dose verification. A subject must receive the full intended CAR-T cell infusion (`DSCLFL='Y'`) to be evaluable.

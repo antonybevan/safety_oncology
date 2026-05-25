@@ -188,7 +188,7 @@ data raw_ae;
       AESOC = "Immune system disorders";
       AEREL = "RELATED";
       AEOUT = "RECOVERED/RESOLVED";
-      AECONTRT = "PBCAR20A";
+      AECONTRT = "TOCILIZUMAB";
       output;
    end;
  
@@ -219,7 +219,7 @@ data raw_ae;
       AESOC = "Nervous system disorders";
       AEREL = "RELATED";
       AEOUT = "RECOVERED/RESOLVED";
-      AECONTRT = "PBCAR20A";
+      AECONTRT = "TOCILIZUMAB";
       output;
    end;
    

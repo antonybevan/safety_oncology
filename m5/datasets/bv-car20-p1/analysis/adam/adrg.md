@@ -1,6 +1,6 @@
 # Analysis Data Reviewer Guide (ADRG)
 **Study**: BV-CAR20-P1  
-**Product**: PBCAR20A (Allogeneic CD20 CAR-T)  
+**Product**: BVCAR20A (Allogeneic CD20 CAR-T)  
 **Date**: 2026-02-08
 
 ## 1. Introduction

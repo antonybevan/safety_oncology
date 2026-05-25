@@ -17,11 +17,11 @@ data ts;
     /* Mandatory TS Parameters */
     TSPARMCD='SSTDT';   TSPARM='Study Start Date';           TSVAL='2025-01-15';                          TSVALCD=''; output;
     TSPARMCD='SENDTC';  TSPARM='Study Stop Date';            TSVAL='&DATA_CUTOFF';                        TSVALCD=''; output;
-    TSPARMCD='TITLE';   TSPARM='Trial Title';                TSVAL='Clinical Safety Study of PBCAR20A';   TSVALCD=''; output;
+    TSPARMCD='TITLE';   TSPARM='Trial Title';                TSVAL='Clinical Safety Study of BVCAR20A';   TSVALCD=''; output;
     TSPARMCD='PHASE';   TSPARM='Trial Phase';                TSVAL='PHASE I';                  TSVALCD='C54689'; output;
-    TSPARMCD='TRT';     TSPARM='Investigational Therapy';    TSVAL='PBCAR20A (BV-CAR20)';                 TSVALCD=''; output;
+    TSPARMCD='TRT';     TSPARM='Investigational Therapy';    TSVAL='BVCAR20A (BV-CAR20)';                 TSVALCD=''; output;
     TSPARMCD='INDIC';   TSPARM='Trial Indication';           TSVAL='Non-Hodgkin Lymphoma and CLL/SLL';    TSVALCD=''; output;
-    TSPARMCD='OBJPRIM'; TSPARM='Trial Primary Objective';    TSVAL='Assess safety and determine MTD/RP2D of PBCAR20A'; TSVALCD=''; output;
+    TSPARMCD='OBJPRIM'; TSPARM='Trial Primary Objective';    TSVAL='Assess safety and determine MTD/RP2D of BVCAR20A'; TSVALCD=''; output;
     TSPARMCD='SPONSOR'; TSPARM='Clinical Study Sponsor';     TSVAL='BioVeRis Therapeutics';               TSVALCD=''; output;
     TSPARMCD='NARMS';   TSPARM='Planned Number of Arms';     TSVAL='3';                                   TSVALCD=''; output;
     TSPARMCD='STYPE';   TSPARM='Study Type';                 TSVAL='INTERVENTIONAL';          TSVALCD='C98388'; output;
@@ -33,7 +33,7 @@ data te;
     STUDYID = "&STUDYID";
     
     ETCD="LD";     ELEMENT="Lymphodepletion"; TESTRL="Start of Fludarabine/Cyclophosphamide"; output;
-    ETCD="CART";   ELEMENT="CAR-T Infusion";  TESTRL="Start of PBCAR20A Infusion"; output;
+    ETCD="CART";   ELEMENT="CAR-T Infusion";  TESTRL="Start of BVCAR20A Infusion"; output;
     ETCD="FU";     ELEMENT="Follow-Up";       TESTRL="End of CAR-T Infusion"; output;
 run;
 

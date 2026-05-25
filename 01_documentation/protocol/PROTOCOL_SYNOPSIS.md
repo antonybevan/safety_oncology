@@ -1,12 +1,12 @@
 # Protocol Synopsis: BV-CAR20-P1
 
-**Protocol Title**: A Phase 1 Open-label, Dose-escalation Study to Evaluate the Safety and Clinical Activity of PBCAR20A in Subjects with r/r NHL or r/r CLL/SLL.
+**Protocol Title**: A Phase 1 Open-label, Dose-escalation Study to Evaluate the Safety and Clinical Activity of BVCAR20A in Subjects with r/r NHL or r/r CLL/SLL.
 
 ## 1. Study Design
 - **Phase**: 1 (Dose Escalation).
 - **Strategy**: Standard **3+3 Dose Escalation**.
 - **Indication**: Relapsed/Refractory (r/r) Non-Hodgkin Lymphoma (NHL) or Chronic Lymphocytic Leukemia (CLL) / Small Lymphocytic Lymphoma (SLL).
-- **Therapy**: PBCAR20A (Anti-CD20 CAR-T), preceded by Lymphodepletion (Fludarabine/Cyclophosphamide).
+- **Therapy**: BVCAR20A (Anti-CD20 CAR-T), preceded by Lymphodepletion (Fludarabine/Cyclophosphamide).
 
 ## 2. Dose Levels
 | Cohort | Dose Level (Cells) | Calculation |
@@ -18,7 +18,7 @@
 ## 3. Analysis Populations
 - **Safety**: All subjects receiving any study treatment (incl. Lymphodepletion).
 - **ITT**: All enrolled subjects.
-- **DLT Evaluable**: Subjects receiving PBCAR20A who complete 28-day window or experience DLT.
+- **DLT Evaluable**: Subjects receiving BVCAR20A who complete 28-day window or experience DLT.
 
 ## 4. Key Endpoints
 - **Primary**: Safety & MTD (Frequency of DLTs).
