@@ -118,7 +118,7 @@ proc report data=sae_ld_report nowd split='*';
     define GR3 / "Gr 3" center;
     define GR4 / "Gr 4" center;
     define GR5 / "Gr 5" center;
-    define Result / "n (%)" center;
+    define Result / max "n (%)" center;
     
     title1 "Table 3.8: Summary of Lymphodepletion-Related Serious Adverse Events";
     title2 "By Maximum Toxicity Grade — Safety Population";
