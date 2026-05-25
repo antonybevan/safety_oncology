@@ -82,29 +82,38 @@ proc sql;
     group by a.ARMCD, a.AEDECOD, d.N;
 quit;
 
-/* 5. Format for report */
-data sae_ld_report;
-    length Result $50;
-    set sae_ld_counts;
-    Result = catx(' ', put(TOTAL, 3.), cats('(', put(PCT, 5.1), '%)'));
-run;
-
-/* Handle empty dataset for regulatory submission readiness and to avoid warnings */
-data sae_ld_report;
-    length AEDECOD $200 ARMCD $8 Result $50;
-    if sae_num = 0 then do;
-        AEDECOD = "No serious adverse events related to lymphodepletion chemotherapy occurred.";
-        ARMCD = "DL1";
-        GR1 = .; GR2 = .; GR3 = .; GR4 = .; GR5 = .; TOTAL = 0; PCT = 0.0;
-        Result = "0 (0.0%)";
-        output;
+/* 5. Format for report and handle empty dataset under a Zero-Warning Standard */
+%macro create_sae_ld_report;
+    %global sae_num;
+    %let sae_num = 0;
+    
+    /* Determine the number of observations without reading to avoid compilation or empty-read warnings */
+    data _null_;
+        if 0 then set sae_ld_counts;
+        call symputx('sae_num', sae_num);
         stop;
-    end;
-    do until(eof);
-        set sae_ld_report end=eof nobs=sae_num;
-        output;
-    end;
-run;
+        set sae_ld_counts nobs=sae_num;
+    run;
+    
+    %if &sae_num = 0 %then %do;
+        data sae_ld_report;
+            length AEDECOD $200 ARMCD $20 Result $50;
+            AEDECOD = "No serious adverse events related to lymphodepletion chemotherapy occurred.";
+            ARMCD = "DL1";
+            GR1 = .; GR2 = .; GR3 = .; GR4 = .; GR5 = .; TOTAL = 0; PCT = 0.0;
+            Result = "0 (0.0%)";
+            output;
+        run;
+    %end;
+    %else %do;
+        data sae_ld_report;
+            length AEDECOD $200 ARMCD $20 Result $50;
+            set sae_ld_counts;
+            Result = catx(' ', put(TOTAL, 3.), cats('(', put(PCT, 5.1), '%)'));
+        run;
+    %end;
+%mend create_sae_ld_report;
+%create_sae_ld_report;
 
 /* 6. Generate Table */
 %ods_setup(type=RTF, outpath=&OUT_TABLES/t_sae_ld.rtf);

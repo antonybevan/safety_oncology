@@ -28,35 +28,55 @@ proc sql;
     order by a.USUBJID;
 quit;
 
-/* Combine sources */
-data all_deaths;
-    length DTHCAUS $200;
-    set deaths_listing deaths_from_ae;
-run;
+/* Combine sources using SQL union to avoid length mismatch warnings during dataset concatenation */
+proc sql;
+    create table all_deaths as
+    select USUBJID, ARMCD, AGE, SEX, COHORT, DTHDT, DTHDTC, DTHCAUS
+    from deaths_listing
+    union
+    select USUBJID, ARMCD, AGE, SEX, COHORT, DTHDT, '' as DTHDTC, DTHCAUS
+    from deaths_from_ae;
+quit;
 
 proc sort data=all_deaths nodupkey;
     by USUBJID;
 run;
 
 /* Handle empty dataset for regulatory submission readiness and to avoid warnings */
-data all_deaths;
-    length USUBJID $40 ARMCD $8 SEX $1 COHORT $200 DTHCAUS $200;
-    if deaths_num = 0 then do;
-        USUBJID = "No deaths occurred";
-        ARMCD = "DL1";
-        AGE = .;
-        SEX = "";
-        COHORT = "";
-        DTHDT = .;
-        DTHCAUS = "N/A";
-        output;
+%macro create_all_deaths;
+    %global deaths_num;
+    %let deaths_num = 0;
+    
+    /* Determine the number of observations without reading to avoid compilation or empty-read warnings */
+    data _null_;
+        if 0 then set all_deaths;
+        call symputx('deaths_num', deaths_num);
         stop;
-    end;
-    do until(eof);
-        set all_deaths end=eof nobs=deaths_num;
-        output;
-    end;
-run;
+        set all_deaths nobs=deaths_num;
+    run;
+    
+    %if &deaths_num = 0 %then %do;
+        data all_deaths;
+            length USUBJID $40 ARMCD $20 SEX $1 COHORT $10 DTHDTC $19 DTHCAUS $200;
+            USUBJID = "No deaths occurred";
+            ARMCD = "DL1";
+            AGE = .;
+            SEX = "";
+            COHORT = "";
+            DTHDT = .;
+            DTHDTC = "";
+            DTHCAUS = "N/A";
+            output;
+        run;
+    %end;
+    %else %do;
+        data all_deaths;
+            length USUBJID $40 ARMCD $20 SEX $1 COHORT $10 DTHDTC $19 DTHCAUS $200;
+            set all_deaths;
+        run;
+    %end;
+%mend create_all_deaths;
+%create_all_deaths;
 
 /* 2. Production Listing */
 %ods_setup(type=RTF, outpath=&OUT_LISTINGS/l_deaths.rtf);
