@@ -113,13 +113,17 @@ To guarantee the absolute zero-warning standard across both localized Windows SA
 * **SQL Union Concatenation**: In `l_deaths.sas`, `deaths_listing` and `deaths_from_ae` are now concatenated using a clean `proc sql` union. This enables automatic alignment of variables with different input lengths (such as `DTHCAUS` and `COHORT`), completely silencing standard SAS `Multiple lengths were specified` warnings during dataset concatenation.
 * **ARMCD Length Hardening**: In both `t_sae_ld.sas` and `l_deaths.sas`, the variable `ARMCD` length declaration has been standardized to `$20` in the empty-check DATA step length statements. This aligns perfectly with `sdtm.dm` and `adam.adsl` specifications and guarantees zero compiler length warnings.
 
-### 10.3 Post-Hardening gateway submission compilation
+### 10.3 Legal Naming Hardening & Clinical Simulator Patch
+* **Product Name Fictionalization**: Replaced all occurrences of the real-world proprietary investigational drug name `PBCAR20A` with the fully fictionalized and legally safe product name **`BVCAR20A`** (`BioVeRis CAR-T CD20 A`) across all analytical programs, define.xml files, protocols, and reports to prevent copyright and trademark concerns.
+* **Concomitant Therapy Correction**: Patched the raw clinical data simulator (`generate_data.sas`) to change the concomitant medication (`AECONTRT`) for CRS and ICANS events from the study drug itself to **`TOCILIZUMAB`** (the clinical standard generic monoclonal antibody).
+
+### 10.4 Post-Hardening gateway submission compilation
 * **eCTD Structural Verification**: **PASS** (53 assets verified, 0 prohibited files inside `m5/`).
 * **Gateway Transfer Package**: `d:\safety_oncology\m5.zip`
-* **File Size**: 90642 Bytes (0.086 MB)
+* **File Size**: 90638 Bytes (0.086 MB)
 * **Cryptographic Checksums**:
-  * **MD5**: `7f69a59b567a1d1bb579636e5755361a`
-  * **SHA-256**: `fc55afaaea68f1d5d9b34c7c95142a484ece5c5d1de0939573503d9ffbc40b22`
+  * **MD5**: `441aefd296c828b2dce00d8c97e60ae4`
+  * **SHA-256**: `2fa7ec68ab6832f715f8c9def7ad54b403ed989887ea78c123419e7243ffa691`
 * **Final Verdict**: **CERTIFIED CLEAN & GATEWAY APPROVED**
 
 ---
