@@ -1,6 +1,6 @@
 # Programming SOP Compliance Reference
 **Study**: BV-CAR20-P1  
-**Company**: Bioveris Therapeutics (Anonymized)  
+**Company**: BioVeRis Therapeutics (Anonymized)  
 **Document Version**: 1.0  
 **Date**: 2026-02-08
 
