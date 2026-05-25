@@ -110,7 +110,7 @@ run;
 %ods_setup(type=RTF, outpath=&OUT_TABLES/t_sae_ld.rtf);
 
 proc report data=sae_ld_report nowd split='*';
-    column AEDECOD ARMCD, (GR1 GR2 GR3 GR4 GR5 Result);
+    column AEDECOD ARMCD, (GR1 GR2 GR3 GR4 GR5 TOTAL PCT);
     define AEDECOD / group "Preferred Term" left;
     define ARMCD / across "Dose Level";
     define GR1 / "Gr 1" center;
@@ -118,7 +118,8 @@ proc report data=sae_ld_report nowd split='*';
     define GR3 / "Gr 3" center;
     define GR4 / "Gr 4" center;
     define GR5 / "Gr 5" center;
-    define Result / max "n (%)" center;
+    define TOTAL / sum "n" center format=3.0;
+    define PCT / sum "(%)" center format=5.1;
     
     title1 "Table 3.8: Summary of Lymphodepletion-Related Serious Adverse Events";
     title2 "By Maximum Toxicity Grade — Safety Population";
