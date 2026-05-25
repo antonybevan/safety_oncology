@@ -72,8 +72,8 @@ All open items and residual risks have been programmatically resolved, audited, 
 The final, certified regulatory submission package has been compiled, checked for integrity, and signed with cryptographic checksum hashes to guarantee data completeness and trace integrity:
 * **Compiled Submission Package**: `d:\safety_oncology\m5.zip`
 * **File Inventory**: 53 pristine, submission-ready datasets, REVIEW guides, and programs.
-* **MD5 Checksum Hash**: `b2ff78130a77ca18a5ad8111c58c1e19`
-* **SHA-256 Checksum Hash**: `13ba2adf8b83b496d683ebf390a29ca233efac45431c9a3cf102479421ec1384`
+* **MD5 Checksum Hash**: `3e942252d35b54f586fbd3621eed7cf1`
+* **SHA-256 Checksum Hash**: `fb744c523b4bccb37d5612d3db9fb494ac0335b37e1db4d7dfb2962db63ba4aa`
 
 ### 8.2 Gateway Transfer Approval
 * **Sponsor Gateway Gate**: **CLOSED (100% COMPLETE)**

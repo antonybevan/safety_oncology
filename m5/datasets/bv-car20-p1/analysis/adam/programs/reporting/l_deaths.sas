@@ -40,6 +40,7 @@ run;
 
 /* Handle empty dataset for regulatory submission readiness and to avoid warnings */
 data all_deaths;
+    length USUBJID $40 ARMCD $8 SEX $1 COHORT $200 DTHCAUS $200;
     if deaths_num = 0 then do;
         USUBJID = "No deaths occurred";
         ARMCD = "DL1";

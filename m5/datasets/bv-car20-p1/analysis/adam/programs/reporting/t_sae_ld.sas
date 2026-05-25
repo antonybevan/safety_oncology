@@ -70,11 +70,11 @@ quit;
 proc sql;
     create table sae_ld_counts as
     select a.ARMCD, a.AEDECOD,
-           coalesce(count(distinct case when MAX_GRADE = 1 then a.USUBJID else null end), 0) as GR1,
-           coalesce(count(distinct case when MAX_GRADE = 2 then a.USUBJID else null end), 0) as GR2,
-           coalesce(count(distinct case when MAX_GRADE = 3 then a.USUBJID else null end), 0) as GR3,
-           coalesce(count(distinct case when MAX_GRADE = 4 then a.USUBJID else null end), 0) as GR4,
-           coalesce(count(distinct case when MAX_GRADE = 5 then a.USUBJID else null end), 0) as GR5,
+           coalesce(count(distinct case when MAX_GRADE = 1 then a.USUBJID else '' end), 0) as GR1,
+           coalesce(count(distinct case when MAX_GRADE = 2 then a.USUBJID else '' end), 0) as GR2,
+           coalesce(count(distinct case when MAX_GRADE = 3 then a.USUBJID else '' end), 0) as GR3,
+           coalesce(count(distinct case when MAX_GRADE = 4 then a.USUBJID else '' end), 0) as GR4,
+           coalesce(count(distinct case when MAX_GRADE = 5 then a.USUBJID else '' end), 0) as GR5,
            coalesce(count(distinct a.USUBJID), 0) as TOTAL,
            calculated TOTAL / d.N * 100 as PCT format=5.1
     from sae_ld_max a
@@ -84,13 +84,14 @@ quit;
 
 /* 5. Format for report */
 data sae_ld_report;
-    set sae_ld_counts;
     length Result $50;
+    set sae_ld_counts;
     Result = catx(' ', put(TOTAL, 3.), cats('(', put(PCT, 5.1), '%)'));
 run;
 
 /* Handle empty dataset for regulatory submission readiness and to avoid warnings */
 data sae_ld_report;
+    length Result $50;
     if sae_num = 0 then do;
         AEDECOD = "No serious adverse events related to lymphodepletion chemotherapy occurred.";
         ARMCD = "DL1";
