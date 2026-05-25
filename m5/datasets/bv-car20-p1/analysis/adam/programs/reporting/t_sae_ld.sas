@@ -91,7 +91,7 @@ run;
 
 /* Handle empty dataset for regulatory submission readiness and to avoid warnings */
 data sae_ld_report;
-    length Result $50;
+    length AEDECOD $200 ARMCD $8 Result $50;
     if sae_num = 0 then do;
         AEDECOD = "No serious adverse events related to lymphodepletion chemotherapy occurred.";
         ARMCD = "DL1";
