@@ -5,7 +5,7 @@
 - **Study Identification**: BV-CAR20-P1  
 - **Dose Cohorts**: DL1 (1x10^6 cells/kg), DL3 (3x10^6 cells/kg)  
 - **Submission Phase**: Phase 1 Dose Escalation (3+3)  
-- **Date and Time of Compilation**: 2026-05-25 18:51:35 UTC  
+- **Date and Time of Compilation**: 2026-05-26 10:16:40 UTC  
 - **Statistical Programmer**: Antony Bevan  
 - **QC Level Verification**: Level 3 Double-Programmed Conformance  
 
