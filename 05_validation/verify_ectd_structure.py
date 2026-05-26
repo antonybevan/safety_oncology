@@ -160,7 +160,7 @@ def write_markdown_report(metrics, out_path):
             md.write("The `m5/` directory structure has been recursively audited. It is confirmed to be 100% compliant with standard FDA eCTD Module 5 folder guidelines, and is entirely free of developmental, backup, intermediate, or unneeded assets. The submission folder is completely pristine and submission-ready.\n")
 
 def main():
-    workspace_root = r"d:\safety_oncology"
+    workspace_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     metrics = verify_structure(workspace_root)
     
     total_prohibited = len(metrics["prohibited_files"])

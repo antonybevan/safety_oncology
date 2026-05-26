@@ -233,17 +233,28 @@ def main():
 
     print_banner()
 
+    # Resolve workspace root dynamically
+    workspace_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
     # Resolve default path if not specified
     log_path = args.log_path
     if not log_path:
         # Fallback to standard locations or standard downloads path
-        dld_path = r"C:\Users\91936\Downloads\00_main-results (1).html"
+        dld_path = os.path.join(os.path.expanduser("~"), "Downloads", "00_main-results (1).html")
         if os.path.exists(dld_path):
             log_path = dld_path
             print(f"Using default target file detected in downloads: {CLR_CYAN}{log_path}{CLR_RESET}")
         else:
-            print(f"{CLR_ERROR}Error: No log file provided, and default download file was not found.{CLR_RESET}")
-            sys.exit(1)
+            # Fallback to checking local workspace folder if there's any active log
+            local_log = os.path.join(workspace_root, "05_validation", "qc-logs", "00_main-results (1).html")
+            if not os.path.exists(local_log):
+                local_log = os.path.join(workspace_root, "05_validation", "qc-logs", "00_main-log (1).html")
+            if os.path.exists(local_log):
+                log_path = local_log
+                print(f"Using conformed log file found in qc-logs: {CLR_CYAN}{log_path}{CLR_RESET}")
+            else:
+                print(f"{CLR_ERROR}Error: No log file provided, and default download or local log files were not found.{CLR_RESET}")
+                sys.exit(1)
 
     results = parse_sas_log(log_path)
     if not results:
@@ -253,7 +264,7 @@ def main():
     # Resolve default markdown report location if not specified
     out_md = args.out_md
     if not out_md:
-        out_md = r"d:\safety_oncology\05_validation\qc-logs\QC_AUTOMATED_AUDIT_REPORT.md"
+        out_md = os.path.join(workspace_root, "05_validation", "qc-logs", "QC_AUTOMATED_AUDIT_REPORT.md")
 
     print_report(results, output_md_path=out_md)
 

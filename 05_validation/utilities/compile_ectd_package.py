@@ -93,7 +93,7 @@ def write_compilation_log(workspace_root, zip_path, file_count, md5_sum, sha256_
         f.write("| Archive Property | Value |\n")
         f.write("|:---|:---|\n")
         f.write(f"| **Archive Filename** | `m5.zip` |\n")
-        f.write(f"| **Archive File Path** | `d:\\safety_oncology\\m5.zip` |\n")
+        f.write(f"| **Archive File Path** | `{zip_path}` |\n")
         f.write(f"| **Zipped Directory Root** | `m5/` |\n")
         f.write(f"| **Total Conformed Files** | {file_count} |\n")
         f.write(f"| **File Size** | {size_bytes} Bytes ({size_mb:.3f} MB) |\n")
@@ -141,7 +141,7 @@ def append_qc_activity_log(workspace_root):
 
 
 def main():
-    workspace_root = r"d:\safety_oncology"
+    workspace_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     m5_dir = os.path.join(workspace_root, "m5")
     zip_path = os.path.join(workspace_root, "m5.zip")
     
