@@ -1,8 +1,8 @@
 # Automated Quality Control (QC) & Log Verification Report
 
 **Study**: BV-CAR20-P1  
-**Target Log File**: `00_main-log (2).html`  
-**Date Verified**: 2026-05-25 18:38:33  
+**Target Log File**: `00_main-log (1).html`  
+**Date Verified**: 2026-05-25 19:10:06  
 **Overall Compliance Status**: **PASS**  
 
 ## QC Metrics Checklist
