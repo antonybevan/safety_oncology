@@ -1,0 +1,25 @@
+                                   ASTCT-graded CRS / ICANS events (calc_astct macro)
+
+  USUBJID  AESICAT    AESTOXGR  ASTCT 2019 Analysis Grade
+BV-01-001  CRS      Grade 1                             1
+BV-01-002  CRS      Grade 3                             3
+BV-01-003  ICANS    GRADE 2                             2
+BV-01-004  ICANS    grade 4                             4
+BV-01-005  CRS      5                                   5
+BV-01-006  ICANS    3                                   3
+BV-01-007  CRS      Not Applic                          .
+BV-01-008  ICANS    Grade 1                             1
+
+                                     Distribution of derived ASTCT analysis grades
+
+                                                   The FREQ Procedure
+
+Table of AESICAT by ASTCT 2019 Analysis Grade
+
+AESICAT |         1 |         2 |         3 |         4 |         5 |      Total
+--------+-----------+-----------+-----------+-----------+-----------+-----------
+CRS     |         1 |         0 |         1 |         0 |         1 |          3
+--------+-----------+-----------+-----------+-----------+-----------+-----------
+ICANS   |         1 |         1 |         1 |         1 |         0 |          4
+--------+-----------+-----------+-----------+-----------+-----------+-----------
+Total   |         2 |         1 |         2 |         1 |         1 |          7

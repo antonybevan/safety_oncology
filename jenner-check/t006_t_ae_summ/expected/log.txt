@@ -1,0 +1,109 @@
+NOTE: Jenner v1.5.30 (build v1.5.30+unknown.20260714T043649Z.x86_64-unknown-linux-gnu)
+
+NOTE: Option OBS changed to 100.
+NOTE: Library ADAM uses 1 concatenated paths.
+NOTE: DATA adam.adsl
+
+NOTE: Processing inline DATALINES (7 lines)
+
+NOTE: Read 7 rows from DATALINES.
+NOTE: Wrote adam.adsl (7 rows, 4 columns).
+NOTE: DATA elapsed:
+  wall  0.00 seconds
+  cpu   0.00 seconds
+NOTE: DATA adam.adae
+
+NOTE: Processing inline DATALINES (9 lines)
+
+NOTE: Read 9 rows from DATALINES.
+NOTE: Wrote adam.adae (9 rows, 6 columns).
+NOTE: DATA elapsed:
+  wall  0.00 seconds
+  cpu   0.00 seconds
+NOTE: PROC SQL 
+
+NOTE: Macro variable N_TOTAL = 7
+NOTE: Macro variable N_DL1 = 3
+NOTE: Macro variable N_DL2 = 0
+NOTE: Macro variable N_DL3 = 4
+NOTE: PROC SQL statement used.
+NOTE: DATA ae_data
+
+
+NOTE: Read 9 rows from adam.adae.
+NOTE: Wrote ae_data (9 rows, 6 columns).
+NOTE: DATA elapsed:
+  wall  0.00 seconds
+  cpu   0.00 seconds
+NOTE: PROC FORMAT library=WORK
+
+NOTE: FORMAT row_fmt defined (5 ranges).
+NOTE: PROC SQL 
+
+NOTE: Table subj_flags created.
+NOTE: PROC SQL statement used.
+NOTE: PROC TRANSPOSE data=subj_flags
+
+NOTE: Created 35 rows.
+NOTE: Output written to /tmp/work/r_35c4e4432e4f43ad8840a18f7d49c595/work/eb090cf3-2434-44c1-ae5b-b4c3f6bb8476/trans_flags.avro.
+NOTE: DATA final_counts
+
+
+NOTE: Read 35 rows from trans_flags.
+NOTE: Wrote final_counts (35 rows, 6 columns).
+NOTE: DATA elapsed:
+  wall  0.00 seconds
+  cpu   0.00 seconds
+NOTE: PROC SQL 
+
+NOTE: Table table_out created.
+NOTE: PROC SQL statement used.
+NOTE: DATA shell
+
+
+NOTE: Wrote shell (15 rows, 4 columns).
+NOTE: DATA elapsed:
+  wall  0.00 seconds
+  cpu   0.00 seconds
+NOTE: PROC SORT data=table_out
+
+NOTE: Read 10 rows from table_out.
+NOTE: Wrote table_out (10 rows, 4 columns).
+NOTE: PROC SORT statement used.
+NOTE: DATA report_all
+
+NOTE: Stream 1 processed 15 rows, max BY-group size: 1 (O(1) memory verified)
+NOTE: Stream 2 processed 10 rows, max BY-group size: 1 (O(1) memory verified)
+
+NOTE: Wrote report_all (15 rows, 4 columns).
+NOTE: DATA elapsed:
+  wall  0.00 seconds
+  cpu   0.00 seconds
+NOTE: DATA report
+
+
+NOTE: Read 15 rows from report_all.
+NOTE: Wrote report (15 rows, 7 columns).
+NOTE: DATA elapsed:
+  wall  0.00 seconds
+  cpu   0.00 seconds
+NOTE: PROC TRANSPOSE data=report
+
+NOTE: Created 5 rows.
+NOTE: Output written to /tmp/work/r_35c4e4432e4f43ad8840a18f7d49c595/work/eb090cf3-2434-44c1-ae5b-b4c3f6bb8476/final_report.avro.
+NOTE: Option LS changed to 120.
+NOTE: Option PS changed to 60.
+NOTE: Option TITLE changed to BV-CAR20-P1: CAR-T Safety Study.
+NOTE: Option TITLE2 changed to Table 14.3.1: Overview of Treatment-Emergent Adverse Events.
+NOTE: Option TITLE3 changed to Safety Population.
+NOTE: Option FOOTNOTE1 changed to Note: Percentages are based on the number of subjects in the Safety Population (N)..
+NOTE: Option FOOTNOTE2 changed to TEAE: Treatment-Emergent Adverse Event. CRS: Cytokine Release Syndrome..
+NOTE: PROC REPORT data=final_report
+
+NOTE: PROC REPORT output 5 observations with 4 variables.
+
+NOTE: Read 5 rows from final_report.
+NOTE: Wrote (console) (5 rows, 4 columns).
+NOTE: PROC REPORT elapsed:
+  wall  0.00 seconds
+  cpu   0.00 seconds

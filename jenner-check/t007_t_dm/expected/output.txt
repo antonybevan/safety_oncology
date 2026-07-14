@@ -1,0 +1,22 @@
+                            Table 1.3: Summary of Demographics and Baseline Characteristics
+                                                   Safety Population
+
+
+Characteristic  Category / Statistic  DL1 (N=3)  DL3 (N=4)
+--------------  --------------------  ---------  ---------
+Age (Years)     Max                   71.0              68
+Age (Years)     Mean                  57.7            58.8
+Age (Years)     Median                58.0              59
+Age (Years)     Min                   44.0              49
+Age (Years)     N                     3                  4
+Age (Years)     SD                    13.5             9.6
+Age Group       <65                   2                  2
+Age Group       >=65                  1                  2
+Race            ASIAN                 1                  1
+Race            BLACK                 1                  1
+Race            WHITE                 1                  2
+Sex             F                     1                  2
+Sex             M                     2                  2
+
+
+Note: Dose Level 2 (3x10^6 cells/kg) was skipped per Protocol V4; escalation proceeded DL1 -> DL3.

@@ -1,0 +1,29 @@
+                                          BV-CAR20-P1: CAR-T Efficacy Summary
+                           Table 2.1: Summary of Objective Response Rate by Initial Treatment
+                                           Response Evaluable (RE) Population
+
+                                                                       Dose Level         
+                                                                DL1       DL2       DL3   
+                              Response Category                  n         n         n
+
+                              CR                                 1         0         2    
+                              NE                                 0         0         1    
+                              PD                                 0         0         1    
+                              PR                                 1         0         1    
+                              SD                                 1         0         0
+
+Note: BOR is assessed via Lugano 2016 for NHL and iwCLL 2018 for CLL/SLL cohorts.
+ORR (Objective Response Rate) = CR + PR.
+95% CI calculated using Clopper-Pearson Exact binomial method (SAP §7.1.1).
+                                          BV-CAR20-P1: CAR-T Efficacy Summary
+                                        Summary of Objective Response Rate (ORR)
+
+                          Dose Level            N  ORR (n)  ORR (%)         95% CI (%)
+
+                          DL1                   3     2      66.7            9.4,  99.2       
+                          DL2                   0     0       0.0               N/A           
+                          DL3                   5     3      60.0           14.7,  94.7
+
+Note: BOR is assessed via Lugano 2016 for NHL and iwCLL 2018 for CLL/SLL cohorts.
+ORR (Objective Response Rate) = CR + PR.
+95% CI calculated using Clopper-Pearson Exact binomial method (SAP §7.1.1).

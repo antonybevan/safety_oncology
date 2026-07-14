@@ -1,0 +1,7 @@
+{
+  "bundle": "t002_macro_calc_astct",
+  "source_file": "m5/datasets/bv-car20-p1/analysis/adam/programs/macros/calc_astct.sas",
+  "source_blob_sha": "487026d1af69ac2127f7a3dc44887413fb9b7e20",
+  "source_commit": "d41a1086e54bd5d9daf781c006b1803895d5454b",
+  "notes": "Caller for the repo %calc_astct autocall macro (ASTCT 2019 CAR-T grading). Mock CRS/ICANS AESI rows exercise the case-insensitive GRADE-string -> numeric mapping; no upstream edits to the macro."
+}
