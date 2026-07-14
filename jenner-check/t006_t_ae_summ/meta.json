@@ -1,0 +1,7 @@
+{
+  "bundle": "t006_t_ae_summ",
+  "source_file": "m5/datasets/bv-car20-p1/analysis/adam/programs/reporting/t_ae_summ.sas",
+  "source_blob_sha": "7f87d5d7c96bf35c1566d60b1d197fca7fadd5b4",
+  "source_commit": "d41a1086e54bd5d9daf781c006b1803895d5454b",
+  "notes": "Repo t_ae_summ.sas (Table 14.3.1 TEAE overview). Table body unchanged; subject-level flags via PROC SQL left join + max(case), PROC TRANSPOSE, PROC REPORT spanned columns; ADAM adsl/adae supplied as small WORK mock; %load_config/%ods_setup no-ops."
+}

@@ -1,0 +1,7 @@
+{
+  "bundle": "t007_t_dm",
+  "source_file": "m5/datasets/bv-car20-p1/analysis/adam/programs/reporting/t_dm.sas",
+  "source_blob_sha": "08a2a7df46adc6da54d98a5a0dc55c89d4fccf89",
+  "source_commit": "d41a1086e54bd5d9daf781c006b1803895d5454b",
+  "notes": "Repo t_dm.sas (Table 1.3 demographics). Table body unchanged; PROC MEANS with CLASS, categorical counts, PROC TRANSPOSE to wide arm columns; ADAM adsl supplied as small WORK mock; %load_config/%ods_setup no-ops."
+}

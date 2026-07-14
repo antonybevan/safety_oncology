@@ -1,0 +1,75 @@
+NOTE: Jenner v1.5.30 (build v1.5.30+unknown.20260714T020019Z.x86_64-unknown-linux-gnu)
+
+NOTE: Option OBS changed to 100.
+NOTE: Library ADAM uses 1 concatenated paths.
+NOTE: DATA adam.adsl
+
+NOTE: Processing inline DATALINES (7 lines)
+
+NOTE: Read 7 rows from DATALINES.
+NOTE: Wrote adam.adsl (7 rows, 7 columns).
+NOTE: DATA elapsed:
+  wall  0.00 seconds
+  cpu   0.00 seconds
+NOTE: DATA t_dm_data
+
+
+NOTE: Read 7 rows from adam.adsl.
+NOTE: Wrote t_dm_data (7 rows, 7 columns).
+NOTE: DATA elapsed:
+  wall  0.00 seconds
+  cpu   0.00 seconds
+NOTE: PROC SQL 
+
+NOTE: Macro variable N_DL1 = 3
+NOTE: Macro variable N_DL2 = 0
+NOTE: Macro variable N_DL3 = 4
+NOTE: Macro variable N_TOT = 7
+NOTE: PROC SQL statement used.
+NOTE: PROC MEANS
+NOTE: Output dataset age_stats has 2 observations and 9 variables.
+NOTE: PROC MEANS statement used.
+NOTE: DATA age_long
+
+
+NOTE: Read 2 rows from age_stats.
+NOTE: Wrote age_long (12 rows, 4 columns).
+NOTE: DATA elapsed:
+  wall  0.00 seconds
+  cpu   0.00 seconds
+NOTE: DATA cat_input
+
+
+NOTE: Read 7 rows from t_dm_data.
+NOTE: Wrote cat_input (21 rows, 3 columns).
+NOTE: DATA elapsed:
+  wall  0.00 seconds
+  cpu   0.00 seconds
+NOTE: PROC SQL 
+
+NOTE: Table cat_counts created.
+NOTE: PROC SQL statement used.
+NOTE: DATA all_stats
+
+
+NOTE: Read 12 rows from age_long.
+NOTE: Read 26 rows from cat_counts.
+NOTE: Wrote all_stats (26 rows, 4 columns).
+NOTE: DATA elapsed:
+  wall  0.00 seconds
+  cpu   0.00 seconds
+NOTE: PROC SORT data=all_stats
+
+NOTE: Read 26 rows from all_stats.
+NOTE: Wrote all_stats (26 rows, 4 columns).
+NOTE: PROC SORT statement used.
+NOTE: PROC TRANSPOSE data=all_stats
+
+NOTE: Created 13 rows.
+NOTE: Output written to /tmp/work/r_748ad284b6c44acbb6753e894c632ae6/work/779644f4-66e3-48ab-8faf-a03a86d78d9e/dm_wide.avro.
+NOTE: Option TITLE changed to Table 1.3: Summary of Demographics and Baseline Characteristics.
+NOTE: Option TITLE2 changed to Safety Population.
+NOTE: Option FOOTNOTE1 changed to Note: Dose Level 2 (3x10^6 cells/kg) was skipped per Protocol V4; escalation proceeded DL1 -> DL3..
+NOTE: PROC PRINT data=dm_wide
+
+NOTE: PROC PRINT completed: 13 observations printed, 4 variables

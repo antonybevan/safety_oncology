@@ -1,0 +1,146 @@
+NOTE: Jenner v1.5.30 (build v1.5.30+unknown.20260714T020019Z.x86_64-unknown-linux-gnu)
+
+NOTE: Option OBS changed to 100.
+NOTE: Library ADAM uses 1 concatenated paths.
+NOTE: DATA adam.adrs
+
+NOTE: Processing inline DATALINES (10 lines)
+
+NOTE: Read 10 rows from DATALINES.
+NOTE: Wrote adam.adrs (10 rows, 5 columns).
+NOTE: DATA elapsed:
+  wall  0.00 seconds
+  cpu   0.00 seconds
+NOTE: DATA adam.adsl
+
+NOTE: Processing inline DATALINES (8 lines)
+
+NOTE: Read 8 rows from DATALINES.
+NOTE: Wrote adam.adsl (8 rows, 3 columns).
+NOTE: DATA elapsed:
+  wall  0.00 seconds
+  cpu   0.00 seconds
+NOTE: DATA t_eff_data
+
+
+NOTE: Read 2 rows from adam.adrs.
+NOTE: Wrote t_eff_data (2 rows, 5 columns).
+NOTE: DATA elapsed:
+  wall  0.00 seconds
+  cpu   0.00 seconds
+NOTE: DATA t_bor_data
+
+
+NOTE: Read 8 rows from adam.adrs.
+NOTE: Wrote t_bor_data (8 rows, 5 columns).
+NOTE: DATA elapsed:
+  wall  0.00 seconds
+  cpu   0.00 seconds
+NOTE: PROC SQL 
+
+NOTE: Macro variable N_DL1 = 3
+NOTE: Macro variable N_DL2 = 0
+NOTE: Macro variable N_DL3 = 5
+NOTE: PROC SQL statement used.
+NOTE: PROC FREQ
+NOTE: Output dataset bor_counts has 7 observations and 4 variables.
+NOTE: PROC FREQ statement used.
+NOTE: DATA bor_shell
+
+
+NOTE: Wrote bor_shell (15 rows, 3 columns).
+NOTE: DATA elapsed:
+  wall  0.00 seconds
+  cpu   0.00 seconds
+NOTE: PROC SORT data=bor_counts
+
+NOTE: Read 7 rows from bor_counts.
+NOTE: Wrote bor_counts (7 rows, 4 columns).
+NOTE: PROC SORT statement used.
+NOTE: PROC SORT data=bor_shell
+
+NOTE: Read 15 rows from bor_shell.
+NOTE: Wrote bor_shell (15 rows, 3 columns).
+NOTE: PROC SORT statement used.
+NOTE: DATA bor_final_report
+
+NOTE: Stream 1 processed 15 rows, max BY-group size: 1 (O(1) memory verified)
+NOTE: Stream 2 processed 7 rows, max BY-group size: 1 (O(1) memory verified)
+
+NOTE: Wrote bor_final_report (15 rows, 4 columns).
+NOTE: DATA elapsed:
+  wall  0.00 seconds
+  cpu   0.00 seconds
+NOTE: DATA orr_data
+
+
+NOTE: Read 8 rows from t_bor_data.
+NOTE: Wrote orr_data (8 rows, 6 columns).
+NOTE: DATA elapsed:
+  wall  0.00 seconds
+  cpu   0.00 seconds
+NOTE: PROC SQL 
+
+NOTE: Table orr_summary created.
+NOTE: PROC SQL statement used.
+NOTE: DATA arm_shell
+
+
+NOTE: Wrote arm_shell (3 rows, 3 columns).
+NOTE: DATA elapsed:
+  wall  0.00 seconds
+  cpu   0.00 seconds
+NOTE: PROC SORT data=orr_summary
+
+NOTE: Read 2 rows from orr_summary.
+NOTE: Wrote orr_summary (2 rows, 3 columns).
+NOTE: PROC SORT statement used.
+NOTE: PROC SORT data=arm_shell
+
+NOTE: Read 3 rows from arm_shell.
+NOTE: Wrote arm_shell (3 rows, 3 columns).
+NOTE: PROC SORT statement used.
+NOTE: DATA orr_summary_all
+
+NOTE: Stream 1 processed 3 rows, max BY-group size: 1 (O(1) memory verified)
+NOTE: Stream 2 processed 2 rows, max BY-group size: 1 (O(1) memory verified)
+
+NOTE: Wrote orr_summary_all (3 rows, 3 columns).
+NOTE: DATA elapsed:
+  wall  0.00 seconds
+  cpu   0.00 seconds
+NOTE: DATA orr_final
+
+
+NOTE: Read 3 rows from orr_summary_all.
+NOTE: Wrote orr_final (3 rows, 10 columns).
+NOTE: DATA elapsed:
+  wall  0.00 seconds
+  cpu   0.00 seconds
+NOTE: Option LS changed to 120.
+NOTE: Option PS changed to 60.
+NOTE: Option TITLE changed to BV-CAR20-P1: CAR-T Efficacy Summary.
+NOTE: Option TITLE2 changed to Table 2.1: Summary of Objective Response Rate by Initial Treatment.
+NOTE: Option TITLE3 changed to Response Evaluable (RE) Population.
+NOTE: Option FOOTNOTE1 changed to Note: BOR is assessed via Lugano 2016 for NHL and iwCLL 2018 for CLL/SLL cohorts..
+NOTE: Option FOOTNOTE2 changed to ORR (Objective Response Rate) = CR + PR..
+NOTE: Option FOOTNOTE3 changed to 95% CI calculated using Clopper-Pearson Exact binomial method (SAP §7.1.1)..
+NOTE: PROC REPORT data=bor_final_report
+
+NOTE: PROC REPORT output 5 observations with 3 variables.
+
+NOTE: Read 15 rows from bor_final_report.
+NOTE: Wrote (console) (5 rows, 3 columns).
+NOTE: PROC REPORT elapsed:
+  wall  0.00 seconds
+  cpu   0.00 seconds
+NOTE: Option TITLE2 changed to Summary of Objective Response Rate (ORR).
+NOTE: PROC REPORT data=orr_final
+
+NOTE: PROC REPORT output 3 observations with 5 variables.
+
+NOTE: Read 3 rows from orr_final.
+NOTE: Wrote (console) (3 rows, 5 columns).
+NOTE: PROC REPORT elapsed:
+  wall  0.00 seconds
+  cpu   0.00 seconds

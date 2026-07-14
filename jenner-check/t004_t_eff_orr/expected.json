@@ -1,0 +1,18 @@
+{
+  "_captured_at": "2026-07-14T09:31:40Z",
+  "_captured_run_id": "r_421a819533a247f58f5a30cb325e3374",
+  "status": "ok",
+  "exit_code": 0,
+  "log_contains": [
+    "NOTE: Wrote t_bor_data (8 rows, 5 columns).",
+    "NOTE: Output dataset bor_counts has 7 observations and 4 variables."
+  ],
+  "log_does_not_contain": [
+    "ERROR:",
+    "[JENNER-ERROR"
+  ],
+  "diagnostics": {
+    "parse_warnings": [],
+    "runtime_warnings": []
+  }
+}

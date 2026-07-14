@@ -1,0 +1,7 @@
+{
+  "bundle": "t004_t_eff_orr",
+  "source_file": "m5/datasets/bv-car20-p1/analysis/adam/programs/reporting/t_eff.sas",
+  "source_blob_sha": "941c52d3451383cfcfeadde6ee4ef8abb39a1606",
+  "source_commit": "d41a1086e54bd5d9daf781c006b1803895d5454b",
+  "notes": "Repo t_eff.sas (Table 2.1 ORR by dose with Clopper-Pearson exact 95% CI via betainv). Analytic body unchanged; ADAM adrs/adsl supplied as small WORK mock; %load_config/%ods_setup made no-ops routing to LISTING."
+}

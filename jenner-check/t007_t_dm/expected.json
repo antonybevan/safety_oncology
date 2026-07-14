@@ -1,0 +1,18 @@
+{
+  "_captured_at": "2026-07-14T09:31:40Z",
+  "_captured_run_id": "r_748ad284b6c44acbb6753e894c632ae6",
+  "status": "ok",
+  "exit_code": 0,
+  "log_contains": [
+    "NOTE: Wrote t_dm_data (7 rows, 7 columns).",
+    "NOTE: Output dataset age_stats has 2 observations and 9 variables."
+  ],
+  "log_does_not_contain": [
+    "ERROR:",
+    "[JENNER-ERROR"
+  ],
+  "diagnostics": {
+    "parse_warnings": [],
+    "runtime_warnings": []
+  }
+}

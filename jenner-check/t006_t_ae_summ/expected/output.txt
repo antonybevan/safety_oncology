@@ -1,0 +1,16 @@
+                                            BV-CAR20-P1: CAR-T Safety Study
+                              Table 14.3.1: Overview of Treatment-Emergent Adverse Events
+                                                   Safety Population
+
+                                                         Dose Level 1|(N=3)  Dose Level 2|(N=0)  Dose Level 3|(N=4)
+     Adverse Event Category                                   n (%)            n (%)            n (%)
+     -----------------------------------------------------------------------------------------------------
+
+     Any Treatment-Emergent Adverse Event (TEAE)           3 (100.0%)        0 (0.0%)        4 (100.0%)   
+     Any TEAE with Grade 3 or 4                             1 (33.3%)        0 (0.0%)         2 (50.0%)   
+     Any Serious TEAE                                       1 (33.3%)        0 (0.0%)         2 (50.0%)   
+     Cytokine Release Syndrome (CRS)                        2 (66.7%)        0 (0.0%)         2 (50.0%)   
+     Any ICANS                                              1 (33.3%)        0 (0.0%)         1 (25.0%)
+
+Note: Percentages are based on the number of subjects in the Safety Population (N).
+TEAE: Treatment-Emergent Adverse Event. CRS: Cytokine Release Syndrome.

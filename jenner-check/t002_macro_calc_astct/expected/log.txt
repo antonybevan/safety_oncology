@@ -1,0 +1,26 @@
+NOTE: Jenner v1.5.30 (build v1.5.30+unknown.20260714T043649Z.x86_64-unknown-linux-gnu)
+
+NOTE: Option OBS changed to 100.
+NOTE: DATA ae_aesi
+
+NOTE: Processing inline DATALINES (8 lines)
+
+NOTE: Read 8 rows from DATALINES.
+NOTE: Wrote ae_aesi (8 rows, 3 columns).
+NOTE: DATA elapsed:
+  wall  0.00 seconds
+  cpu   0.00 seconds
+NOTE: DATA ae_graded
+
+
+NOTE: Read 8 rows from ae_aesi.
+NOTE: Wrote ae_graded (8 rows, 4 columns).
+NOTE: DATA elapsed:
+  wall  0.00 seconds
+  cpu   0.00 seconds
+NOTE: PROC PRINT data=ae_graded
+
+NOTE: PROC PRINT completed: 8 observations printed, 4 variables
+NOTE: PROC FREQ
+NOTE: ODS plot written: freq_mosaic_aesicat_astctgr.spec.json
+NOTE: PROC FREQ statement used.

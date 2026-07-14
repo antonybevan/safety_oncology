@@ -1,0 +1,7 @@
+{
+  "bundle": "t003_macro_iso_to_sas",
+  "source_file": "m5/datasets/bv-car20-p1/analysis/adam/programs/macros/iso_to_sas.sas",
+  "source_blob_sha": "ac99fc9f75b58f05dbccde753a1b6bdf92fb7834",
+  "source_commit": "d41a1086e54bd5d9daf781c006b1803895d5454b",
+  "notes": "Caller for the repo %iso_to_sas autocall macro (ISO 8601 -> SAS date). Mock EX-domain rows exercise full/YYYY-MM/YYYY partial dates and datetime truncation; no upstream edits to the macro."
+}

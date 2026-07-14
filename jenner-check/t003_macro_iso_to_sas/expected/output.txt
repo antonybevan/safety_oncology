@@ -1,0 +1,9 @@
+                                   ISO 8601 -> SAS date conversion (iso_to_sas macro)
+
+  USUBJID        EXTRT           EXSTDTC  Exposure Start Date (SAS)
+BV-01-001  BV-CAR20     2026-01-15                        15JAN2026
+BV-01-002  FLUDARABINE  2026-02-03T09:30                  03FEB2026
+BV-01-003  BV-CAR20     2026-03                           01MAR2026
+BV-01-004  BV-CAR20     2026                              01JAN2026
+BV-01-005  CYCLOPHOS    2026-04-20T14:00                  20APR2026
+BV-01-006  BV-CAR20     .                                         .
